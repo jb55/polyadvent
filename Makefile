@@ -1,5 +1,5 @@
 
-BIN ?= polycraft
+BIN ?= polyadvent
 PREFIX ?= /usr/local
 LDFLAGS = -lglfw3 -lX11 -lGL -lXi -lXrandr -lXxf86vm
 
