@@ -1,15 +1,20 @@
 
 BIN ?= polyadvent
 PREFIX ?= /usr/local
-LDFLAGS = -lglfw3 -lX11 -lGL -lXi -lXrandr -lXxf86vm
+LDFLAGS = -lglfw3 -lX11 -lGL -lXi -lXrandr -lXxf86vm -lepoxy
+DEFS= -DGLFW_INCLUDE_NONE
+
+OBJS  = render.o
+OBJS += window.o
+OBJS += buffer.o
 
 all: $(BIN)
 
-%.o: %.c
-	$(CXX) -o $@ -c $<
+%.o: %.cc
+	$(CXX) $(DEFS) -c $< -o $@
 
 $(BIN): $(OBJS)
-	$(CXX) $^ main.cc $(LDFLAGS) -o $@
+	$(CXX) $(DEFS) $^ main.cc $(LDFLAGS) -o $@
 
 install: $(BIN)
 	install -d $(PREFIX)/bin

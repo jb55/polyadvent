@@ -1,0 +1,5 @@
+
+#ifndef POLYADVENT_COMMON_H
+#define POLYADVENT_COMMON_H
+
+#endif /* POLYADVENT_COMMON_H */
