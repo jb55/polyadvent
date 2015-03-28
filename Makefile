@@ -3,14 +3,15 @@ BIN ?= polyadvent
 PREFIX ?= /usr/local
 LDFLAGS = -lglfw3 -lX11 -lGL -lXi -lXrandr -lXxf86vm -lepoxy
 DEFS= -DGLFW_INCLUDE_NONE
+SRC=src
 
-OBJS  = main.o
-OBJS += window.o
-OBJS += buffer.o
-OBJS += shader.o
-OBJS += file.o
-OBJS += debug.o
-OBJS += render.o
+OBJS  = ${SRC}/main.o
+OBJS += ${SRC}/window.o
+OBJS += ${SRC}/buffer.o
+OBJS += ${SRC}/shader.o
+OBJS += ${SRC}/file.o
+OBJS += ${SRC}/debug.o
+OBJS += ${SRC}/render.o
 
 all: $(BIN)
 
