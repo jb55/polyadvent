@@ -32,6 +32,7 @@ int main(void)
     glMatrixMode(GL_MODELVIEW); //Switch to the drawing perspective
     glLoadIdentity(); //Reset the drawing perspective
 
+    //update();
     render();
 
     /* Swap front and back buffers */
