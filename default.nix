@@ -1,7 +1,6 @@
 { clangStdenv
 , SDL2
 , mesa
-, epoxy
 , xlibs
 }:
 
@@ -15,7 +14,7 @@ in stdenv.mkDerivation rec {
 
   makeFlags = "PREFIX=$(out)";
 
-  buildInputs = [ SDL2 mesa epoxy ]
+  buildInputs = [ SDL2 mesa ]
     ++ (with xlibs; [ libX11 libXi libXrandr libXxf86vm  ] );
 
   meta = with stdenv.lib; {
