@@ -1,4 +1,9 @@
-{clangStdenv, glfw, mesa, xlibs, epoxy}:
+{ clangStdenv
+, SDL2
+, mesa
+, epoxy
+, xlibs
+}:
 
 let
   stdenv = clangStdenv;
@@ -10,7 +15,7 @@ in stdenv.mkDerivation rec {
 
   makeFlags = "PREFIX=$(out)";
 
-  buildInputs = [ glfw mesa epoxy ]
+  buildInputs = [ SDL2 mesa epoxy ]
     ++ (with xlibs; [ libX11 libXi libXrandr libXxf86vm  ] );
 
   meta = with stdenv.lib; {

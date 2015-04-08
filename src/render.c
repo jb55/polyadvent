@@ -45,6 +45,8 @@ static struct {
 void
 init_gl() {
   //glEnable(GL_DEPTH_TEST);
+  SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
+  SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
 
   // VBOs
   g_resources.vertex_buffer = make_buffer(
@@ -90,6 +92,12 @@ init_gl() {
 
 void
 render () {
+  glClearColor( 0.0f, 0.0f, 0.0f, 1.0f ); //clear background screen to black
+  glClear( GL_COLOR_BUFFER_BIT );
+
+  //glMatrixMode(GL_MODELVIEW); //Switch to the drawing perspective
+  //glLoadIdentity(); //Reset the drawing perspective
+
   glUseProgram(g_resources.program);
 
   glBindBuffer(GL_ARRAY_BUFFER, g_resources.vertex_buffer);

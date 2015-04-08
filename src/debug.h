@@ -5,11 +5,7 @@
 #include "gl.h"
 
 void
-show_info_log(
-  GLuint object,
-  PFNGLGETSHADERIVPROC glGet__iv,
-  PFNGLGETSHADERINFOLOGPROC glGet__InfoLog
-);
+show_info_log();
 
 
 #endif /* POLYADVENT_DEBUG_H */
