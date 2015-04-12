@@ -3,6 +3,6 @@
 
 #include "gl.h"
 
-void *file_contents(const char *filename, GLint *length);
+void *file_contents(const char *filename, size_t *length);
 
 #endif /* POLYADVEMT_FILE_H */

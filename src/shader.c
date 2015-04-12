@@ -1,13 +1,15 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+
 #include "file.h"
 #include "gl.h"
 #include "debug.h"
+#include "shader.h"
 
 GLuint
 make_shader(GLenum type, const char *filename) {
-  GLint length;
+  size_t length;
   GLchar *source = (GLchar *)file_contents(filename, &length);
   GLuint shader;
   GLint shader_ok;
@@ -16,7 +18,7 @@ make_shader(GLenum type, const char *filename) {
     return 0;
 
   shader = glCreateShader(type);
-  glShaderSource(shader, 1, (const GLchar**)&source, &length);
+  glShaderSource(shader, 1, (const GLchar**)&source, (GLint*)&length);
   free(source);
   glCompileShader(shader);
 
@@ -24,7 +26,7 @@ make_shader(GLenum type, const char *filename) {
 
   if (!shader_ok) {
     fprintf(stderr, "Failed to compile %s:\n", filename);
-    show_info_log(shader, glGetShaderiv, glGetShaderInfoLog);
+    //show_info_log(shader, glGetShaderiv, glGetShaderInfoLog);
     glDeleteShader(shader);
     return 0;
   }
@@ -48,7 +50,7 @@ make_program(GLuint vertex_shader, GLuint fragment_shader) {
   glGetProgramiv(program, GL_LINK_STATUS, &program_ok);
   if (!program_ok) {
     fprintf(stderr, "Failed to link shader program:\n");
-    show_info_log(program, glGetProgramiv, glGetProgramInfoLog);
+    //show_info_log(program, glGetProgramiv, glGetProgramInfoLog);
     glDeleteProgram(program);
     return 0;
   }

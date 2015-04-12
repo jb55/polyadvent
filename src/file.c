@@ -1,9 +1,10 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include "file.h"
 
 void *
-file_contents(const char *filename, int *length) {
+file_contents(const char *filename, size_t *length) {
   FILE *f = fopen(filename, "r");
   void *buffer;
 
@@ -13,7 +14,7 @@ file_contents(const char *filename, int *length) {
   }
 
   fseek(f, 0, SEEK_END);
-  *length = ftell(f);
+  *length = (size_t)ftell(f);
   fseek(f, 0, SEEK_SET);
 
   buffer = malloc(*length+1);

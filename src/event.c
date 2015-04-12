@@ -4,7 +4,6 @@
 
 void process_events() {
   SDL_Event event;
-  struct SDL_Window * window;
 
   while (SDL_PollEvent(&event)) {
     switch (event.type) {
@@ -14,7 +13,6 @@ void process_events() {
     case SDL_QUIT:
       SDL_Quit();
       exit(0);
-      break;
     }
   }
 }

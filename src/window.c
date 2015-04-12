@@ -1,6 +1,7 @@
 
 
 #include "gl.h"
+#include "window.h"
 
 void
 handle_resize(int width, int height) {

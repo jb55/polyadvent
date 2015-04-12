@@ -4,8 +4,7 @@
 
 #include "gl.h"
 
-void
-show_info_log();
+void show_info_log(void);
 
 
 #endif /* POLYADVENT_DEBUG_H */

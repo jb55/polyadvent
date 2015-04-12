@@ -4,6 +4,6 @@
 
 #include "gl.h"
 
-void process_events();
+void process_events(void);
 
 #endif /* PA_EVENT_H */
