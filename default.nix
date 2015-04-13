@@ -1,7 +1,6 @@
 { clangStdenv
 , SDL2
 , mesa
-, xlibs
 }:
 
 let
@@ -14,8 +13,7 @@ in stdenv.mkDerivation rec {
 
   makeFlags = "PREFIX=$(out)";
 
-  buildInputs = [ SDL2 mesa ]
-    ++ (with xlibs; [ libX11 libXi libXrandr libXxf86vm  ] );
+  buildInputs = [ SDL2 mesa ];
 
   meta = with stdenv.lib; {
     description = "Procedural low poly fun";
