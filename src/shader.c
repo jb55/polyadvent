@@ -18,11 +18,11 @@ make_shader(GLenum type, const char *filename) {
     return 0;
 
   shader = glCreateShader(type);
-  glShaderSource(shader, 1, (const GLchar**)&source, (GLint*)&length);
+  glShaderSource(shader, 1, (const GLchar*const*)&source, (GLint*)&length);
   free(source);
   glCompileShader(shader);
 
-  glGetShaderiv(shader, GL_COMPILE_STATUS, &shader_ok);
+ glGetShaderiv(shader, GL_COMPILE_STATUS, &shader_ok);
 
   if (!shader_ok) {
     fprintf(stderr, "Failed to compile %s:\n", filename);

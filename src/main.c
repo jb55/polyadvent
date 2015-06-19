@@ -8,7 +8,7 @@
 
 int main(void)
 {
-  GameState game;
+  struct game_state game;
 
   SDL_Window *window = SDL_CreateWindow(
     "SDL2/OpenGL Demo", 0, 0, 640, 480,

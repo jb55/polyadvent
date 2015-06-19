@@ -2,11 +2,13 @@
 #ifndef PA_GAME_H
 #define PA_GAME_H
 
+#include "buffer.h"
+
 /*
  * Global data used by our render callback:
  */
-typedef struct TestResources {
-    GLuint vertex_buffer, element_buffer;
+struct test_resources {
+    struct vbo vertex_buffer, element_buffer;
     GLuint vertex_shader, fragment_shader, program;
 
     struct {
@@ -14,17 +16,17 @@ typedef struct TestResources {
     } uniforms;
 
     struct {
-      GLint position;
+      gpu_addr position;
     } attributes;
 
     GLfloat fade_factor;
-} TestResources;
+};
 
 
-typedef struct GameState {
+struct game_state {
   int counter;
-  TestResources test_resources;
-} GameState;
+  struct test_resources test_resources;
+};
 
 
 #endif /* PA_GAME_H */
