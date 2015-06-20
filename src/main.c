@@ -17,6 +17,7 @@ int main(void)
   /* SDL_GLContext _SDL_GLContext _gl =gl = */ SDL_GL_CreateContext(window);
 
   init_gl(&game.test_resources);
+  init_game(&game);
 
   /* Loop until the user closes the window */
   while (1) {

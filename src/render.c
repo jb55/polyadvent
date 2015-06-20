@@ -86,16 +86,18 @@ init_gl(struct test_resources * resources) {
   );
   assert(resources->fragment_shader != 0);
 
-
   // Shader program
   resources->program = make_program(resources->vertex_shader,
                                     resources->fragment_shader);
-  assert(resources->program != 0);
 
+  assert(resources->program != 0);
 
   // Program variables
   resources->uniforms.fade_factor
     = glGetUniformLocation(resources->program, "fade_factor");
+
+  resources->uniforms.mvp
+    = glGetUniformLocation(resources->program, "mvp");
 
   resources->attributes.position
     = (gpu_addr)glGetAttribLocation(resources->program, "position");
@@ -105,8 +107,7 @@ init_gl(struct test_resources * resources) {
 
 
 
-void
-render (struct test_resources * resources) {
+void render (struct test_resources * resources) {
   glClearColor( 0.0f, 0.0f, 0.0f, 1.0f ); //clear background screen to black
   glClear( GL_COLOR_BUFFER_BIT );
 
@@ -118,7 +119,11 @@ render (struct test_resources * resources) {
   glUniform1f(resources->uniforms.fade_factor,
               resources->fade_factor);
 
-  bind_vbo(&resources->vertex_buffer, resources->attributes.position);
+  glUniformMatrix4fv(resources->uniforms.mvp, 1, 0, resources->test_mvp);
+
+  bind_vbo(&resources->vertex_buffer,
+           resources->attributes.position);
+
   bind_ibo(&resources->element_buffer);
 
   glDrawElements(

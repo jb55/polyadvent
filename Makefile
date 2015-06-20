@@ -10,12 +10,15 @@ SHLIB=$(SRC)/lib$(NAME).so
 
 OBJS  = $(SRC)/window.o
 OBJS += $(SRC)/buffer.o
-OBJS += $(SRC)/update.o
-OBJS += $(SRC)/event.o
-OBJS += $(SRC)/shader.o
-OBJS += $(SRC)/file.o
+#OBJS += $(SRC)/camera.o
 OBJS += $(SRC)/debug.o
+OBJS += $(SRC)/event.o
+OBJS += $(SRC)/file.o
+OBJS += $(SRC)/game.o
+OBJS += $(SRC)/mat4/mat4.o
 OBJS += $(SRC)/render.o
+OBJS += $(SRC)/shader.o
+OBJS += $(SRC)/update.o
 
 all: $(BIN)
 

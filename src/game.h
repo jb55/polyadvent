@@ -13,12 +13,14 @@ struct test_resources {
 
     struct {
       GLint fade_factor;
+      GLint mvp;
     } uniforms;
 
     struct {
       gpu_addr position;
     } attributes;
 
+    float test_mvp[16];
     GLfloat fade_factor;
 };
 
@@ -28,5 +30,6 @@ struct game_state {
   struct test_resources test_resources;
 };
 
+void init_game(struct game_state *game);
 
 #endif /* PA_GAME_H */
