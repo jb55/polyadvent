@@ -8,7 +8,7 @@
  * Global data used by our render callback:
  */
 struct test_resources {
-    struct vbo vertex_buffer, element_buffer;
+    struct vbo vertex_buffer, element_buffer, normal_buffer;
     GLuint vertex_shader, fragment_shader, program;
 
     struct {
@@ -18,6 +18,7 @@ struct test_resources {
 
     struct {
       gpu_addr position;
+      gpu_addr normal;
     } attributes;
 
     float test_mvp[16];

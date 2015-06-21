@@ -5,6 +5,7 @@
 
 #include "gl.h"
 #include "game.h"
+#include "mat4/mat4.h"
 #include "buffer.h"
 #include "shader.h"
 #include "debug.h"
@@ -21,7 +22,7 @@
 //  |/      |/
 //  v2------v3
 
-static const GLfloat g_vertex_buffer_data[] = {
+static const GLfloat cube_vertices[] = {
   1, 1, 1,  -1, 1, 1,  -1,-1, 1,   1,-1, 1,    // v0-v1-v2-v3 front
   1, 1,-1,   1, 1, 1,   1,-1, 1,   1,-1,-1,    // v5-v0-v3-v4 right
  -1, 1, 1,   1, 1, 1,   1, 1,-1,  -1, 1,-1,    // v1-v0-v5-v6 top
@@ -31,7 +32,7 @@ static const GLfloat g_vertex_buffer_data[] = {
 };
 
 
-/* static const GLfloat g_element_buffer_normals[] = { */
+/* static const GLfloat cube_normals[] = { */
 /*   0, 0, 1,   0, 0, 1,   0, 0, 1,   0, 0, 1, // front */
 /*   1, 0, 0,   1, 0, 0,   1, 0, 0,   1, 0, 0, // right */
 /*   0, 1, 0,   0, 1, 0,   0, 1, 0,   0, 1, 0, // top */
@@ -41,7 +42,7 @@ static const GLfloat g_vertex_buffer_data[] = {
 /* }; */
 
 
-static const GLushort g_element_buffer_data[] = {
+static const GLushort cube_indices[] = {
    0, 1, 2,   0, 2, 3,    // front
    4, 5, 6,   4, 6, 7,    // right
    8, 9,10,   8,10,11,    // top
@@ -61,15 +62,24 @@ init_gl(struct test_resources * resources) {
   // VBOs
   make_vertex_buffer(
     GL_ARRAY_BUFFER,
-    g_vertex_buffer_data,
-    sizeof(g_vertex_buffer_data),
+    cube_vertices,
+    sizeof(cube_vertices),
     &resources->vertex_buffer
   );
 
+  // cube normals
+  /* make_vertex_buffer( */
+  /*   GL_ARRAY_BUFFER, */
+  /*   cube_normals, */
+  /*   sizeof(cube_normals), */
+  /*   &resources->normal_buffer */
+  /* ); */
+
+  // cube indices
   make_index_buffer(
     GL_ELEMENT_ARRAY_BUFFER,
-    g_element_buffer_data,
-    sizeof(g_element_buffer_data),
+    cube_indices,
+    sizeof(cube_indices),
     &resources->element_buffer
   );
 
@@ -99,6 +109,9 @@ init_gl(struct test_resources * resources) {
   resources->uniforms.mvp
     = glGetUniformLocation(resources->program, "mvp");
 
+  resources->attributes.normal
+    = (gpu_addr)glGetAttribLocation(resources->program, "normal");
+
   resources->attributes.position
     = (gpu_addr)glGetAttribLocation(resources->program, "position");
 
@@ -108,27 +121,31 @@ init_gl(struct test_resources * resources) {
 
 
 void render (struct test_resources * resources) {
+  float *mvp = &resources->test_mvp[0];
+  float fade_factor = resources->fade_factor;
+
   glClearColor( 0.0f, 0.0f, 0.0f, 1.0f ); //clear background screen to black
   glClear( GL_COLOR_BUFFER_BIT );
 
-  //glMatrixMode(GL_MODELVIEW); //Switch to the drawing perspective
-  //glLoadIdentity(); //Reset the drawing perspective
+  static float v3[] = { 1, 1, 0 };
+  v3[1] = (float)(fade_factor * 0.4);
+  mat4_rotate(mvp, (float)0.004, v3, mvp);
 
   glUseProgram(resources->program);
-
-  glUniform1f(resources->uniforms.fade_factor,
-              resources->fade_factor);
-
+  glUniform1f(resources->uniforms.fade_factor, fade_factor);
   glUniformMatrix4fv(resources->uniforms.mvp, 1, 0, resources->test_mvp);
 
   bind_vbo(&resources->vertex_buffer,
            resources->attributes.position);
 
+  /* bind_vbo(&resources->normal_buffer, */
+  /*          resources->attributes.normal) */;
+
   bind_ibo(&resources->element_buffer);
 
   glDrawElements(
-    GL_TRIANGLE_STRIP,
-    36,                 /* count */
+    GL_TRIANGLES,
+    ARRAY_SIZE(cube_indices), /* count */
     GL_UNSIGNED_SHORT,  /* type */
     (void*)0            /* element array buffer offset */
   );

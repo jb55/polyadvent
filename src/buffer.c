@@ -42,10 +42,10 @@ void bind_vbo(struct vbo *vbo, gpu_addr slot) {
   glEnableVertexAttribArray(slot);
   glBindBuffer(vbo->type, vbo->handle);
   glVertexAttribPointer(slot,              // attribute
-                        vbo->components,   // size
+                        3,                 // size
                         GL_FLOAT,          // type
                         GL_FALSE,          // normalized?
-                        sizeof(GLfloat)*2, // stride
+                        0,   // stride
                         (void*)0           // array buffer offset
                         );
 }
