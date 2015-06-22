@@ -13,7 +13,9 @@ struct test_resources {
 
     struct {
       GLint fade_factor;
+      GLint light_dir;
       GLint mvp;
+      GLint normal_matrix;
     } uniforms;
 
     struct {
@@ -21,7 +23,8 @@ struct test_resources {
       gpu_addr normal;
     } attributes;
 
-    float test_mvp[16];
+    float normal_matrix[MAT4_ELEMS];
+    float test_mvp[MAT4_ELEMS];
     GLfloat fade_factor;
 };
 

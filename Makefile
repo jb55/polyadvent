@@ -1,7 +1,7 @@
 NAME ?= polyadvent
 BIN ?= $(NAME)
 PREFIX ?= /usr/local
-CFLAGS = -ggdb -Wall -Wextra -Weverything -Werror
+CFLAGS = -ggdb -Wall -Wextra -Weverything -Werror -std=c99 -Wno-unused-function
 LDFLAGS = -lSDL2 -lGL
 DEFS= -DGLFW_INCLUDE_NONE
 SRC=src
@@ -36,7 +36,7 @@ install: $(BIN)
 	install $(BIN) $(PREFIX)/bin
 
 nixbuild:
-	nix-shell shell.nix --pure --command 'make -j4'
+	nix-shell shell.nix --command 'make -j4'
 
 clean:
 	rm -f main.o $(OBJS) $(SHLIB) $(BIN)

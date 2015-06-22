@@ -2,6 +2,9 @@
 #ifndef POLYADVENT_COMMON_H
 #define POLYADVENT_COMMON_H
 
+#define MAT3_ELEMS 9
+#define MAT4_ELEMS 16
+
 typedef unsigned short u16;
 typedef signed short s16;
 

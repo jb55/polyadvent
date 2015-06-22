@@ -32,14 +32,14 @@ static const GLfloat cube_vertices[] = {
 };
 
 
-/* static const GLfloat cube_normals[] = { */
-/*   0, 0, 1,   0, 0, 1,   0, 0, 1,   0, 0, 1, // front */
-/*   1, 0, 0,   1, 0, 0,   1, 0, 0,   1, 0, 0, // right */
-/*   0, 1, 0,   0, 1, 0,   0, 1, 0,   0, 1, 0, // top */
-/*  -1, 0, 0,  -1, 0, 0,  -1, 0, 0,  -1, 0, 0, // left */
-/*   0,-1, 0,   0,-1, 0,   0,-1, 0,   0,-1, 0, // bottom */
-/*   0, 0,-1,   0, 0,-1,   0, 0,-1,   0, 0,-1  // back */
-/* }; */
+static const GLfloat cube_normals[] = {
+  0, 0, 1,   0, 0, 1,   0, 0, 1,   0, 0, 1, // front
+  1, 0, 0,   1, 0, 0,   1, 0, 0,   1, 0, 0, // right
+  0, 1, 0,   0, 1, 0,   0, 1, 0,   0, 1, 0, // top
+ -1, 0, 0,  -1, 0, 0,  -1, 0, 0,  -1, 0, 0, // left
+  0,-1, 0,   0,-1, 0,   0,-1, 0,   0,-1, 0, // bottom
+  0, 0,-1,   0, 0,-1,   0, 0,-1,   0, 0,-1  // back
+};
 
 
 static const GLushort cube_indices[] = {
@@ -57,6 +57,7 @@ init_gl(struct test_resources * resources) {
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
 
+
   /* wireframe_mode_on(); */
 
   // VBOs
@@ -68,12 +69,12 @@ init_gl(struct test_resources * resources) {
   );
 
   // cube normals
-  /* make_vertex_buffer( */
-  /*   GL_ARRAY_BUFFER, */
-  /*   cube_normals, */
-  /*   sizeof(cube_normals), */
-  /*   &resources->normal_buffer */
-  /* ); */
+  make_vertex_buffer(
+    GL_ARRAY_BUFFER,
+    cube_normals,
+    sizeof(cube_normals),
+    &resources->normal_buffer
+  );
 
   // cube indices
   make_index_buffer(
@@ -106,6 +107,12 @@ init_gl(struct test_resources * resources) {
   resources->uniforms.fade_factor
     = glGetUniformLocation(resources->program, "fade_factor");
 
+  resources->uniforms.light_dir
+    = glGetUniformLocation(resources->program, "light_dir");
+
+  resources->uniforms.normal_matrix
+    = glGetUniformLocation(resources->program, "normal_matrix");
+
   resources->uniforms.mvp
     = glGetUniformLocation(resources->program, "mvp");
 
@@ -118,6 +125,18 @@ init_gl(struct test_resources * resources) {
   assert(resources->program != 0);
 }
 
+static mat4
+*calc_normals(mat4 *mvp, mat4 *normal) {
+  mat4_inverse(mvp, normal);
+  mat4_transpose(normal, normal);
+  return normal;
+}
+
+static void
+recalc_normals(GLint norm_uniform, mat4 *mvp, mat4 *normal) {
+  mat4 *calc = calc_normals(mvp, normal);
+  glUniformMatrix4fv(norm_uniform, 1, 0, calc);
+}
 
 
 void render (struct test_resources * resources) {
@@ -128,18 +147,23 @@ void render (struct test_resources * resources) {
   glClear( GL_COLOR_BUFFER_BIT );
 
   static float v3[] = { 1, 1, 0 };
-  v3[1] = (float)(fade_factor * 0.4);
+  //v3[1] = (float)(fade_factor * 0.4);
   mat4_rotate(mvp, (float)0.004, v3, mvp);
 
+  recalc_normals(resources->uniforms.normal_matrix, mvp,
+                 &resources->normal_matrix[0]);
+
   glUseProgram(resources->program);
+
+  glUniform3f(resources->uniforms.light_dir, -1, 1, (float)-0.09);
   glUniform1f(resources->uniforms.fade_factor, fade_factor);
   glUniformMatrix4fv(resources->uniforms.mvp, 1, 0, resources->test_mvp);
 
   bind_vbo(&resources->vertex_buffer,
            resources->attributes.position);
 
-  /* bind_vbo(&resources->normal_buffer, */
-  /*          resources->attributes.normal) */;
+  bind_vbo(&resources->normal_buffer,
+           resources->attributes.normal);
 
   bind_ibo(&resources->element_buffer);
 
