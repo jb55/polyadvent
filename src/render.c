@@ -97,6 +97,9 @@ init_gl(struct test_resources * resources) {
   );
   assert(resources->fragment_shader != 0);
 
+  // camera
+  mat4_perspective(45 /* fov */, 1080 / 720, 1, 100, resources->camera);
+
   // Shader program
   resources->program = make_program(resources->vertex_shader,
                                     resources->fragment_shader);
@@ -138,26 +141,32 @@ recalc_normals(GLint norm_uniform, mat4 *mvp, mat4 *normal) {
   glUniformMatrix4fv(norm_uniform, 1, 0, calc);
 }
 
+static float tmp_matrix[MAT4_ELEMS] = { 0 };
+
 
 void render (struct test_resources * resources) {
-  float *mvp = &resources->test_mvp[0];
+  static float id[MAT4_ELEMS] = { 0 };
+  mat4_id(id);
+
+  float *mvp = resources->test_mvp;
+  float *normal = resources->normal_matrix;
+  float *camera = resources->camera;
   float fade_factor = resources->fade_factor;
 
   glClearColor( 0.0f, 0.0f, 0.0f, 1.0f ); //clear background screen to black
   glClear( GL_COLOR_BUFFER_BIT );
 
   static float v3[] = { 1, 1, 0 };
-  //v3[1] = (float)(fade_factor * 0.4);
-  mat4_rotate(mvp, (float)0.004, v3, mvp);
-
-  recalc_normals(resources->uniforms.normal_matrix, mvp,
-                 &resources->normal_matrix[0]);
+  //v3[1] = fade_factor * 0.4f;
+  mat4_rotate(mvp, 0.004f, v3, mvp);
+  mat4_multiply(camera, mvp, tmp_matrix);
+  recalc_normals(resources->uniforms.normal_matrix, mvp, normal);
 
   glUseProgram(resources->program);
 
-  glUniform3f(resources->uniforms.light_dir, -1, 1, (float)-0.09);
-  glUniform1f(resources->uniforms.fade_factor, fade_factor);
-  glUniformMatrix4fv(resources->uniforms.mvp, 1, 0, resources->test_mvp);
+  glUniform3f(resources->uniforms.light_dir, -1, 1, -0.09f);
+  //glUniform1f(resources->uniforms.fade_factor, fade_factor);
+  glUniformMatrix4fv(resources->uniforms.mvp, 1, 0, tmp_matrix);
 
   bind_vbo(&resources->vertex_buffer,
            resources->attributes.position);

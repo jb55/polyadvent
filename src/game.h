@@ -25,6 +25,7 @@ struct test_resources {
 
     float normal_matrix[MAT4_ELEMS];
     float test_mvp[MAT4_ELEMS];
+    float camera[MAT4_ELEMS];
     GLfloat fade_factor;
 };
 

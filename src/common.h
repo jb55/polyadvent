@@ -5,6 +5,8 @@
 #define MAT3_ELEMS 9
 #define MAT4_ELEMS 16
 
+#define PI 3.14159265f;
+
 typedef unsigned short u16;
 typedef signed short s16;
 

@@ -7,4 +7,7 @@ void init_game(struct game_state *game) {
   float *normal = &game->test_resources.normal_matrix[0];
   mat4_id(mvp);
   mat4_id(normal);
+
+  // move the camera a bit
+  mat4_translate(mvp, 0.0f, 0.0f, -10.0f, mvp);
 }
