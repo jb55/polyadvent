@@ -53,7 +53,7 @@ static const GLushort cube_indices[] = {
 
 void
 init_gl(struct test_resources * resources) {
-  //glEnable(GL_DEPTH_TEST);
+  glEnable(GL_DEPTH_TEST);
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
 
@@ -154,17 +154,17 @@ void render (struct test_resources * resources) {
   float fade_factor = resources->fade_factor;
 
   glClearColor( 0.0f, 0.0f, 0.0f, 1.0f ); //clear background screen to black
-  glClear( GL_COLOR_BUFFER_BIT );
+  glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
   static float v3[] = { 1, 1, 0 };
-  //v3[1] = fade_factor * 0.4f;
+  v3[1] = fade_factor * 1.4f;
   mat4_rotate(mvp, 0.004f, v3, mvp);
   mat4_multiply(camera, mvp, tmp_matrix);
-  recalc_normals(resources->uniforms.normal_matrix, mvp, normal);
+  recalc_normals(resources->uniforms.normal_matrix, tmp_matrix, normal);
 
   glUseProgram(resources->program);
 
-  glUniform3f(resources->uniforms.light_dir, -1, 1, -0.09f);
+  glUniform3f(resources->uniforms.light_dir, -1, 1, -0.099f);
   //glUniform1f(resources->uniforms.fade_factor, fade_factor);
   glUniformMatrix4fv(resources->uniforms.mvp, 1, 0, tmp_matrix);
 

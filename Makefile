@@ -1,7 +1,9 @@
 NAME ?= polyadvent
 BIN ?= $(NAME)
 PREFIX ?= /usr/local
-CFLAGS = -ggdb -Wall -Wextra -Weverything -Werror -std=c99 -Wno-unused-function
+CFLAGS = -ggdb -I src -Wall -Wextra -Weverything -Werror -std=c99 \
+						-Wno-unused-function \
+						-Wno-unused-variable
 LDFLAGS = -lSDL2 -lGL
 DEFS= -DGLFW_INCLUDE_NONE
 SRC=src
