@@ -5,7 +5,7 @@
 #define GEOMETRY_H
 
 
-struct geom_t {
+struct geom {
   int num_elements;
   float *vertices;
   float *normals;

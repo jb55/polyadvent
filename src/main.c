@@ -13,8 +13,8 @@
 int main(void)
 {
   struct game_state game;
-  struct slab_t slab;
-  struct geom_t slab_geom;
+  struct slab slab;
+  struct geom slab_geom;
   size_t length;
   void *slab_buffer;
 

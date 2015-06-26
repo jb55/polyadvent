@@ -145,7 +145,7 @@ recalc_normals(GLint norm_uniform, mat4 *mvp, mat4 *normal) {
 static float tmp_matrix[MAT4_ELEMS] = { 0 };
 
 void
-render (struct test_resources * resources, struct geom_t *geom) {
+render (struct test_resources * resources, struct geom *geom) {
   static float id[MAT4_ELEMS] = { 0 };
   mat4_id(id);
 

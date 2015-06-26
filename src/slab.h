@@ -4,23 +4,23 @@
 
 #include "common.h"
 
-struct slab_t {
+struct slab {
   int x;
   int y;
   int z;
   char *voxels;
 };
 
-struct slab_t *
-slab_parse(struct slab_t *slab, void *data);
+struct slab *
+slab_parse(struct slab *slab, void *data);
 
 void
-slab_show(const struct slab_t *slab);
+slab_show(const struct slab *slab);
 
-int slab_size(const struct slab_t *slab);
+int slab_size(const struct slab *slab);
 
 void
-slab_arrays(const struct slab_t *slab,
+slab_arrays(const struct slab *slab,
             float *verts,
             u16 *indices,
             float *normals);

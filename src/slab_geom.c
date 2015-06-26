@@ -2,9 +2,9 @@
 #include "slab_geom.h"
 #include <stdlib.h>
 
-struct geom_t*
-alloc_slab_geom(const struct slab_t *slab,
-                struct geom_t *geom,
+struct geom*
+alloc_slab_geom(const struct slab *slab,
+                struct geom *geom,
                 void* (*_realloc)(void*, size_t)) {
   _realloc = _realloc ? _realloc : realloc;
   float *verts, *normals;

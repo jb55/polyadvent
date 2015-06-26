@@ -20,13 +20,13 @@ defconsume(int)
 //defconsume(char)
 
 /* slab_vbo(const void *data) { */
-/*   struct slab_t *slab = (struct slab_t*)data; */
+/*   struct slab *slab = (struct slab*)data; */
 /*   assert(slab->x == 3); */
 /*   assert(slab->y == 3); */
 /*   assert(slab->z == 3); */
 /* } */
 
-struct slab_t *slab_parse(struct slab_t *slab, void *data) {
+struct slab *slab_parse(struct slab *slab, void *data) {
   void *p = data;
   slab->x = consume_int(&p);
   slab->y = consume_int(&p);
@@ -35,13 +35,13 @@ struct slab_t *slab_parse(struct slab_t *slab, void *data) {
   return slab;
 }
 
-int slab_size(const struct slab_t *slab) {
+int slab_size(const struct slab *slab) {
   return slab->x *
          slab->y *
          slab->z;
 }
 
-void slab_show(const struct slab_t *slab) {
+void slab_show(const struct slab *slab) {
   printf("slab %d %d %d\n", slab->x, slab->y, slab->z);
 }
 
@@ -86,7 +86,7 @@ static const u16 cube_indices[] = {
 };
 
 void
-slab_arrays(const struct slab_t *slab,
+slab_arrays(const struct slab *slab,
             float *verts,
             u16 *indices,
             float *normals) {
