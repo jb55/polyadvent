@@ -7,7 +7,7 @@
 #include <stddef.h>
 
 struct geom*
-alloc_slab_geom(const struct slab_t *slab,
+alloc_slab_geom(const struct slab *slab,
                 struct geom *geom,
                 void* (*_realloc)(void*, size_t));
 

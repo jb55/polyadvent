@@ -25,7 +25,7 @@ alloc_slab_geom(const struct slab *slab,
 
 
 void
-free_slab_geom(struct geom_t *geom,
+free_slab_geom(struct geom *geom,
                void (*_free)(void*)) {
   _free = _free ? _free : free;
   _free(geom->vertices);
