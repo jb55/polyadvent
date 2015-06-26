@@ -5,7 +5,13 @@
 #define MAT3_ELEMS 9
 #define MAT4_ELEMS 16
 
+#define SLAB(f) "etc/slab/" f
+#define RESOURCE(f) "etc/shaders/" f
+
 #define PI 3.14159265f;
+
+typedef unsigned char u8;
+typedef signed char s8;
 
 typedef unsigned short u16;
 typedef signed short s16;

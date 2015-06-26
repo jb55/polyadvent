@@ -8,6 +8,7 @@
 #include "mat4/mat4.h"
 #include "buffer.h"
 #include "shader.h"
+#include "geometry.h"
 #include "debug.h"
 #include "render.h"
 #include "util.h"
@@ -143,8 +144,8 @@ recalc_normals(GLint norm_uniform, mat4 *mvp, mat4 *normal) {
 
 static float tmp_matrix[MAT4_ELEMS] = { 0 };
 
-
-void render (struct test_resources * resources) {
+void
+render (struct test_resources * resources, struct geom_t *geom) {
   static float id[MAT4_ELEMS] = { 0 };
   mat4_id(id);
 
@@ -167,6 +168,9 @@ void render (struct test_resources * resources) {
   glUniform3f(resources->uniforms.light_dir, -1, 1, -0.099f);
   //glUniform1f(resources->uniforms.fade_factor, fade_factor);
   glUniformMatrix4fv(resources->uniforms.mvp, 1, 0, tmp_matrix);
+
+  bind_vbo(&resources->vertex_buffer,
+           resources->attributes.position);
 
   bind_vbo(&resources->vertex_buffer,
            resources->attributes.position);

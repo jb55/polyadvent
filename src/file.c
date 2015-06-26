@@ -20,7 +20,6 @@ file_contents(const char *filename, size_t *length) {
   buffer = malloc(*length+1);
   *length = fread(buffer, 1, *length, f);
   fclose(f);
-  ((char*)buffer)[*length] = '\0';
 
   return buffer;
 }

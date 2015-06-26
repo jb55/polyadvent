@@ -3,7 +3,10 @@ BIN ?= $(NAME)
 PREFIX ?= /usr/local
 CFLAGS = -ggdb -I src -Wall -Wextra -Weverything -Werror -std=c99 \
 						-Wno-unused-function \
-						-Wno-unused-variable
+						-Wno-unused-parameter \
+						-Wno-unused-variable \
+						-Wno-cast-align \
+						-Wno-padded
 LDFLAGS = -lSDL2 -lGL
 DEFS= -DGLFW_INCLUDE_NONE
 SRC=src
@@ -21,6 +24,9 @@ OBJS += $(SRC)/mat4/mat4.o
 OBJS += $(SRC)/render.o
 OBJS += $(SRC)/shader.o
 OBJS += $(SRC)/update.o
+OBJS += $(SRC)/slab.o
+OBJS += $(SRC)/slab_geom.o
+#OBJS += $(SRC)/geometry.o
 
 all: $(BIN)
 
