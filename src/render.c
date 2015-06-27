@@ -53,7 +53,7 @@ static const GLushort cube_indices[] = {
 };
 
 void
-init_gl(struct test_resources * resources) {
+init_gl(struct resources *resources) {
   glEnable(GL_DEPTH_TEST);
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
@@ -144,8 +144,8 @@ recalc_normals(GLint norm_uniform, mat4 *mvp, mat4 *normal) {
 
 static float tmp_matrix[MAT4_ELEMS] = { 0 };
 
-void
-render (struct test_resources * resources, struct geom *geom) {
+static void
+render_cube (struct resources * resources) {
   static float id[MAT4_ELEMS] = { 0 };
   mat4_id(id);
 
@@ -153,9 +153,6 @@ render (struct test_resources * resources, struct geom *geom) {
   float *normal = resources->normal_matrix;
   float *camera = resources->camera;
   float fade_factor = resources->fade_factor;
-
-  glClearColor( 0.0f, 0.0f, 0.0f, 1.0f ); //clear background screen to black
-  glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
   static float v3[] = { 1, 1, 0 };
   v3[1] = fade_factor * 1.4f;
@@ -189,4 +186,17 @@ render (struct test_resources * resources, struct geom *geom) {
 
   //glDisableVertexAttribArray(resources->attributes.position);
 }
+
+static void render_geom (struct resources *res, struct geom_t *slab) {
+}
+
+void
+render (struct resources * resources, struct geom_t *geom) {
+  glClearColor( 0.0f, 0.0f, 0.0f, 1.0f ); //clear background screen to black
+  glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+
+  render_cube(resources);
+}
+
+
 

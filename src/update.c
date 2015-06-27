@@ -4,7 +4,7 @@
 
 void update (struct game_state * game) {
   unsigned int ms = SDL_GetTicks();
-  struct test_resources * res;
+  struct resources *res;
 
   res = &game->test_resources;
 

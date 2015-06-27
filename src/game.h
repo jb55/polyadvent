@@ -7,7 +7,7 @@
 /*
  * Global data used by our render callback:
  */
-struct test_resources {
+struct resources {
     struct vbo vertex_buffer, element_buffer, normal_buffer;
     GLuint vertex_shader, fragment_shader, program;
 
@@ -32,7 +32,7 @@ struct test_resources {
 
 struct game_state {
   int counter;
-  struct test_resources test_resources;
+  struct resources test_resources;
 };
 
 void init_game(struct game_state *game);
