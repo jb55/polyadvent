@@ -4,7 +4,7 @@
 #include "geometry.h"
 
 void init_gl(struct resources *resources);
-void render (struct resources *resources, struct geom *geom);
+void render (struct resources *resources, struct geometry *geom);
 
 void wireframe_mode_on();
 void wireframe_mode_off();

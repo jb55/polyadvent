@@ -1,32 +1,49 @@
 
 #include "slab_geom.h"
 #include <stdlib.h>
+#include <assert.h>
 
-struct geom*
-alloc_slab_geom(const struct slab *slab,
-                struct geom *geom,
-                void* (*_realloc)(void*, size_t)) {
+struct geometry*
+slab_alloc_arrays(const struct slab *slab,
+                  struct geometry *geom,
+                  void* (*_realloc)(void*, size_t)) {
   _realloc = _realloc ? _realloc : realloc;
   float *verts, *normals;
-  u16 *indices;
+  u32 *indices;
   const int num_cubes = slab_size(slab);
   const int num_sides = 6;
   const int vert_per_side = 4;
-  const int num_verts = num_cubes * num_sides * vert_per_side;
-  verts = _realloc(NULL, (size_t)num_verts * 3 * sizeof(float));
-  normals = _realloc(NULL, (size_t)num_verts * 3 * sizeof(float));
-  indices = _realloc(NULL, (size_t)num_verts * sizeof(u16));
+  const int wut_factor = 0;
+  const int num_verts = (num_cubes * num_sides * vert_per_side) + wut_factor;
+  const size_t verts_allocd  = (size_t)num_verts * 3 * sizeof(float);
+  printf("stuff ncubes(%d) num_verts(%d) num_sides(%d) vert_per_side(%d) allocd(%zu)\n",
+         num_cubes,
+         num_verts,
+         num_sides,
+         vert_per_side,
+         verts_allocd 
+         );
+  verts = malloc(verts_allocd * 2);
+  normals = malloc(verts_allocd * 2);
+  indices = malloc((size_t)num_verts * sizeof(u32) * 2);
+
+  assert(verts);
+  assert(normals);
+  assert(indices);
+
   geom->vertices = verts;
   geom->indices = indices;
   geom->normals = normals;
-  geom->num_elements = num_verts;
+
+  geom->num_verts = num_verts - wut_factor;
+
   return geom;
 }
 
 
 void
-free_slab_geom(struct geom *geom,
-               void (*_free)(void*)) {
+slab_free_arrays(struct geometry *geom,
+                 void (*_free)(void*)) {
   _free = _free ? _free : free;
   _free(geom->vertices);
   _free(geom->indices);

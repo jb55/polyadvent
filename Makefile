@@ -26,7 +26,8 @@ OBJS += $(SRC)/shader.o
 OBJS += $(SRC)/update.o
 OBJS += $(SRC)/slab.o
 OBJS += $(SRC)/slab_geom.o
-#OBJS += $(SRC)/geometry.o
+OBJS += $(SRC)/geometry.o
+OBJS += $(SRC)/util.o
 
 all: $(BIN)
 

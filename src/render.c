@@ -7,6 +7,7 @@
 #include "game.h"
 #include "mat4/mat4.h"
 #include "buffer.h"
+#include "buffer_geometry.h"
 #include "shader.h"
 #include "geometry.h"
 #include "debug.h"
@@ -56,10 +57,7 @@ void
 init_gl(struct resources *resources) {
   glEnable(GL_DEPTH_TEST);
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
-  SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
-
-
-  /* wireframe_mode_on(); */
+  SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
 
   // VBOs
   make_vertex_buffer(
@@ -99,7 +97,7 @@ init_gl(struct resources *resources) {
   assert(resources->fragment_shader != 0);
 
   // camera
-  mat4_perspective(45 /* fov */, 1080 / 720, 1, 100, resources->camera);
+  mat4_perspective(90 /* fov */, 1080 / 720, 1, 100, resources->camera);
 
   // Shader program
   resources->program = make_program(resources->vertex_shader,
@@ -129,12 +127,14 @@ init_gl(struct resources *resources) {
   assert(resources->program != 0);
 }
 
-static mat4
-*calc_normals(mat4 *mvp, mat4 *normal) {
+
+static mat4 *
+calc_normals(mat4 *mvp, mat4 *normal) {
   mat4_inverse(mvp, normal);
   mat4_transpose(normal, normal);
   return normal;
 }
+
 
 static void
 recalc_normals(GLint norm_uniform, mat4 *mvp, mat4 *normal) {
@@ -142,30 +142,12 @@ recalc_normals(GLint norm_uniform, mat4 *mvp, mat4 *normal) {
   glUniformMatrix4fv(norm_uniform, 1, 0, calc);
 }
 
+
 static float tmp_matrix[MAT4_ELEMS] = { 0 };
+
 
 static void
 render_cube (struct resources * resources) {
-  static float id[MAT4_ELEMS] = { 0 };
-  mat4_id(id);
-
-  float *mvp = resources->test_mvp;
-  float *normal = resources->normal_matrix;
-  float *camera = resources->camera;
-  float fade_factor = resources->fade_factor;
-
-  static float v3[] = { 1, 1, 0 };
-  v3[1] = fade_factor * 1.4f;
-  mat4_rotate(mvp, 0.004f, v3, mvp);
-  mat4_multiply(camera, mvp, tmp_matrix);
-  recalc_normals(resources->uniforms.normal_matrix, tmp_matrix, normal);
-
-  glUseProgram(resources->program);
-
-  glUniform3f(resources->uniforms.light_dir, -1, 1, -0.099f);
-  //glUniform1f(resources->uniforms.fade_factor, fade_factor);
-  glUniformMatrix4fv(resources->uniforms.mvp, 1, 0, tmp_matrix);
-
   bind_vbo(&resources->vertex_buffer,
            resources->attributes.position);
 
@@ -187,16 +169,48 @@ render_cube (struct resources * resources) {
   //glDisableVertexAttribArray(resources->attributes.position);
 }
 
-static void render_geom (struct resources *res, struct geom_t *slab) {
+
+static void render_geom (struct resources *res,
+                         struct geometry *geom) {
+  struct attributes *attrs = &res->attributes;
+
+  bind_vbo(&geom->buffer.vertex_buffer, attrs->position);
+  bind_vbo(&geom->buffer.normal_buffer, attrs->normal);
+  bind_ibo(&geom->buffer.index_buffer);
+
+  glDrawElements(
+                 GL_TRIANGLES,
+                 geom->num_elements, /* count */
+                 GL_UNSIGNED_INT,    /* type */
+                 (void*)0            /* element array buffer offset */
+                 );
 }
 
+
 void
-render (struct resources * resources, struct geom_t *geom) {
+render (struct resources * resources, struct geometry *geom) {
   glClearColor( 0.0f, 0.0f, 0.0f, 1.0f ); //clear background screen to black
   glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
-  render_cube(resources);
+  static float id[MAT4_ELEMS] = { 0 };
+  mat4_id(id);
+
+  float *mvp = resources->test_mvp;
+  float *normal = resources->normal_matrix;
+  float *camera = resources->camera;
+  float fade_factor = resources->fade_factor;
+
+  static float v3[] = { 1, 1, 0 };
+  v3[1] = fade_factor * 1.4f;
+  mat4_rotate(mvp, 0.004f, v3, mvp);
+  mat4_multiply(camera, mvp, tmp_matrix);
+  recalc_normals(resources->uniforms.normal_matrix, tmp_matrix, normal);
+
+  glUseProgram(resources->program);
+  glUniform3f(resources->uniforms.light_dir, -1, 1, -0.099f);
+  //glUniform1f(resources->uniforms.fade_factor, fade_factor);
+  glUniformMatrix4fv(resources->uniforms.mvp, 1, 0, tmp_matrix);
+
+  //render_cube(resources);
+  render_geom(resources, geom);
 }
-
-
-

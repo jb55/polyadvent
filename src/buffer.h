@@ -15,7 +15,7 @@ struct vbo {
 #define NUM_VBO_SLOTS 1
 
 gpu_addr make_buffer(GLenum target, const void *buffer_data,
-                       GLsizei buffer_size);
+                     GLsizei buffer_size);
 
 struct vbo *
 make_vertex_buffer(GLenum target, const void *buffer_data,

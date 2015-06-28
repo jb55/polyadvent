@@ -6,13 +6,13 @@
 #include "slab.h"
 #include <stddef.h>
 
-struct geom*
-alloc_slab_geom(const struct slab *slab,
-                struct geom *geom,
-                void* (*_realloc)(void*, size_t));
+struct geometry*
+slab_alloc_arrays(const struct slab *slab,
+                  struct geometry *geom,
+                  void* (*_realloc)(void*, size_t));
 
 void
-free_slab_geom(struct geom *geom,
-               void (*_free)(void*));
+slab_free_arrays(struct geometry *geom,
+                 void (*_free)(void*));
 
 #endif // SLAB_GEOM

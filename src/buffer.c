@@ -1,16 +1,21 @@
 
 #include "buffer.h"
-
-/*
- * Functions for creating OpenGL objects:
- */
+#include "util.h"
+#include <assert.h>
 
 gpu_addr
 make_buffer(GLenum target, const void *buffer_data, GLsizei buffer_size) {
   gpu_addr buffer;
+  check_gl();
   glGenBuffers(1, &buffer);
+  check_gl();
+
   glBindBuffer(target, buffer);
+  check_gl();
+
   glBufferData(target, buffer_size, buffer_data, GL_STATIC_DRAW);
+  check_gl();
+
   return buffer;
 }
 

@@ -76,7 +76,7 @@ static const float cube_normals[] = {
 };
 
 
-static const u16 cube_indices[] = {
+static const u32 cube_indices[] = {
    0, 1, 2,   0, 2, 3,    // front
    4, 5, 6,   4, 6, 7,    // right
    8, 9,10,   8,10,11,    // top
@@ -88,25 +88,35 @@ static const u16 cube_indices[] = {
 void
 slab_arrays(const struct slab *slab,
             float *verts,
-            u16 *indices,
-            float *normals) {
+            float *normals,
+            u32 *indices,
+            int *num_elements) {
   int x, y, z, i, j;
-  u16 start_index = 0;
+  u32 start_index = 0;
   int verts_ind, normals_ind, index_ind;
   verts_ind = 0; normals_ind = 0; index_ind = 0;
-  float xs = slab->x;
-  float ys = slab->y;
-  float zs = slab->z;
+  int xs = slab->x;
+  int ys = slab->y;
+  int zs = slab->z;
   int cube_verts_size = ARRAY_SIZE(cube_verts);
   int cube_indices_size = ARRAY_SIZE(cube_indices);
   float n = 0.5f;
   u8 color = 0;
 
-  for (y = 0; y < ys; ++y)
+  printf("got here cvs(%d) %d %d %d\n", cube_verts_size, xs, ys, zs);
+
   for (x = 0; x < xs; ++x)
+  for (y = 0; y < ys; ++y)
   for (z = 0; z < zs; ++z) {
-    for (i = 0; i < cube_verts_size; i += 12)
-    for (j = 0; j < 12; j += 3) {
+    int yind = y * zs;
+    int xind = x * zs * ys;
+    color = slab->voxels[z + yind + xind];
+
+    /* printf("building color(0x%x) %d %d %d vi(%d) ni(%d) ii(%d)\n", */
+    /*        color, x, y, z, verts_ind, normals_ind, index_ind); */
+
+    for (i = 0; i < cube_verts_size; i += 12) // for each face
+    for (j = 0; j < 12; j += 3) { // for each vert
       int k = i + j;
       verts[verts_ind++] = cube_verts[k] * n + x;
       verts[verts_ind++] = cube_verts[k+1] * n + y;
@@ -126,4 +136,10 @@ slab_arrays(const struct slab *slab,
 
     start_index += 24;
   }
+
+
+  //assert(index_ind < 65535);
+  printf("ind %d pos(%d) norm(%d)\n", index_ind, verts_ind, normals_ind);
+  printf("ret slab_arrays %d\n", index_ind);
+  *num_elements = index_ind;
 }

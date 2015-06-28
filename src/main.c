@@ -6,15 +6,18 @@
 #include "update.h"
 #include "window.h"
 #include "slab_geom.h"
+#include "slab.h"
 #include "geometry.h"
 #include "event.h"
 #include "render.h"
+#include <assert.h>
+
 
 int main(void)
 {
   struct game_state game;
   struct slab slab;
-  struct geom slab_geom;
+  struct geometry slab_geom;
   size_t length;
   void *slab_buffer;
 
@@ -32,8 +35,14 @@ int main(void)
   // parse to a slab_t
   slab_parse(&slab, slab_buffer);
   slab_show(&slab);
+  slab_alloc_arrays(&slab, &slab_geom, NULL);
+  slab_arrays(&slab,
+              slab_geom.vertices,
+              slab_geom.normals,
+              slab_geom.indices,
+              &slab_geom.num_elements);
+  make_buffer_geometry(&slab_geom);
   // mesh it -> load into vbo
-  alloc_slab_geom(&slab, &slab_geom, NULL);
 
   /* Loop until the user closes the window */
   while (1) {

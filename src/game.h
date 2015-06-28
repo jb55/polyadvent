@@ -6,19 +6,20 @@
 
 /*
  * Global data used by our render callback:
+ * NOTE: just for testing right now
  */
 struct resources {
     struct vbo vertex_buffer, element_buffer, normal_buffer;
     GLuint vertex_shader, fragment_shader, program;
 
-    struct {
+    struct uniforms {
       GLint fade_factor;
       GLint light_dir;
       GLint mvp;
       GLint normal_matrix;
     } uniforms;
 
-    struct {
+    struct attributes {
       gpu_addr position;
       gpu_addr normal;
     } attributes;

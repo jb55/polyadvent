@@ -8,7 +8,7 @@ struct slab {
   int x;
   int y;
   int z;
-  char *voxels;
+  u8 *voxels;
 };
 
 struct slab *
@@ -22,7 +22,9 @@ int slab_size(const struct slab *slab);
 void
 slab_arrays(const struct slab *slab,
             float *verts,
-            u16 *indices,
-            float *normals);
+            float *normals,
+            u32 *indices,
+            int *num_elements
+            );
 
 #endif /* SLAB_H */

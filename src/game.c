@@ -9,5 +9,5 @@ void init_game(struct game_state *game) {
   mat4_id(normal);
 
   // move the camera a bit
-  mat4_translate(mvp, 0.0f, 0.0f, -10.0f, mvp);
+  mat4_translate(mvp, -10.0f, -10.0f, -20.0f, mvp);
 }
