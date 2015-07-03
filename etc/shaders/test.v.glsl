@@ -12,6 +12,6 @@ uniform vec3 light_dir;
 void main()
 {
     vec4 trans_normal = normal_matrix * vec4(normal, 1);
-    gl_Position = mvp * vec4(position.xyz, 1.0);
+    gl_Position = mvp * vec4(position.xyz / 10., 1.0);
     v_dot = max(dot(trans_normal.xyz, light_dir), 0.4);
 }

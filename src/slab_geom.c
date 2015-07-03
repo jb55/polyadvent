@@ -23,9 +23,9 @@ slab_alloc_arrays(const struct slab *slab,
          vert_per_side,
          verts_allocd 
          );
-  verts = malloc(verts_allocd * 2);
-  normals = malloc(verts_allocd * 2);
-  indices = malloc((size_t)num_verts * sizeof(u32) * 2);
+  verts = malloc(verts_allocd);
+  normals = malloc(verts_allocd);
+  indices = malloc((size_t)num_verts * sizeof(u32));
 
   assert(verts);
   assert(normals);
