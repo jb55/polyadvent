@@ -1,7 +1,7 @@
 NAME ?= polyadvent
 BIN ?= $(NAME)
 PREFIX ?= /usr/local
-CFLAGS = -ggdb -I src -Wall -Wextra -Werror -std=c99 \
+CFLAGS = -ggdb -I src -Wall -Wextra -std=c99 \
 						-Wno-unused-function \
 						-Wno-unused-parameter \
 						-Wno-unused-variable \
@@ -10,8 +10,6 @@ CFLAGS = -ggdb -I src -Wall -Wextra -Werror -std=c99 \
 LDFLAGS = -lSDL2 -lGL
 DEFS= -DGLFW_INCLUDE_NONE
 SRC=src
-
-SHLIB=$(SRC)/lib$(NAME).so
 
 OBJS  = $(SRC)/window.o
 OBJS += $(SRC)/buffer.o
@@ -24,6 +22,7 @@ OBJS += $(SRC)/mat4/mat4.o
 OBJS += $(SRC)/render.o
 OBJS += $(SRC)/shader.o
 OBJS += $(SRC)/update.o
+OBJS += $(SRC)/terrain.o
 OBJS += $(SRC)/slab.o
 OBJS += $(SRC)/slab_geom.o
 OBJS += $(SRC)/geometry.o
@@ -34,10 +33,7 @@ all: $(BIN)
 %.o: %.c %.h
 	$(CC) $(CFLAGS) -fPIC $(DEFS) -c $< -o $@
 
-$(SHLIB): $(OBJS)
-	$(CC) $(CFLAGS) -shared $^ -o $@
-
-$(BIN): $(SRC)/main.o $(SHLIB)
+$(BIN): $(SRC)/main.o $(OBJS)
 	$(CC) $(CFLAGS) $(DEFS) $^ $(LDFLAGS) -o $@
 
 install: $(BIN)

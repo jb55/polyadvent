@@ -10,6 +10,7 @@
 #include "geometry.h"
 #include "event.h"
 #include "render.h"
+#include "terrain.h"
 #include <assert.h>
 
 
@@ -18,6 +19,8 @@ int main(void)
   struct game_state game;
   struct slab slab;
   struct geometry slab_geom;
+  struct terrain terrain;
+
   size_t length;
   void *slab_buffer;
 
@@ -30,18 +33,20 @@ int main(void)
   init_gl(&game.test_resources);
   init_game(&game);
 
-  // load slab file
-  slab_buffer = file_contents(SLAB("test.slab"), &length);
-  // parse to a slab_t
-  slab_parse(&slab, slab_buffer);
-  slab_show(&slab);
-  slab_alloc_arrays(&slab, &slab_geom, NULL);
-  slab_arrays(&slab,
-              slab_geom.vertices,
-              slab_geom.normals,
-              slab_geom.indices,
-              &slab_geom.num_elements);
-  make_buffer_geometry(&slab_geom);
+  terrain_init(&terrain);
+  terrain_create(&terrain);
+
+  /* slab_buffer = file_contents(SLAB("test.slab"), &length); */
+  /* slab_parse(&slab, slab_buffer); */
+  /* slab_show(&slab); */
+  /* slab_alloc_arrays(&slab, &slab_geom, NULL); */
+  /* slab_arrays(&slab, */
+  /*             slab_geom.vertices, */
+  /*             slab_geom.normals, */
+  /*             slab_geom.indices, */
+  /*             &slab_geom.num_elements); */
+
+  /* make_buffer_geometry(&slab_geom); */
   // mesh it -> load into vbo
 
   /* Loop until the user closes the window */
@@ -54,8 +59,8 @@ int main(void)
     SDL_GL_SwapWindow(window);
   }
 
-  //free(slab_buffer);
-  //free_slab_geom(&geom, NULL)
+  /* free(slab_buffer); */
+  /* free_slab_geom(&geom, NULL) */
 
   //SDL_GL_DeleteContext(gl);
   //return 0;
