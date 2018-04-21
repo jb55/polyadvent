@@ -1,7 +1,7 @@
 NAME ?= polyadvent
 BIN ?= $(NAME)
 PREFIX ?= /usr/local
-CFLAGS = -ggdb -I src -Wall -Wextra -Weverything -Werror -std=c99 \
+CFLAGS = -ggdb -I src -Wall -Wextra -Werror -std=c99 \
 						-Wno-unused-function \
 						-Wno-unused-parameter \
 						-Wno-unused-variable \
@@ -48,4 +48,4 @@ nixbuild:
 	nix-shell shell.nix --command 'make -j4'
 
 clean:
-	rm -f main.o $(OBJS) $(SHLIB) $(BIN)
+	rm -f src/main.o $(OBJS) $(SHLIB) $(BIN)

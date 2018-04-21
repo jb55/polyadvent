@@ -1,11 +1,9 @@
-{ clangStdenv
+{ stdenv
 , SDL2
 , mesa
 }:
 
-let
-  stdenv = clangStdenv;
-in stdenv.mkDerivation rec {
+stdenv.mkDerivation rec {
   name = "polyadvent";
   version = "0.1";
 
