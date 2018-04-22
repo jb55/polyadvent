@@ -4,6 +4,6 @@
 
 #include "game.h"
 
-void update(struct game_state * game);
+void update(struct game * game);
 
 #endif /* PA_UPDATE_H */

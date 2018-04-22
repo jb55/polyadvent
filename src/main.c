@@ -16,7 +16,7 @@
 
 int main(void)
 {
-  struct game_state game;
+  struct game game;
   struct slab slab;
   struct geometry slab_geom;
   struct terrain terrain;
@@ -31,7 +31,7 @@ int main(void)
   SDL_GL_CreateContext(window);
 
   init_gl(&game.test_resources);
-  init_game(&game);
+  game_init(&game);
 
   terrain_init(&terrain);
   terrain_create(&terrain);
@@ -53,7 +53,7 @@ int main(void)
   while (1) {
     process_events();
     update(&game);
-    render(&game.test_resources, &slab_geom);
+    render(&game.test_resources, &terrain.geom);
 
     /* Swap front and back buffers */
     SDL_GL_SwapWindow(window);

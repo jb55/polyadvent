@@ -9,6 +9,7 @@ make_buffer_geometry(struct geometry *geom) {
   assert(geom->vertices);
   assert(geom->normals);
   assert(geom->indices);
+  assert(geom->num_indices >= 1);
 
   printf("making vertex buffer\n");
   make_vertex_buffer(
@@ -32,7 +33,7 @@ make_buffer_geometry(struct geometry *geom) {
   make_index_buffer(
                     GL_ELEMENT_ARRAY_BUFFER,
                     geom->indices,
-                    geom->num_elements * (int)sizeof(u32),
+                    geom->num_indices * (int)sizeof(u32),
                     &geom->buffer.index_buffer
                     );
 }

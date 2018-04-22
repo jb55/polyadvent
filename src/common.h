@@ -2,6 +2,8 @@
 #ifndef POLYADVENT_COMMON_H
 #define POLYADVENT_COMMON_H
 
+#include <stdbool.h>
+
 #define MAT3_ELEMS 9
 #define MAT4_ELEMS 16
 

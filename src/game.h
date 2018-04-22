@@ -3,6 +3,7 @@
 #define PA_GAME_H
 
 #include "buffer.h"
+#include "input.h"
 
 /*
  * Global data used by our render callback:
@@ -27,15 +28,17 @@ struct resources {
     float normal_matrix[MAT4_ELEMS];
     float test_mvp[MAT4_ELEMS];
     float camera[MAT4_ELEMS];
+    float camera_persp[MAT4_ELEMS];
     GLfloat fade_factor;
 };
 
 
-struct game_state {
+struct game {
   int counter;
   struct resources test_resources;
+  struct input input;
 };
 
-void init_game(struct game_state *game);
+void game_init(struct game *game);
 
 #endif /* PA_GAME_H */

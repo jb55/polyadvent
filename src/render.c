@@ -55,6 +55,7 @@ static const GLushort cube_indices[] = {
 
 void
 init_gl(struct resources *resources) {
+  float tmp_matrix[16];
   glEnable(GL_DEPTH_TEST);
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
@@ -97,7 +98,7 @@ init_gl(struct resources *resources) {
   assert(resources->fragment_shader != 0);
 
   // camera
-  mat4_perspective(90 /* fov */, 1080 / 720, 1, 1000, resources->camera);
+  mat4_perspective(50 /* fov */, 1080 / 720, 1, 1000, resources->camera_persp);
 
   // Shader program
   resources->program = make_program(resources->vertex_shader,
@@ -180,15 +181,14 @@ static void render_geom (struct resources *res,
 
   glDrawElements(
                  GL_TRIANGLES,
-                 geom->num_elements, /* count */
+                 geom->num_indices, /* count */
                  GL_UNSIGNED_INT,    /* type */
                  (void*)0            /* element array buffer offset */
                  );
 }
 
 
-void
-render (struct resources * resources, struct geometry *geom) {
+void render (struct resources * resources, struct geometry *geom) {
   glClearColor( 0.0f, 0.0f, 0.0f, 1.0f ); //clear background screen to black
   glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
@@ -198,19 +198,21 @@ render (struct resources * resources, struct geometry *geom) {
   float *mvp = resources->test_mvp;
   float *normal = resources->normal_matrix;
   float *camera = resources->camera;
+  float *persp = resources->camera_persp;
   float fade_factor = resources->fade_factor;
 
-  static float v3[] = { 1, 1, 0 };
-  v3[1] = fade_factor * 1.4f;
-  mat4_rotate(mvp, 0.004f, v3, mvp);
-  mat4_multiply(camera, mvp, tmp_matrix);
+  /* static float v3[] = { 1, 1, 0 }; */
+  /* v3[1] = fade_factor * 1.4f; */
+  /* mat4_rotate(mvp, 0.004f, v3, mvp); */
+  mat4_multiply(persp, camera, tmp_matrix);
+  mat4_multiply(tmp_matrix, mvp, tmp_matrix);
   recalc_normals(resources->uniforms.normal_matrix, tmp_matrix, normal);
 
   glUseProgram(resources->program);
   glUniform3f(resources->uniforms.light_dir, -1, 1, -0.099f);
-  //glUniform1f(resources->uniforms.fade_factor, fade_factor);
+  glUniform1f(resources->uniforms.fade_factor, fade_factor);
   glUniformMatrix4fv(resources->uniforms.mvp, 1, 0, tmp_matrix);
 
-  //render_cube(resources);
+  /* render_cube(resources); */
   render_geom(resources, geom);
 }

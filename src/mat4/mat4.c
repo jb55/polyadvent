@@ -1,6 +1,7 @@
 
 #include "mat4.h"
 #include <math.h>
+#include <stdio.h>
 #include <string.h>
 
 #define PI 3.14159265f
@@ -234,6 +235,7 @@ int float_eq(float a, float b) {
   return fabsf(a - b) < 0.0001;
 }
 
+
 mat4 *mat4_rotate(const mat4 *mat, const float angle,
                   const float *axis, mat4 *dest) {
   float x = axis[0], y = axis[1], z = axis[2];
@@ -287,4 +289,14 @@ mat4 *mat4_rotate(const mat4 *mat, const float angle,
   dest[11] = a03*b20 + a13*b21 + a23*b22;
 
   return dest;
+}
+
+
+mat4_print(const mat4 *m) {
+  for (int i = 0; i < 16; ++i) {
+    if (i % 4 == 0)
+      printf("\n");
+    printf("%f ", m[i]);
+  }
+  printf("\n");
 }

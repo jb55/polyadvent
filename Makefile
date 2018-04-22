@@ -26,7 +26,10 @@ OBJS += $(SRC)/terrain.o
 OBJS += $(SRC)/slab.o
 OBJS += $(SRC)/slab_geom.o
 OBJS += $(SRC)/geometry.o
+OBJS += $(SRC)/input.o
 OBJS += $(SRC)/util.o
+
+SRCS=$(OBJS:.o=.c)
 
 all: $(BIN)
 
@@ -43,5 +46,10 @@ install: $(BIN)
 nixbuild:
 	nix-shell shell.nix --command 'make -j4'
 
+TAGS:
+	etags $(SRCS)
+
 clean:
 	rm -f src/main.o $(OBJS) $(SHLIB) $(BIN)
+
+.PHONY: TAGS

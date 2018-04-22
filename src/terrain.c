@@ -1,16 +1,19 @@
 
 #include "terrain.h"
 
-
 #include "util.h"
 
-//    v6----- v5
-//   /|      /|
-//  v1------v0|
-//  | |     | |
-//  | |v7---|-|v4
-//  |/      |/
-//  v2------v3
+static const float plane_verts[] = {
+  -1,-1,0,  -1,1,0,  1,1,0,  1,-1,0
+};
+
+static const float plane_normals[] = {
+  0,0,1,  0,0,1,  0,0,1,  0,0,1
+};
+
+static const u32 plane_indices[] = {
+  2,1,0,  2,0,3
+};
 
 void
 terrain_init(struct terrain *terrain) {
@@ -21,15 +24,14 @@ terrain_init(struct terrain *terrain) {
 void
 terrain_create(struct terrain *terrain) {
   const int num_verts = 4;
-  float *vs;
-  float *ns;
 
   terrain->geom.num_verts = num_verts;
-  vs = terrain->geom.vertices = calloc(num_verts * 3, sizeof(*terrain->geom.vertices));
-  ns = terrain->geom.normals = calloc(num_verts * 3, sizeof(*terrain->geom.normals));
+  terrain->geom.vertices = (float*)plane_verts;
+  terrain->geom.normals = (float*)plane_normals;
+  terrain->geom.indices = (u32*)plane_indices;
+  terrain->geom.num_indices = ARRAY_SIZE(plane_indices);
 
-  for (int i = 0; i < num_verts; ++i) {
-  }
+  make_buffer_geometry(&terrain->geom);
 }
 
 void

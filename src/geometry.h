@@ -13,7 +13,7 @@ struct buffer_geometry {
 
 struct geometry {
   struct buffer_geometry buffer;
-  int num_elements;
+  int num_indices;
   int num_verts;
   float *vertices;
   float *normals;
