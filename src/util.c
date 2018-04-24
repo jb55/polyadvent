@@ -11,8 +11,8 @@ void check_gl() {
 }
 
 
-float rand_0to1() {
-  return (float) rand() / RAND_MAX;
+double rand_0to1() {
+  return (double) rand() / RAND_MAX;
 }
 
 /* void glhLookAtf2( float *matrix, float *eyePosition3D, */

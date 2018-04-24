@@ -25,6 +25,7 @@ OBJS += $(SRC)/update.o
 OBJS += $(SRC)/terrain.o
 OBJS += $(SRC)/slab.o
 OBJS += $(SRC)/slab_geom.o
+OBJS += $(SRC)/delaunay.o
 OBJS += $(SRC)/geometry.o
 OBJS += $(SRC)/input.o
 OBJS += $(SRC)/util.o

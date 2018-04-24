@@ -180,7 +180,7 @@ static void render_geom (struct resources *res,
   bind_ibo(&geom->buffer.index_buffer);
 
   glDrawElements(
-                 GL_TRIANGLES,
+                 GL_LINES,
                  geom->num_indices, /* count */
                  GL_UNSIGNED_INT,    /* type */
                  (void*)0            /* element array buffer offset */

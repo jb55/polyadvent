@@ -27,7 +27,7 @@ int main(void)
     "SDL2/OpenGL Demo", 0, 0, 640, 480,
     SDL_WINDOW_OPENGL|SDL_WINDOW_RESIZABLE);
 
-  srand(42);
+  srand(52);
   SDL_GL_CreateContext(window);
 
   init_gl(&game.test_resources);
@@ -50,6 +50,7 @@ int main(void)
   // mesh it -> load into vbo
 
   /* Loop until the user closes the window */
+
   while (1) {
     process_events();
     update(&game);
