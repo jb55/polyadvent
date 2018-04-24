@@ -1,6 +1,5 @@
 
 #include "terrain.h"
-
 #include "util.h"
 
 static const float plane_verts[] = {
@@ -40,3 +39,7 @@ terrain_detroy(struct terrain *terrain) {
   free(terrain->geom.normals);
 }
 
+
+float old_noisy_boi(float x, float y) {
+  return sinf(x) * cosf(y);
+}

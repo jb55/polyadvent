@@ -1,5 +1,6 @@
 
 #include "util.h"
+#include <stdlib.h>
 
 void check_gl() {
   unsigned int e = glGetError();
@@ -10,6 +11,9 @@ void check_gl() {
 }
 
 
+float rand_0to1() {
+  return (float) rand() / RAND_MAX;
+}
 
 /* void glhLookAtf2( float *matrix, float *eyePosition3D, */
 /*                   float *center3D, float *upVector3D ) */

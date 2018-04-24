@@ -9,6 +9,6 @@
 
 void check_gl(void);
 
-
+float rand_0to1();
 
 #endif /* PA_UTIL_H */

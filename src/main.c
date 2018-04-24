@@ -22,12 +22,12 @@ int main(void)
   struct terrain terrain;
 
   size_t length;
-  void *slab_buffer;
 
   SDL_Window *window = SDL_CreateWindow(
     "SDL2/OpenGL Demo", 0, 0, 640, 480,
     SDL_WINDOW_OPENGL|SDL_WINDOW_RESIZABLE);
 
+  srand(42);
   SDL_GL_CreateContext(window);
 
   init_gl(&game.test_resources);
