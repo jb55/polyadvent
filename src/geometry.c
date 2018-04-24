@@ -15,7 +15,7 @@ make_buffer_geometry(struct geometry *geom) {
   make_vertex_buffer(
                      GL_ARRAY_BUFFER,
                      geom->vertices,
-                     geom->num_verts * 3 * (int)sizeof(float),
+                     geom->num_verts * 3 * (int)sizeof(*geom->vertices),
                      &geom->buffer.vertex_buffer
                      );
 
@@ -24,7 +24,7 @@ make_buffer_geometry(struct geometry *geom) {
   make_vertex_buffer(
                      GL_ARRAY_BUFFER,
                      geom->normals,
-                     geom->num_verts * 3 * (int)sizeof(float),
+                     geom->num_verts * 3 * (int)sizeof(*geom->normals),
                      &geom->buffer.normal_buffer
                      );
 
@@ -33,7 +33,7 @@ make_buffer_geometry(struct geometry *geom) {
   make_index_buffer(
                     GL_ELEMENT_ARRAY_BUFFER,
                     geom->indices,
-                    geom->num_indices * (int)sizeof(u32),
+                    geom->num_indices * (int)sizeof(*geom->indices),
                     &geom->buffer.index_buffer
                     );
 }

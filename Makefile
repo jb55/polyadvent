@@ -32,7 +32,13 @@ OBJS += $(SRC)/util.o
 
 SRCS=$(OBJS:.o=.c)
 
+# include $(OBJS:.o=.d)
+
 all: $(BIN)
+
+# src/%.d: src/%.c
+# 	@rm -f $@; \
+# 	$(CC) -MM $(CFLAGS) $< > $@
 
 %.o: %.c %.h
 	$(CC) $(CFLAGS) -fPIC $(DEFS) -c $< -o $@
@@ -51,6 +57,6 @@ TAGS:
 	etags $(SRCS)
 
 clean:
-	rm -f src/main.o $(OBJS) $(SHLIB) $(BIN)
+	rm -f src/main.o $(OBJS) $(SHLIB) $(BIN) *.d
 
 .PHONY: TAGS

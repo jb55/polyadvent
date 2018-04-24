@@ -12,6 +12,7 @@
 #include "render.h"
 #include "terrain.h"
 #include <assert.h>
+#include <time.h>
 
 
 int main(void)
@@ -23,13 +24,16 @@ int main(void)
 
   size_t length;
 
+  /* SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES); */
+  SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
+
   SDL_Window *window = SDL_CreateWindow(
     "SDL2/OpenGL Demo", 0, 0, 640, 480,
     SDL_WINDOW_OPENGL|SDL_WINDOW_RESIZABLE);
 
-  srand(52);
-  SDL_GL_CreateContext(window);
+  srand(42);
 
+  SDL_GL_CreateContext(window);
   init_gl(&game.test_resources);
   game_init(&game);
 

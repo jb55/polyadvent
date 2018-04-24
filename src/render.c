@@ -57,8 +57,8 @@ void
 init_gl(struct resources *resources) {
   float tmp_matrix[16];
   glEnable(GL_DEPTH_TEST);
-  SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
-  SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+  /* SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES); */
+  /* SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4); */
 
   // VBOs
   make_vertex_buffer(
@@ -172,15 +172,15 @@ render_cube (struct resources * resources) {
 
 
 static void render_geom (struct resources *res,
-                         struct geometry *geom) {
+                         struct geometry *geom,
+                         GLenum type) {
   struct attributes *attrs = &res->attributes;
 
   bind_vbo(&geom->buffer.vertex_buffer, attrs->position);
   bind_vbo(&geom->buffer.normal_buffer, attrs->normal);
   bind_ibo(&geom->buffer.index_buffer);
 
-  glDrawElements(
-                 GL_LINES,
+  glDrawElements(type,
                  geom->num_indices, /* count */
                  GL_UNSIGNED_INT,    /* type */
                  (void*)0            /* element array buffer offset */
@@ -214,5 +214,5 @@ void render (struct resources * resources, struct geometry *geom) {
   glUniformMatrix4fv(resources->uniforms.mvp, 1, 0, tmp_matrix);
 
   /* render_cube(resources); */
-  render_geom(resources, geom);
+  render_geom(resources, geom, GL_TRIANGLES);
 }
