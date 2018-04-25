@@ -55,7 +55,7 @@ int main(void)
   /* Loop until the user closes the window */
 
   while (1) {
-    process_events();
+    process_events(&game.input);
     update(&game);
     render(&game.test_resources, &terrain.geom);
 

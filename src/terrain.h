@@ -5,8 +5,16 @@
 
 #include "geometry.h"
 
+struct perlin_settings {
+  double freq;
+  int depth;
+  double amplitude;
+  double exp;
+};
+
 struct terrain {
   struct geometry geom;
+  struct perlin_settings settings;
   float width, height;
 };
 

@@ -188,34 +188,35 @@ static void render_geom (struct resources *res,
 }
 
 
-void render (struct resources * resources, struct geometry *geom) {
+void render (struct resources * res, struct geometry *geom) {
   glClearColor( 0.0f, 0.0f, 0.0f, 1.0f ); //clear background screen to black
   glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
   static float id[MAT4_ELEMS] = { 0 };
   mat4_id(id);
 
-  float *mvp = resources->test_mvp;
-  float *normal = resources->normal_matrix;
-  float *camera = resources->camera;
-  float *persp = resources->camera_persp;
-  float fade_factor = resources->fade_factor;
+  float *mvp = res->test_mvp;
+  float *normal = res->normal_matrix;
+  float *camera = res->camera;
+  float *persp = res->camera_persp;
+  float *light = res->light_dir;
+  float fade_factor = res->fade_factor;
 
   /* static float v3[] = { 1, 1, 0 }; */
   /* v3[1] = fade_factor * 1.4f; */
   /* mat4_rotate(mvp, 0.004f, v3, mvp); */
   mat4_multiply(persp, camera, tmp_matrix);
   mat4_multiply(tmp_matrix, mvp, tmp_matrix);
-  recalc_normals(resources->uniforms.normal_matrix, tmp_matrix, normal);
-  glUniform3f(resources->uniforms.light_dir, 1.0f, 1.0f, 0.0f);
+  recalc_normals(res->uniforms.normal_matrix, tmp_matrix, normal);
+  glUniform3f(res->uniforms.light_dir, light[0], light[1], light[2]);
 
-  glUseProgram(resources->program);
-  glUniform1f(resources->uniforms.fade_factor, fade_factor);
-  glUniformMatrix4fv(resources->uniforms.mvp, 1, 0, tmp_matrix);
+  glUseProgram(res->program);
+  glUniform1f(res->uniforms.fade_factor, fade_factor);
+  glUniformMatrix4fv(res->uniforms.mvp, 1, 0, tmp_matrix);
 
-  /* render_cube(resources); */
+  /* render_cube(res); */
   glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-  render_geom(resources, geom, GL_TRIANGLES);
+  render_geom(res, geom, GL_TRIANGLES);
   /* glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); */
-  /* render_geom(resources, geom, GL_TRIANGLES); */
+  /* render_geom(res, geom, GL_TRIANGLES); */
 }

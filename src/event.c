@@ -4,11 +4,15 @@
 #include "input.h"
 #include "game.h"
 
-void process_events() {
+void process_events(struct input *input) {
   SDL_Event event;
 
   while (SDL_PollEvent(&event)) {
     switch (event.type) {
+    case SDL_KEYDOWN:
+    case SDL_KEYUP:
+      handle_key(input, event.key);
+      break;
     case SDL_WINDOWEVENT:
       switch (event.window.event) {
       case SDL_WINDOWEVENT_RESIZED:
