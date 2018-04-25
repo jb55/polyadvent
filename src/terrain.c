@@ -42,7 +42,8 @@ terrain_init(struct terrain *terrain) {
 void
 terrain_create(struct terrain *terrain) {
   u32 i;
-  const int num_verts = 5000;
+  const double size = 200;
+  const int num_verts = size*size;
   float tmp1[3];
   float tmp2[3];
   del_point2d_t *points = calloc(num_verts, sizeof(*points));
@@ -55,8 +56,8 @@ terrain_create(struct terrain *terrain) {
   for (i = 0; i < (u32)num_verts; i++) {
     int n = i*3;
     double dx, dy;
-    double x = rand_0to1() * 100.0;
-    double y = rand_0to1() * 100.0;
+    double x = rand_0to1() * size;
+    double y = rand_0to1() * size;
     double z = old_noisy_boi(x, y);
     deriv(old_noisy_boi, x, y, z, &dx, &dy);
 
