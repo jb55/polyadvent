@@ -96,34 +96,6 @@ terrain_create(struct terrain *terrain) {
     /* normals[n+2] = rand_0to1(); */
   }
 
-  /* for (i = 0; i < tri->num_triangles; ++i) { */
-
-  /*   int p0 = tri->tris[i * 3 + 0]; */
-  /*   int p1 = tri->tris[i * 3 + 1]; */
-  /*   int p2 = tri->tris[i * 3 + 2]; */
-
-  /*   vec3 *v0 = (vec3*)&verts[p0]; */
-  /*   vec3 *v1 = (vec3*)&verts[p1]; */
-  /*   vec3 *v2 = (vec3*)&verts[p2]; */
-
-  /*   vec3_subtract(v1, v0, tmp1); */
-  /*   vec3_subtract(v2, v0, tmp2); */
-  /*   vec3_cross(tmp1, tmp2, norm); */
-
-  /*   normals[p0] = norm[0]; */
-  /*   normals[p0+1] = norm[1]; */
-  /*   normals[p0+2] = norm[2]; */
-
-  /*   normals[p1] = norm[0]; */
-  /*   normals[p1+1] = norm[1]; */
-  /*   normals[p1+2] = norm[2]; */
-
-  /*   normals[p2] = norm[0]; */
-  /*   normals[p2+1] = norm[1]; */
-  /*   normals[p2+2] = norm[2]; */
-  /* } */
-
-
   terrain->geom.num_verts = num_verts;
   terrain->geom.vertices = (float*)verts;
   terrain->geom.normals = (float*)normals;
