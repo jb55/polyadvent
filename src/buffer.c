@@ -2,6 +2,7 @@
 #include "buffer.h"
 #include "util.h"
 #include <assert.h>
+#include "gl.h"
 
 gpu_addr
 make_buffer(GLenum target, const void *buffer_data, GLsizei buffer_size) {

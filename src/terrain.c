@@ -45,7 +45,6 @@ terrain_create(struct terrain *terrain) {
   const int num_verts = 5000;
   float tmp1[3];
   float tmp2[3];
-  float norm[3];
   del_point2d_t *points = calloc(num_verts, sizeof(*points));
   float *zs = calloc(num_verts * 3, sizeof(*zs));
   float *verts = calloc(num_verts * 3, sizeof(*verts));

@@ -292,7 +292,7 @@ mat4 *mat4_rotate(const mat4 *mat, const float angle,
 }
 
 
-mat4_print(const mat4 *m) {
+void mat4_print(const mat4 *m) {
   for (int i = 0; i < 16; ++i) {
     if (i % 4 == 0)
       printf("\n");
