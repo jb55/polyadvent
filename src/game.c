@@ -18,7 +18,7 @@ void game_init(struct game *game) {
   mat4_id(camera);
 
   // move the camera a bit
-  /* mat4_translate(camera, -1.0f, -1.0f, -7.0f, camera); */
+  /* mat4_translate(camera, 1.0f, 1.0f, 20.0f, camera); */
   mat4_copy(cam_init, camera);
 
   input_init(&game->input);

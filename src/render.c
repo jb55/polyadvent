@@ -207,9 +207,9 @@ void render (struct resources * resources, struct geometry *geom) {
   mat4_multiply(persp, camera, tmp_matrix);
   mat4_multiply(tmp_matrix, mvp, tmp_matrix);
   recalc_normals(resources->uniforms.normal_matrix, tmp_matrix, normal);
+  glUniform3f(resources->uniforms.light_dir, 1.0f, 1.0f, 0.0f);
 
   glUseProgram(resources->program);
-  glUniform3f(resources->uniforms.light_dir, -1, 1, -0.099f);
   glUniform1f(resources->uniforms.fade_factor, fade_factor);
   glUniformMatrix4fv(resources->uniforms.mvp, 1, 0, tmp_matrix);
 

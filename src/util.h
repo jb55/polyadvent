@@ -7,13 +7,6 @@
 
 #define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
 
-typedef struct vec3 {
-  union {
-    float x,y,z;
-    float xyz[3];
-  };
-} vec3;
-
 void check_gl(void);
 
 double rand_0to1();

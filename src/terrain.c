@@ -2,6 +2,7 @@
 #include "terrain.h"
 #include "util.h"
 #include "delaunay.h"
+#include "vec3/vec3.h"
 
 static const float plane_verts[] = {
   -1,-1,0,  -1,1,0,  1,1,0,  1,-1,0
@@ -17,8 +18,11 @@ static const u32 plane_indices[] = {
 
 
 double old_noisy_boi(double x, double y, double *dx, double *dy) {
-  double z = sin(x/5.0) * cos(y/5.0) * 5.0;
-  /* *dx =  */
+  double c = 5.0;
+  double h = c;
+  double z = sin(x/c) * cos(y/c) * h;
+  *dx = (cos(x/c) * cos(y/c) * h)/c;
+  *dy = (sin(x/c) * sin(y/c) * h)/c;
   return z;
 }
 
@@ -31,7 +35,10 @@ terrain_init(struct terrain *terrain) {
 void
 terrain_create(struct terrain *terrain) {
   u32 i;
-  const int num_verts = 10000;
+  const int num_verts = 5000;
+  float tmp1[3];
+  float tmp2[3];
+  float norm[3];
   del_point2d_t *points = calloc(num_verts, sizeof(*points));
   float *zs = calloc(num_verts * 3, sizeof(*zs));
   float *verts = calloc(num_verts * 3, sizeof(*verts));
@@ -39,7 +46,7 @@ terrain_create(struct terrain *terrain) {
   /* int *indices = calloc(num_verts, sizeof(*indices)); */
 
   // 100 random samples from our noise function
-  for (i = 0; i < num_verts; i++) {
+  for (i = 0; i < (u32)num_verts; i++) {
     int n = i*3;
     double dx, dy;
     double x = rand_0to1() * 100.0;
@@ -54,9 +61,21 @@ terrain_create(struct terrain *terrain) {
     verts[n+1] = (float)y;
     verts[n+2] = (float)z;
 
-    normals[n] = 0;
-    normals[n+1] = 0;
-    normals[n+2] = 1;
+
+    // ^i * dx
+    vec3_scale((float[3]){1,0,0}, dx, tmp1);
+    // ^k - (^i * dx)
+    vec3_subtract((float[3]){0,0,1}, tmp1, tmp2);
+
+    // ^j * dy
+    vec3_scale((float[3]){0,1,0}, dy, tmp1);
+
+    // (^k - (^i * dx)) - ^j * dy
+    vec3_subtract(tmp2, tmp1, tmp2);
+
+    normals[n] = tmp2[0];
+    normals[n+1] = tmp2[1];
+    normals[n+2] = tmp2[2];
   }
 
   delaunay2d_t *del = delaunay2d_from(points, num_verts);
@@ -72,9 +91,9 @@ terrain_create(struct terrain *terrain) {
     verts[n]   = (float)tri->points[i].x;
     verts[n+1] = (float)tri->points[i].y;
 
-    normals[n]   = rand_0to1();
-    normals[n+1] = rand_0to1();
-    normals[n+2] = rand_0to1();
+    /* normals[n]   = rand_0to1(); */
+    /* normals[n+1] = rand_0to1(); */
+    /* normals[n+2] = rand_0to1(); */
   }
 
   /* for (i = 0; i < tri->num_triangles; ++i) { */
@@ -82,37 +101,26 @@ terrain_create(struct terrain *terrain) {
   /*   int p0 = tri->tris[i * 3 + 0]; */
   /*   int p1 = tri->tris[i * 3 + 1]; */
   /*   int p2 = tri->tris[i * 3 + 2]; */
+
   /*   vec3 *v0 = (vec3*)&verts[p0]; */
   /*   vec3 *v1 = (vec3*)&verts[p1]; */
   /*   vec3 *v2 = (vec3*)&verts[p2]; */
 
-  /*   float x0 = v0->x; */
-  /*   float x1 = v1->x; */
-  /*   float x2 = v2->x; */
+  /*   vec3_subtract(v1, v0, tmp1); */
+  /*   vec3_subtract(v2, v0, tmp2); */
+  /*   vec3_cross(tmp1, tmp2, norm); */
 
-  /*   float y0 = v0->y; */
-  /*   float y1 = v1->y; */
-  /*   float y2 = v2->y; */
+  /*   normals[p0] = norm[0]; */
+  /*   normals[p0+1] = norm[1]; */
+  /*   normals[p0+2] = norm[2]; */
 
-  /*   float z0 = v0->z; */
-  /*   float z1 = v1->z; */
-  /*   float z2 = v2->z; */
+  /*   normals[p1] = norm[0]; */
+  /*   normals[p1+1] = norm[1]; */
+  /*   normals[p1+2] = norm[2]; */
 
-  /*   float nx = (y1-y0)*(z2-z0)-(y2-y0)*(z1-z0); */
-  /*   float ny = (z1-z0)*(x2-x0)-(x1-x0)*(z2-z0); */
-  /*   float nz = (x1-x0)*(y2-x0)-(x2-x1)*(y1-y0); */
-
-  /*   normals[p0] = nx; */
-  /*   normals[p0+1] = ny; */
-  /*   normals[p0+2] = nz; */
-
-  /*   normals[p1] = nx; */
-  /*   normals[p1+1] = ny; */
-  /*   normals[p1+2] = nz; */
-
-  /*   normals[p2] = nx; */
-  /*   normals[p2+1] = ny; */
-  /*   normals[p2+2] = nz; */
+  /*   normals[p2] = norm[0]; */
+  /*   normals[p2+1] = norm[1]; */
+  /*   normals[p2+2] = norm[2]; */
   /* } */
 
 
