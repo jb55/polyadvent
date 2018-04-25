@@ -17,13 +17,20 @@ static const u32 plane_indices[] = {
 };
 
 
-double old_noisy_boi(double x, double y, double *dx, double *dy) {
+double old_noisy_boi(double x, double y) {
   double c = 5.0;
   double h = c;
-  double z = sin(x/c) * cos(y/c) * h;
-  *dx = (cos(x/c) * cos(y/c) * h)/c;
-  *dy = (sin(x/c) * sin(y/c) * h)/c;
-  return z;
+  return sin(x/c) * cos(y/c) * h;
+}
+
+void deriv(double (*noisefn)(double, double), double x, double y,
+           double z1, double *dx, double *dy)
+{
+  static const double h = 0.00001;
+  double zx = noisefn(x + h, y);
+  double zy = noisefn(x, y - h);
+  *dx = (zx - z1)/h;
+  *dy = (zy - z1)/h;
 }
 
 void
@@ -51,7 +58,8 @@ terrain_create(struct terrain *terrain) {
     double dx, dy;
     double x = rand_0to1() * 100.0;
     double y = rand_0to1() * 100.0;
-    double z = old_noisy_boi(x, y, &dx, &dy);
+    double z = old_noisy_boi(x, y);
+    deriv(old_noisy_boi, x, y, z, &dx, &dy);
 
     points[i].x = x;
     points[i].y = y;
