@@ -40,7 +40,6 @@ terrain_create(struct terrain *terrain) {
   float tmp2[3];
   float norm[3];
   del_point2d_t *points = calloc(num_verts, sizeof(*points));
-  float *zs = calloc(num_verts * 3, sizeof(*zs));
   float *verts = calloc(num_verts * 3, sizeof(*verts));
   float *normals = calloc(num_verts * 3, sizeof(*normals));
   /* int *indices = calloc(num_verts, sizeof(*indices)); */
@@ -55,12 +54,10 @@ terrain_create(struct terrain *terrain) {
 
     points[i].x = x;
     points[i].y = y;
-    zs[i] = z;
 
     verts[n] = (float)x;
     verts[n+1] = (float)y;
     verts[n+2] = (float)z;
-
 
     // ^i * dx
     vec3_scale((float[3]){1,0,0}, dx, tmp1);
