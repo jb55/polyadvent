@@ -25,7 +25,6 @@ int main(void)
   size_t length;
 
   /* SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES); */
-  SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
 
   SDL_Window *window = SDL_CreateWindow(
     "SDL2/OpenGL Demo", 0, 0, 640, 480,

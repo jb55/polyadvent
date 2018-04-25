@@ -24,11 +24,11 @@ make_shader(GLenum type, const char *filename) {
   free(source);
   glCompileShader(shader);
 
- glGetShaderiv(shader, GL_COMPILE_STATUS, &shader_ok);
+  glGetShaderiv(shader, GL_COMPILE_STATUS, &shader_ok);
 
   if (!shader_ok) {
     fprintf(stderr, "Failed to compile %s:\n", filename);
-    //show_info_log(shader, glGetShaderiv, glGetShaderInfoLog);
+    show_info_log(shader);
     glDeleteShader(shader);
     return 0;
   }
@@ -52,7 +52,7 @@ make_program(GLuint vertex_shader, GLuint fragment_shader) {
   glGetProgramiv(program, GL_LINK_STATUS, &program_ok);
   if (!program_ok) {
     fprintf(stderr, "Failed to link shader program:\n");
-    //show_info_log(program, glGetProgramiv, glGetProgramInfoLog);
+    show_info_log(program);
     glDeleteProgram(program);
     return 0;
   }

@@ -57,8 +57,8 @@ void
 init_gl(struct resources *resources) {
   float tmp_matrix[16];
   glEnable(GL_DEPTH_TEST);
-  /* SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES); */
-  /* SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4); */
+  SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
+  SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
 
   // VBOs
   make_vertex_buffer(
@@ -214,5 +214,8 @@ void render (struct resources * resources, struct geometry *geom) {
   glUniformMatrix4fv(resources->uniforms.mvp, 1, 0, tmp_matrix);
 
   /* render_cube(resources); */
+  glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
   render_geom(resources, geom, GL_TRIANGLES);
+  /* glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); */
+  /* render_geom(resources, geom, GL_TRIANGLES); */
 }

@@ -16,8 +16,10 @@ static const u32 plane_indices[] = {
 };
 
 
-double old_noisy_boi(double x, double y) {
-  return sin(x/5.0) * cos(y/5.0) * rand_0to1() * 10;
+double old_noisy_boi(double x, double y, double *dx, double *dy) {
+  double z = sin(x/5.0) * cos(y/5.0) * 5.0;
+  /* *dx =  */
+  return z;
 }
 
 void
@@ -39,9 +41,10 @@ terrain_create(struct terrain *terrain) {
   // 100 random samples from our noise function
   for (i = 0; i < num_verts; i++) {
     int n = i*3;
+    double dx, dy;
     double x = rand_0to1() * 100.0;
     double y = rand_0to1() * 100.0;
-    double z = old_noisy_boi(x, y);
+    double z = old_noisy_boi(x, y, &dx, &dy);
 
     points[i].x = x;
     points[i].y = y;
@@ -121,12 +124,12 @@ terrain_create(struct terrain *terrain) {
 
   make_buffer_geometry(&terrain->geom);
 
-  /* delaunay2d_release(del); */
-  /* tri_delaunay2d_release(tri); */
+  delaunay2d_release(del);
+  tri_delaunay2d_release(tri);
 
-  /* free(points); */
-  /* free(verts); */
-  /* free(normals); */
+  free(points);
+  free(verts);
+  free(normals);
 }
 
 void

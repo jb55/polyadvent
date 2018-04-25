@@ -4,7 +4,7 @@
 
 #include "gl.h"
 
-void show_info_log(void);
+void show_info_log(GLuint shader);
 
 
 #endif /* POLYADVENT_DEBUG_H */
