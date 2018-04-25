@@ -91,18 +91,6 @@ terrain_create(struct terrain *terrain) {
   printf("faces %d tris %d points %d\n",
          del->num_faces, tri->num_triangles, tri->num_points);
 
-  // TODO: calc normals
-  for (i = 0; i < tri->num_points; i++) {
-    int n = i*3;
-
-    verts[n]   = (float)tri->points[i].x;
-    verts[n+1] = (float)tri->points[i].y;
-
-    /* normals[n]   = rand_0to1(); */
-    /* normals[n+1] = rand_0to1(); */
-    /* normals[n+2] = rand_0to1(); */
-  }
-
   terrain->geom.num_verts = num_verts;
   terrain->geom.vertices = (float*)verts;
   terrain->geom.normals = (float*)normals;
