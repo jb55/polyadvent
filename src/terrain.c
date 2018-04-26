@@ -48,7 +48,6 @@ terrain_create(struct terrain *terrain) {
   const double size = 500;
   const double hsize = size/2;
   const int num_verts = hsize*hsize;
-  float tmp1[3];
   float tmp2[3];
   struct perlin_settings perlin = {
     .depth = 1,
@@ -59,7 +58,6 @@ terrain_create(struct terrain *terrain) {
   del_point2d_t *points = calloc(num_verts, sizeof(*points));
   float *verts = calloc(num_verts * 3, sizeof(*verts));
   float *normals = calloc(num_verts * 3, sizeof(*normals));
-  /* int *indices = calloc(num_verts, sizeof(*indices)); */
 
   // 100 random samples from our noise function
   for (i = 0; i < (u32)num_verts; i++) {
