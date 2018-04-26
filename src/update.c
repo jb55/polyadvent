@@ -90,8 +90,8 @@ void update (struct game *game, u32 dt) {
     /* terrain_settings.o2s = fabs(cos(n+2) * 0.5); */
     /* terrain_settings.o2 = fabs(sin(n*0.02) * 2); */
     /* terrain_settings.freq = fabs(-sin(n)*0.002 * cos(-n)) + 0.02; */
-    terrain_settings.exp = fabs(cos(n)*2.0*cos(n)) + 5.0;
-    terrain_settings.amplitude = cos(1/n)*2.0*cos(n) + 0.5;
+    /* terrain_settings.exp = fabs(cos(n)*2.0*cos(n)) + 5.0; */
+    /* terrain_settings.amplitude = cos(1/n)*2.0*cos(n) + 0.5; */
 
     terrain_destroy(game->terrain);
     terrain_init(game->terrain);

@@ -46,7 +46,7 @@ void
 terrain_create(struct terrain *terrain, struct perlin_settings *perlin) {
   u32 i;
   const double size = 200;
-  const double hsize = size/2;
+  const double hsize = size;
   int num_verts = hsize*hsize;
   static int first = 1;
   static float samples_x[40000];
