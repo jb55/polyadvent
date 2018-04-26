@@ -47,11 +47,11 @@ terrain_create(struct terrain *terrain, struct perlin_settings *perlin) {
   u32 i;
   const double size = 200;
   const double hsize = size/2;
-  const int num_verts = hsize*hsize;
+  int num_verts = hsize*hsize;
   static int first = 1;
   static float samples_x[40000];
   static float samples_y[40000];
-  float tmp2[3];
+  float tmp1[3], tmp2[3];
   del_point2d_t *points = calloc(num_verts, sizeof(*points));
   float *verts = calloc(num_verts * 3, sizeof(*verts));
   float *normals = calloc(num_verts * 3, sizeof(*normals));
@@ -75,7 +75,6 @@ terrain_create(struct terrain *terrain, struct perlin_settings *perlin) {
     }
 
     double z = old_noisy_boi((void*)perlin, ox+x, oy+y);
-    deriv(old_noisy_boi, (void*)perlin, ox+x, oy+y, z, &dx, &dy);
 
     points[i].x = x;
     points[i].y = y;
@@ -83,17 +82,6 @@ terrain_create(struct terrain *terrain, struct perlin_settings *perlin) {
     verts[n] = (float)x;
     verts[n+1] = (float)y;
     verts[n+2] = (float)z;
-
-    // ^k - (^i * dx)
-    vec3_subtract(V3(0,0,1), V3(dx,0,0), tmp2);
-
-    // (^k - (^i * dx)) - ^j * dy
-    vec3_subtract(tmp2, V3(0,dy,0), tmp2);
-    vec3_normalize(tmp2, tmp2);
-
-    normals[n] = tmp2[0];
-    normals[n+1] = tmp2[1];
-    normals[n+2] = tmp2[2];
   }
 
   first = 0;
@@ -101,14 +89,61 @@ terrain_create(struct terrain *terrain, struct perlin_settings *perlin) {
   delaunay2d_t *del = delaunay2d_from(points, num_verts);
   tri_delaunay2d_t *tri = tri_delaunay2d_from(del);
 
+  num_verts = tri->num_triangles * 3;
+  float *del_verts = calloc(num_verts * 3, sizeof(*del_verts));
+  float *del_norms = calloc(num_verts * 3, sizeof(*del_norms));
+  u32   *del_indices = calloc(num_verts, sizeof(*del_indices));
+
+  for (i = 0; i < tri->num_triangles; ++i) {
+    int nv = i * 3;
+    int ndv = i * 9;
+
+    int p[3] = {
+      tri->tris[nv + 0],
+      tri->tris[nv + 1],
+      tri->tris[nv + 2],
+    };
+
+    float *v[3] = {
+      &verts[p[0]*3],
+      &verts[p[1]*3],
+      &verts[p[2]*3]
+    };
+
+    del_verts[ndv+0] = v[0][0];
+    del_verts[ndv+1] = v[0][1];
+    del_verts[ndv+2] = v[0][2];
+
+    del_verts[ndv+3] = v[1][0];
+    del_verts[ndv+4] = v[1][1];
+    del_verts[ndv+5] = v[1][2];
+
+    del_verts[ndv+6] = v[2][0];
+    del_verts[ndv+7] = v[2][1];
+    del_verts[ndv+8] = v[2][2];
+
+    vec3_subtract(v[1], v[0], tmp1);
+    vec3_subtract(v[2], v[0], tmp2);
+    vec3_cross(tmp1, tmp2, tmp2);
+    vec3_normalize(tmp2, tmp2);
+
+    for (int j = 0; j < 9; ++j) {
+      del_norms[ndv+j] = tmp2[j%3];
+    }
+
+    del_indices[nv+0] = nv+0;
+    del_indices[nv+1] = nv+1;
+    del_indices[nv+2] = nv+2;
+  }
+
   printf("faces %d tris %d points %d\n",
          del->num_faces, tri->num_triangles, tri->num_points);
 
   terrain->geom.num_verts = num_verts;
-  terrain->geom.vertices = (float*)verts;
-  terrain->geom.normals = (float*)normals;
-  terrain->geom.indices = tri->tris;
-  terrain->geom.num_indices = tri->num_triangles * 3;
+  terrain->geom.vertices = (float*)del_verts;
+  terrain->geom.normals = (float*)del_norms;
+  terrain->geom.indices = (u32*)del_indices;
+  terrain->geom.num_indices = num_verts;
 
   make_buffer_geometry(&terrain->geom);
 
@@ -118,6 +153,9 @@ terrain_create(struct terrain *terrain, struct perlin_settings *perlin) {
   free(points);
   free(verts);
   free(normals);
+  free(del_verts);
+  free(del_norms);
+  free(del_indices);
 }
 
 
