@@ -4,6 +4,7 @@
 #include "terrain.h"
 #include "util.h"
 #include "mat4/mat4.h"
+#include "vec3/vec3.h"
 
 void movement(struct game *game, float *obj) {
   float amt = 0.25;
@@ -54,6 +55,13 @@ void update (struct game *game, u32 dt) {
   struct resources *res = &game->test_resources;
   static struct perlin_settings terrain_settings = {
     .depth = 1,
+    .freq  = 0.04,
+    .amplitude  = 1.0,
+    .ox = 0,
+    .oy = 0,
+    .o1 = 2.0, .o1s = 0.5,
+    .o2 = 4.0, .o2s = 0.25,
+    .exp = 7.3
   };
   float *light = res->light_dir;
 
@@ -68,17 +76,22 @@ void update (struct game *game, u32 dt) {
     printf("light_dir %f %f %f\n", light[0], light[1], light[2]);
   }
 
-  if (passed < last_gen_time) {
+  int space_down = game->input.keystates[SDL_SCANCODE_SPACE];
+
+  if (space_down || passed < last_gen_time) {
     passed += dt;
   } else {
     passed = 0;
 
-    terrain_settings.depth = 1;
-
-    terrain_settings.amplitude = sin(n);
-    terrain_settings.exp = fabs(sin(n) * 10.0);
-    terrain_settings.freq = fabs(cos(n) * 0.04);
-
+    terrain_settings.oy += 1.0;
+    terrain_settings.ox += 1.0;
+    /* terrain_settings.o1s = fabs(sin(1/n) * 0.25); */
+    /* terrain_settings.o1 = fabs(cos(n*0.2) * 0.5); */
+    /* terrain_settings.o2s = fabs(cos(n+2) * 0.5); */
+    /* terrain_settings.o2 = fabs(sin(n*0.02) * 2); */
+    /* terrain_settings.freq = fabs(-sin(n)*0.002 * cos(-n)) + 0.02; */
+    terrain_settings.exp = fabs(cos(n)*2.0*cos(n)) + 5.0;
+    terrain_settings.amplitude = cos(1/n)*2.0*cos(n) + 0.5;
 
     terrain_destroy(game->terrain);
     terrain_init(game->terrain);

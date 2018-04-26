@@ -42,7 +42,11 @@ int main(void)
   struct perlin_settings terrain_settings = {
     .depth = 1,
     .freq  = 0.02,
+    .o1 = 2.0, .o1s = 0.5,
+    .o2 = 4.0, .o2s = 0.25,
     .amplitude  = 1.0,
+    .ox = 0,
+    .oy = 0,
     .exp = 7.3
   };
 
