@@ -145,6 +145,7 @@ static void
 recalc_normals(GLint norm_uniform, mat4 *mvp, mat4 *normal) {
   mat4 *calc = calc_normals(mvp, normal);
   glUniformMatrix4fv(norm_uniform, 1, 0, calc);
+  check_gl();
 }
 
 
@@ -195,6 +196,7 @@ static void render_geom (struct resources *res,
 void render (struct resources * res, struct geometry *geom) {
   glClearColor( 1.0f, 1.0f, 1.0f, 1.0f ); //clear background screen to black
   glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+  check_gl();
 
   static float id[MAT4_ELEMS] = { 0 };
   mat4_id(id);
@@ -208,16 +210,17 @@ void render (struct resources * res, struct geometry *geom) {
 
   float fade_factor = res->fade_factor;
 
+  glUseProgram(res->program);
 
   /* static float v3[] = { 1, 1, 0 }; */
   /* v3[1] = fade_factor * 1.4f; */
   /* mat4_rotate(mvp, 0.004f, v3, mvp); */
   mat4_multiply(persp, camera, tmp_matrix);
   mat4_multiply(tmp_matrix, mvp, tmp_matrix);
-  recalc_normals(res->uniforms.normal_matrix, tmp_matrix, normal);
-  glUniform3f(res->uniforms.light_dir, light[0], light[1], light[2]);
 
-  glUseProgram(res->program);
+  recalc_normals(res->uniforms.normal_matrix, tmp_matrix, normal);
+
+  glUniform3f(res->uniforms.light_dir, light[0], light[1], light[2]);
   glUniform1f(res->uniforms.fade_factor, fade_factor);
   glUniformMatrix4fv(res->uniforms.mvp, 1, 0, tmp_matrix);
 

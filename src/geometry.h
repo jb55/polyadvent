@@ -21,5 +21,6 @@ struct geometry {
 };
 
 void make_buffer_geometry(struct geometry *geom);
+void destroy_buffer_geometry(struct geometry *geom);
 
 #endif /* GEOMETRY_H */

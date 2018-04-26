@@ -21,7 +21,7 @@ void game_init(struct game *game) {
   mat4_id(normal);
   mat4_id(camera);
 
-  light_dir[0] = 1;
+  light_dir[0] = 0.5;
   light_dir[1] = 1;
   light_dir[2] = 0;
 

@@ -40,6 +40,7 @@ struct game {
   int counter;
   struct resources test_resources;
   struct input input;
+  struct terrain *terrain;
 };
 
 void game_init(struct game *game);

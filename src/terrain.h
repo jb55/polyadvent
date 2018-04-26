@@ -19,7 +19,7 @@ struct terrain {
 };
 
 void terrain_init(struct terrain *terrain);
-void terrain_create(struct terrain *terrain);
+void terrain_create(struct terrain *terrain, struct perlin_settings *);
 void terrain_destroy(struct terrain *terrain);
 
 

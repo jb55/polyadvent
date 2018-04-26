@@ -1,6 +1,26 @@
 
 #include "geometry.h"
+#include "util.h"
 #include <assert.h>
+
+void
+destroy_buffer_geometry(struct geometry *geom) {
+  gpu_addr buffers[] = {
+    geom->buffer.vertex_buffer.handle,
+    geom->buffer.normal_buffer.handle,
+    geom->buffer.index_buffer.handle
+  };
+  /* void glDeleteVertexArrays(GLsizei n, const GLuint *arrays); */
+  /* glDisableVertexAttribArray(geom->buffer.vertex_buffer.handle); */
+  /* check_gl(); */
+  /* glDisableVertexAttribArray(geom->buffer.normal_buffer.handle); */
+  /* check_gl(); */
+  /* glDisableVertexAttribArray(geom->buffer.index_buffer.handle); */
+  /* check_gl(); */
+  check_gl();
+  glDeleteBuffers(ARRAY_SIZE(buffers), buffers);
+  check_gl();
+}
 
 void
 make_buffer_geometry(struct geometry *geom) {

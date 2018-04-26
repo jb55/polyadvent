@@ -37,9 +37,17 @@ int main(void)
   SDL_GL_CreateContext(window);
   init_gl(&game.test_resources, width, height);
   game_init(&game);
+  game.terrain = &terrain;
+
+  struct perlin_settings terrain_settings = {
+    .depth = 1,
+    .freq  = 0.02,
+    .amplitude  = 1.0,
+    .exp = 7.3
+  };
 
   terrain_init(&terrain);
-  terrain_create(&terrain);
+  terrain_create(&terrain, &terrain_settings);
 
   /* slab_buffer = file_contents(SLAB("test.slab"), &length); */
   /* slab_parse(&slab, slab_buffer); */
@@ -56,12 +64,14 @@ int main(void)
 
   /* Loop until the user closes the window */
 
+
   u32 last = SDL_GetTicks();
 
   while (1) {
     process_events(game.test_resources.camera_persp, &game.input);
     u32 ticks = SDL_GetTicks();
     update(&game, ticks-last);
+
     last = ticks;
     render(&game.test_resources, &terrain.geom);
 

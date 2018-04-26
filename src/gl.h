@@ -23,6 +23,8 @@ GLint glGetAttribLocation(GLuint program, const GLchar *name);
 void glEnableVertexAttribArray(GLuint index);
 void glDeleteShader(GLuint shader);
 
+void glDeleteBuffers(GLsizei n, const GLuint * buffers);
+
 void glVertexAttribPointer(GLuint index, GLint size, GLenum type,
                            GLboolean normalized, GLsizei stride,
                            const GLvoid * pointer);
@@ -34,12 +36,15 @@ void glLinkProgram(GLuint program);
 
 void glUniformMatrix4fv(GLint location, GLsizei count, GLboolean transpose,
                         const GLfloat *value);
- 
+
 void glUseProgram(GLuint program);
 void glUniform1f(GLint location, GLfloat v0);
 void glGetProgramiv(GLuint program, GLenum pname, GLint *params);
 void glDeleteProgram(	GLuint program);
- 
 
+void glDisableVertexAttribArray(GLuint index);
+void glDeleteVertexArrays(GLsizei n, const GLuint *arrays);
+
+GLboolean glIsBuffer(	GLuint buffer);
 
 #endif /* POLYADVENT_GL_H */

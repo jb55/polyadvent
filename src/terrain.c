@@ -43,18 +43,12 @@ terrain_init(struct terrain *terrain) {
 }
 
 void
-terrain_create(struct terrain *terrain) {
+terrain_create(struct terrain *terrain, struct perlin_settings *perlin) {
   u32 i;
-  const double size = 500;
+  const double size = 200;
   const double hsize = size/2;
   const int num_verts = hsize*hsize;
   float tmp2[3];
-  struct perlin_settings perlin = {
-    .depth = 1,
-    .freq  = 0.02,
-    .amplitude  = 1.0,
-    .exp = 7.3
-  };
   del_point2d_t *points = calloc(num_verts, sizeof(*points));
   float *verts = calloc(num_verts * 3, sizeof(*verts));
   float *normals = calloc(num_verts * 3, sizeof(*normals));
@@ -65,8 +59,8 @@ terrain_create(struct terrain *terrain) {
     double dx, dy;
     double x = rand_0to1() * size;
     double y = rand_0to1() * size;
-    double z = old_noisy_boi((void*)&perlin, x, y);
-    deriv(old_noisy_boi, (void*)&perlin, x, y, z, &dx, &dy);
+    double z = old_noisy_boi((void*)perlin, x, y);
+    deriv(old_noisy_boi, (void*)perlin, x, y, z, &dx, &dy);
 
     points[i].x = x;
     points[i].y = y;
@@ -75,12 +69,11 @@ terrain_create(struct terrain *terrain) {
     verts[n+1] = (float)y;
     verts[n+2] = (float)z;
 
-
     // ^k - (^i * dx)
-    vec3_subtract((float[3]){0,0,1}, (float[3]){dx,0,0}, tmp2);
+    vec3_subtract(V3(0,0,1), V3(dx,0,0), tmp2);
 
     // (^k - (^i * dx)) - ^j * dy
-    vec3_subtract(tmp2, (float[3]){0,dy,0}, tmp2);
+    vec3_subtract(tmp2, V3(0,dy,0), tmp2);
     vec3_normalize(tmp2, tmp2);
 
     normals[n] = tmp2[0];
@@ -111,7 +104,6 @@ terrain_create(struct terrain *terrain) {
 }
 
 void
-terrain_detroy(struct terrain *terrain) {
-  free(terrain->geom.vertices);
-  free(terrain->geom.normals);
+terrain_destroy(struct terrain *terrain) {
+  destroy_buffer_geometry(&terrain->geom);
 }
