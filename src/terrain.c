@@ -98,7 +98,6 @@ terrain_create(struct terrain *terrain, struct perlin_settings *perlin) {
 
   first = 0;
 
-
   delaunay2d_t *del = delaunay2d_from(points, num_verts);
   tri_delaunay2d_t *tri = tri_delaunay2d_from(del);
 
@@ -121,7 +120,7 @@ terrain_create(struct terrain *terrain, struct perlin_settings *perlin) {
   free(normals);
 }
 
-void
-terrain_destroy(struct terrain *terrain) {
+
+void terrain_destroy(struct terrain *terrain) {
   destroy_buffer_geometry(&terrain->geom);
 }
