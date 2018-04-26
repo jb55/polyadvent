@@ -4,7 +4,7 @@
 #include "input.h"
 #include "game.h"
 
-void process_events(struct input *input) {
+void process_events(float *camera, struct input *input) {
   SDL_Event event;
 
   while (SDL_PollEvent(&event)) {
@@ -16,7 +16,7 @@ void process_events(struct input *input) {
     case SDL_WINDOWEVENT:
       switch (event.window.event) {
       case SDL_WINDOWEVENT_RESIZED:
-        handle_resize(event.window.data1, event.window.data2);
+        handle_resize(camera, event.window.data1, event.window.data2);
         break;
       }
       break;

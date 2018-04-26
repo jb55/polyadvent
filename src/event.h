@@ -5,6 +5,6 @@
 #include "gl.h"
 #include "input.h"
 
-void process_events(struct input *input);
+void process_events(float *camera, struct input *input);
 
 #endif /* PA_EVENT_H */

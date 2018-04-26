@@ -17,6 +17,7 @@ struct resources {
       GLint fade_factor;
       GLint light_dir;
       GLint mvp;
+      GLint local;
       GLint normal_matrix;
     } uniforms;
 
@@ -29,6 +30,7 @@ struct resources {
     float test_mvp[MAT4_ELEMS];
     float light_dir[3];
     float camera[MAT4_ELEMS];
+    float player[MAT4_ELEMS];
     float camera_persp[MAT4_ELEMS];
     GLfloat fade_factor;
 };
@@ -41,5 +43,6 @@ struct game {
 };
 
 void game_init(struct game *game);
+void should_update(struct game *game);
 
 #endif /* PA_GAME_H */

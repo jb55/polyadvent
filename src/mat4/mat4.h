@@ -1,6 +1,7 @@
 
 typedef float mat4;
 
+mat4 *mat4_scale(mat4 *a, float v[3], mat4 *out);
 mat4 *mat4_frustum (float left, float right, float bottom,
                     float top, float near, float far, mat4 *dest);
 

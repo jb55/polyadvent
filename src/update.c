@@ -8,7 +8,7 @@ void camera_movement(struct game *game) {
   float amt = 0.1;
 
   if (game->input.modifiers & KMOD_SHIFT)
-    amt *= 4;
+    amt *= 6;
 
   if (game->input.keystates[SDL_SCANCODE_A])
     mat4_translate(camera, -amt, 0, 0, camera);
@@ -34,10 +34,8 @@ void camera_movement(struct game *game) {
   if (game->input.keystates[SDL_SCANCODE_RIGHT])
     mat4_rotate(camera, amt*0.1, (float[]){0,1,0}, camera);
 
-  if (game->input.keystates[SDL_SCANCODE_LEFT]) {
-    mat4_translate(camera, amt, -amt, -amt, camera);
+  if (game->input.keystates[SDL_SCANCODE_LEFT])
     mat4_rotate(camera, -(amt*0.1), (float[]){0,1,0}, camera);
-  }
 
   if (game->input.keystates[SDL_SCANCODE_DOWN])
     mat4_rotate(camera, -(amt*0.1), (float[]){1,0,0}, camera);
@@ -46,11 +44,21 @@ void camera_movement(struct game *game) {
     mat4_print(camera);
 }
 
-void update (struct game *game) {
-  unsigned int ms = SDL_GetTicks();
+void update (struct game *game, u32 dt) {
+  static int passed = 0;
+  static float n = 1;
   camera_movement(game);
   struct resources *resources = &game->test_resources;
 
-  /* resources->light_dir[0] = cos(game->counter); */
-  /* resources->light_dir[1] = -sin(game->counter); */
+  u32 ticks = SDL_GetTicks();
+
+  if (passed < 10) {
+    passed += dt;
+  } else {
+    passed = 0;
+
+    resources->light_dir[0] = cos(n) * 0.8;
+    n += 0.01f;
+  }
+
 }

@@ -6,6 +6,7 @@
 #include "gl.h"
 #include "game.h"
 #include "mat4/mat4.h"
+#include "vec3/vec3.h"
 #include "buffer.h"
 #include "buffer_geometry.h"
 #include "shader.h"
@@ -54,7 +55,7 @@ static const GLushort cube_indices[] = {
 };
 
 void
-init_gl(struct resources *resources) {
+init_gl(struct resources *resources, int width, int height) {
   float tmp_matrix[16];
   glEnable(GL_DEPTH_TEST);
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
@@ -98,7 +99,7 @@ init_gl(struct resources *resources) {
   assert(resources->fragment_shader != 0);
 
   // camera
-  mat4_perspective(90 /* fov */, 1080 / 720, 1, 1000, resources->camera_persp);
+  mat4_perspective(90 /* fov */, (float)width / height, 1, 1000, resources->camera_persp);
 
   // Shader program
   resources->program = make_program(resources->vertex_shader,
@@ -118,6 +119,9 @@ init_gl(struct resources *resources) {
 
   resources->uniforms.mvp
     = glGetUniformLocation(resources->program, "mvp");
+
+  resources->uniforms.local
+    = glGetUniformLocation(resources->program, "local");
 
   resources->attributes.normal
     = (gpu_addr)glGetAttribLocation(resources->program, "normal");
@@ -189,7 +193,7 @@ static void render_geom (struct resources *res,
 
 
 void render (struct resources * res, struct geometry *geom) {
-  glClearColor( 0.0f, 0.0f, 0.0f, 1.0f ); //clear background screen to black
+  glClearColor( 1.0f, 1.0f, 1.0f, 1.0f ); //clear background screen to black
   glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
   static float id[MAT4_ELEMS] = { 0 };
@@ -200,7 +204,10 @@ void render (struct resources * res, struct geometry *geom) {
   float *camera = res->camera;
   float *persp = res->camera_persp;
   float *light = res->light_dir;
+  float *player = res->player;
+
   float fade_factor = res->fade_factor;
+
 
   /* static float v3[] = { 1, 1, 0 }; */
   /* v3[1] = fade_factor * 1.4f; */
@@ -214,8 +221,10 @@ void render (struct resources * res, struct geometry *geom) {
   glUniform1f(res->uniforms.fade_factor, fade_factor);
   glUniformMatrix4fv(res->uniforms.mvp, 1, 0, tmp_matrix);
 
-  /* render_cube(res); */
-  glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+  glUniformMatrix4fv(res->uniforms.local, 1, 0, player);
+  render_cube(res);
+  glUniformMatrix4fv(res->uniforms.local, 1, 0, id);
+
   render_geom(res, geom, GL_TRIANGLES);
   /* glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); */
   /* render_geom(res, geom, GL_TRIANGLES); */

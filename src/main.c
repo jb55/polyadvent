@@ -25,15 +25,17 @@ int main(void)
   size_t length;
 
   /* SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES); */
+  int width = 640;
+  int height = 480;
 
   SDL_Window *window = SDL_CreateWindow(
-    "SDL2/OpenGL Demo", 0, 0, 640, 480,
+    "SDL2/OpenGL Demo", 0, 0, width, height,
     SDL_WINDOW_OPENGL|SDL_WINDOW_RESIZABLE);
 
-  srand(42);
+  srand(time(NULL));
 
   SDL_GL_CreateContext(window);
-  init_gl(&game.test_resources);
+  init_gl(&game.test_resources, width, height);
   game_init(&game);
 
   terrain_init(&terrain);
@@ -54,9 +56,13 @@ int main(void)
 
   /* Loop until the user closes the window */
 
+  u32 last = SDL_GetTicks();
+
   while (1) {
-    process_events(&game.input);
-    update(&game);
+    process_events(game.test_resources.camera_persp, &game.input);
+    u32 ticks = SDL_GetTicks();
+    update(&game, ticks-last);
+    last = ticks;
     render(&game.test_resources, &terrain.geom);
 
     /* Swap front and back buffers */

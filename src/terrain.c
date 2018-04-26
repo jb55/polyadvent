@@ -45,19 +45,18 @@ terrain_init(struct terrain *terrain) {
 void
 terrain_create(struct terrain *terrain) {
   u32 i;
-  const double size = 200;
-  const double hsize = size;
+  const double size = 500;
+  const double hsize = size/2;
   const int num_verts = hsize*hsize;
   float tmp1[3];
   float tmp2[3];
   struct perlin_settings perlin = {
     .depth = 1,
-    .freq  = 0.03,
-    .amplitude  = 15.0,
-    .exp = 2.3
+    .freq  = 0.02,
+    .amplitude  = 1.0,
+    .exp = 7.3
   };
   del_point2d_t *points = calloc(num_verts, sizeof(*points));
-  float *zs = calloc(num_verts * 3, sizeof(*zs));
   float *verts = calloc(num_verts * 3, sizeof(*verts));
   float *normals = calloc(num_verts * 3, sizeof(*normals));
   /* int *indices = calloc(num_verts, sizeof(*indices)); */
@@ -73,7 +72,6 @@ terrain_create(struct terrain *terrain) {
 
     points[i].x = x;
     points[i].y = y;
-    zs[i] = z;
 
     verts[n] = (float)x;
     verts[n+1] = (float)y;
