@@ -6,6 +6,7 @@
 #include "gl.h"
 #include "game.h"
 #include "mat4/mat4.h"
+#include "vec3/vec3.h"
 #include "buffer.h"
 #include "buffer_geometry.h"
 #include "shader.h"
@@ -54,7 +55,7 @@ static const GLushort cube_indices[] = {
 };
 
 void
-init_gl(struct resources *resources) {
+init_gl(struct resources *resources, int width, int height) {
   float tmp_matrix[16];
   glEnable(GL_DEPTH_TEST);
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
@@ -98,7 +99,7 @@ init_gl(struct resources *resources) {
   assert(resources->fragment_shader != 0);
 
   // camera
-  mat4_perspective(90 /* fov */, 1080 / 720, 1, 1000, resources->camera_persp);
+  mat4_perspective(90 /* fov */, (float)width / height, 1, 1000, resources->camera_persp);
 
   // Shader program
   resources->program = make_program(resources->vertex_shader,
@@ -118,6 +119,9 @@ init_gl(struct resources *resources) {
 
   resources->uniforms.mvp
     = glGetUniformLocation(resources->program, "mvp");
+
+  resources->uniforms.local
+    = glGetUniformLocation(resources->program, "local");
 
   resources->attributes.normal
     = (gpu_addr)glGetAttribLocation(resources->program, "normal");
@@ -141,6 +145,7 @@ static void
 recalc_normals(GLint norm_uniform, mat4 *mvp, mat4 *normal) {
   mat4 *calc = calc_normals(mvp, normal);
   glUniformMatrix4fv(norm_uniform, 1, 0, calc);
+  check_gl();
 }
 
 
@@ -188,34 +193,42 @@ static void render_geom (struct resources *res,
 }
 
 
-void render (struct resources * resources, struct geometry *geom) {
-  glClearColor( 0.0f, 0.0f, 0.0f, 1.0f ); //clear background screen to black
+void render (struct resources * res, struct geometry *geom) {
+  glClearColor( 1.0f, 1.0f, 1.0f, 1.0f ); //clear background screen to black
   glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+  check_gl();
 
   static float id[MAT4_ELEMS] = { 0 };
   mat4_id(id);
 
-  float *mvp = resources->test_mvp;
-  float *normal = resources->normal_matrix;
-  float *camera = resources->camera;
-  float *persp = resources->camera_persp;
-  float fade_factor = resources->fade_factor;
+  float *mvp = res->test_mvp;
+  float *normal = res->normal_matrix;
+  float *camera = res->camera;
+  float *persp = res->camera_persp;
+  float *light = res->light_dir;
+  float *player = res->player;
+
+  float fade_factor = res->fade_factor;
+
+  glUseProgram(res->program);
 
   /* static float v3[] = { 1, 1, 0 }; */
   /* v3[1] = fade_factor * 1.4f; */
   /* mat4_rotate(mvp, 0.004f, v3, mvp); */
   mat4_multiply(persp, camera, tmp_matrix);
   mat4_multiply(tmp_matrix, mvp, tmp_matrix);
-  recalc_normals(resources->uniforms.normal_matrix, tmp_matrix, normal);
-  glUniform3f(resources->uniforms.light_dir, 1.0f, 1.0f, 0.0f);
 
-  glUseProgram(resources->program);
-  glUniform1f(resources->uniforms.fade_factor, fade_factor);
-  glUniformMatrix4fv(resources->uniforms.mvp, 1, 0, tmp_matrix);
+  recalc_normals(res->uniforms.normal_matrix, tmp_matrix, normal);
 
-  /* render_cube(resources); */
-  glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-  render_geom(resources, geom, GL_TRIANGLES);
+  glUniform3f(res->uniforms.light_dir, light[0], light[1], light[2]);
+  glUniform1f(res->uniforms.fade_factor, fade_factor);
+  glUniformMatrix4fv(res->uniforms.mvp, 1, 0, tmp_matrix);
+
+  glUniformMatrix4fv(res->uniforms.local, 1, 0, player);
+  render_cube(res);
+  glUniformMatrix4fv(res->uniforms.local, 1, 0, id);
+
+  render_geom(res, geom, GL_TRIANGLES);
   /* glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); */
-  /* render_geom(resources, geom, GL_TRIANGLES); */
+  /* render_geom(res, geom, GL_TRIANGLES); */
 }

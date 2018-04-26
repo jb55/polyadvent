@@ -3,7 +3,8 @@
 #define PA_EVENT_H
 
 #include "gl.h"
+#include "input.h"
 
-void process_events(void);
+void process_events(float *camera, struct input *input);
 
 #endif /* PA_EVENT_H */

@@ -15,10 +15,11 @@
 struct input {
   /* enum key_state keys[0x7F-0x1F]; */
   u8 const *keystates;
+  SDL_Keymod modifiers;
 };
 
 void input_init(struct input *input);
 
-/* void handle_key(struct input *input, SDL_KeyboardEvent *ke); */
+void handle_key(struct input *input, SDL_KeyboardEvent ke);
 
 #endif /* POLYADVENT_INPUT_H */

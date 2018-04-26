@@ -20,7 +20,7 @@ make_shader(GLenum type, const char *filename) {
   source[length] = '\0';
 
   shader = glCreateShader(type);
-  glShaderSource(shader, 1, (const GLchar*const*)&source, (GLint*)&length);
+  glShaderSource(shader, 1, (const GLchar**)&source, (GLint*)&length);
   free(source);
   glCompileShader(shader);
 

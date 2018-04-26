@@ -1,7 +1,7 @@
 NAME ?= polyadvent
 BIN ?= $(NAME)
 PREFIX ?= /usr/local
-CFLAGS = -ggdb -I src -Wall -Wextra -std=c99 \
+CFLAGS = -ggdb -I src -Wall -Werror -Wextra -std=c99 \
 						-Wno-unused-function \
 						-Wno-unused-parameter \
 						-Wno-unused-variable \
@@ -17,6 +17,7 @@ OBJS += $(SRC)/buffer.o
 OBJS += $(SRC)/debug.o
 OBJS += $(SRC)/event.o
 OBJS += $(SRC)/file.o
+OBJS += $(SRC)/perlin.o
 OBJS += $(SRC)/game.o
 OBJS += $(SRC)/mat4/mat4.o
 OBJS += $(SRC)/vec3/vec3.o

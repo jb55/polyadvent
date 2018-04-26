@@ -3,7 +3,7 @@
 
 #include "geometry.h"
 
-void init_gl(struct resources *resources);
+void init_gl(struct resources *resources, int width, int height);
 void render (struct resources *resources, struct geometry *geom);
 
 void wireframe_mode_on();
