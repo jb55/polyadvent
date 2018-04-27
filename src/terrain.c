@@ -94,6 +94,8 @@ terrain_create(struct terrain *terrain, struct perlin_settings *perlin) {
   float *del_norms = calloc(num_verts * 3, sizeof(*del_norms));
   u32   *del_indices = calloc(num_verts, sizeof(*del_indices));
 
+  /// XXX (perf): we should be able to do this directly from del instead of
+  /// triangulating with tri
   for (i = 0; i < tri->num_triangles; ++i) {
     int nv = i * 3;
     int ndv = i * 9;
