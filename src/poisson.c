@@ -72,6 +72,34 @@ grid_lookup(struct grid_info *info, int x, int y) {
   return ix;
 }
 
+void
+save_samples(struct point *samples, int seed, int n_samples) {
+  FILE *fp = fopen("samples.bin", "wb"); /* b - binary mode */
+  fwrite(&seed, sizeof(seed), 1, fp);
+  fwrite(&n_samples, sizeof(n_samples), 1, fp);
+  fwrite(samples, sizeof(*samples), n_samples, fp);
+  fclose(fp);
+}
+
+struct point *
+load_samples(int *seed, int *n_samples) {
+  FILE *fp = fopen("data/samples-200x200.bin", "rb");
+  int res;
+  int localseed;
+  seed = seed ? seed : &localseed;
+  res = fread(seed, sizeof(*seed), 1, fp);
+  printf("loaded seed %d\n", *seed);
+  assert(res);
+  res = fread(n_samples, sizeof(*n_samples), 1, fp);
+  printf ("loaded n_samples %d\n", *n_samples);
+  assert(res);
+  struct point *samples = malloc(*n_samples * sizeof(*samples));
+  res = fread(samples, sizeof(*samples), *n_samples, fp);
+  assert(res);
+  fclose(fp);
+  return samples;
+}
+
 static int
 add_sample(struct grid_info *info, struct point *candidate) {
   int grid_x = floor(candidate->x / info->cell_size);
@@ -158,7 +186,7 @@ poisson_disk_samples(const double point_dist, double size,
 
     int all_rejected = 1;
 
-    for (int i = 0; i < reject_limit; ++i) {
+    for (int i = 0, tries = 0; i < reject_limit + tries; ++i) {
       int sx = rand() % 2 ? 1 : -1;
       int sy = rand() % 2 ? 1 : -1;
 
@@ -173,8 +201,10 @@ poisson_disk_samples(const double point_dist, double size,
       int cx = floor(candidate.x / info.cell_size);
       int cy = floor(candidate.y / info.cell_size);
 
-      if (candidate.x > size || candidate.x < 0 || candidate.y > size || candidate.y < 0)
+      if (candidate.x > size || candidate.x < 0 || candidate.y > size || candidate.y < 0) {
+        tries++;
         continue;
+      }
 
       int nearby[] = {
         grid_lookup(&info, cx - 1, cy - 1),

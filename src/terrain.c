@@ -4,6 +4,7 @@
 #include "delaunay.h"
 #include "vec3/vec3.h"
 #include "perlin.h"
+#include "poisson.h"
 
 static const float plane_verts[] = {
   -1,-1,0,  -1,1,0,  1,1,0,  1,-1,0
@@ -38,19 +39,14 @@ void deriv(double (*noisefn)(void*, double, double), void* data, double x,
 
 void
 terrain_init(struct terrain *terrain) {
-  terrain->width = 1;
-  terrain->height = 1;
 }
 
 void
 terrain_create(struct terrain *terrain, struct perlin_settings *perlin) {
   u32 i;
-  const double size = 200;
+  const double size = terrain->size;
   const double hsize = size;
   int num_verts = hsize*hsize;
-  static int first = 1;
-  static float samples_x[40000];
-  static float samples_y[40000];
   float tmp1[3], tmp2[3];
   del_point2d_t *points = calloc(num_verts, sizeof(*points));
   float *verts = calloc(num_verts * 3, sizeof(*verts));
@@ -59,20 +55,12 @@ terrain_create(struct terrain *terrain, struct perlin_settings *perlin) {
   double oy = perlin->oy;
 
   // 100 random samples from our noise function
-  for (i = 0; i < (u32)num_verts; i++) {
+  for (i = 0; i < (u32)terrain->n_samples; i++) {
     int n = i*3;
     double dx, dy, x, y;
 
-    if (first) {
-      x = rand_0to1() * size;
-      y = rand_0to1() * size;
-      samples_x[i] = x;
-      samples_y[i] = y;
-    }
-    else {
-      x = samples_x[i];
-      y = samples_y[i];
-    }
+    x = terrain->samples[i].x;
+    y = terrain->samples[i].y;
 
     double z = old_noisy_boi((void*)perlin, ox+x, oy+y);
 
@@ -84,9 +72,7 @@ terrain_create(struct terrain *terrain, struct perlin_settings *perlin) {
     verts[n+2] = (float)z;
   }
 
-  first = 0;
-
-  delaunay2d_t *del = delaunay2d_from(points, num_verts);
+  delaunay2d_t *del = delaunay2d_from(points, terrain->n_samples);
   tri_delaunay2d_t *tri = tri_delaunay2d_from(del);
 
   num_verts = tri->num_triangles * 3;

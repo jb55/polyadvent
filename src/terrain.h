@@ -5,6 +5,8 @@
 
 #include "geometry.h"
 
+struct point;
+
 struct perlin_settings {
   double freq;
   int depth;
@@ -18,7 +20,9 @@ struct perlin_settings {
 struct terrain {
   struct geometry geom;
   struct perlin_settings settings;
-  float width, height;
+  struct point *samples;
+  int n_samples;
+  double size;
 };
 
 void terrain_init(struct terrain *terrain);

@@ -31,7 +31,7 @@ make_buffer_geometry(struct geometry *geom) {
   assert(geom->indices);
   assert(geom->num_indices >= 1);
 
-  printf("making vertex buffer\n");
+  /* printf("making vertex buffer\n"); */
   make_vertex_buffer(
                      GL_ARRAY_BUFFER,
                      geom->vertices,
@@ -39,7 +39,7 @@ make_buffer_geometry(struct geometry *geom) {
                      &geom->buffer.vertex_buffer
                      );
 
-  printf("making normal buffer\n");
+  /* printf("making normal buffer\n"); */
   // cube normals
   make_vertex_buffer(
                      GL_ARRAY_BUFFER,
@@ -48,7 +48,7 @@ make_buffer_geometry(struct geometry *geom) {
                      &geom->buffer.normal_buffer
                      );
 
-  printf("making index buffer\n");
+  /* printf("making index buffer\n"); */
   // cube indices
   make_index_buffer(
                     GL_ELEMENT_ARRAY_BUFFER,

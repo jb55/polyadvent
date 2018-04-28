@@ -19,15 +19,9 @@
 int main(void)
 {
   int nsamples;
-  struct point *samples;
-  const double size = 500;
-  const double point_dist = 20;
 
-  srand(time(NULL));
-
-  samples = poisson_disk_samples(point_dist, size, 30, &nsamples);
-  draw_samples(samples, point_dist, nsamples, size);
-  exit(0);
+  int seed = time(NULL);
+  srand(seed);
 
   struct game game;
   struct slab slab;
@@ -49,6 +43,14 @@ int main(void)
   game_init(&game);
   game.terrain = &terrain;
 
+  const double size = 200;
+  const double pdist = (sqrt(2)*size)/(size-1.0);
+  /* printf("samples seed %d\n", seed); */
+  /* struct point *samples = poisson_disk_samples(pdist, size, 30, &terrain.n_samples); */
+  struct point *samples = load_samples(NULL, &terrain.n_samples);
+  draw_samples(samples, pdist, terrain.n_samples, size);
+  save_samples(samples, seed, terrain.n_samples);
+
   struct perlin_settings terrain_settings = {
     .depth = 1,
     .freq  = 0.02,
@@ -57,10 +59,12 @@ int main(void)
     .amplitude  = 1.0,
     .ox = 0,
     .oy = 0,
-    .exp = 7.3
+    .exp = 7.3,
   };
 
   terrain_init(&terrain);
+  terrain.size = size;
+  terrain.samples = samples;
   terrain_create(&terrain, &terrain_settings);
 
   /* slab_buffer = file_contents(SLAB("test.slab"), &length); */
