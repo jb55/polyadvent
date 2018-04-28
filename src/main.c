@@ -11,6 +11,7 @@
 #include "event.h"
 #include "render.h"
 #include "terrain.h"
+#include "util.h"
 #include <assert.h>
 #include <time.h>
 #include "poisson.h"

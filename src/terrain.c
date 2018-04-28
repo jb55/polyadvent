@@ -20,6 +20,7 @@ static const u32 plane_indices[] = {
 
 
 double old_noisy_boi(void *data, double x, double y) {
+  /* return cos(x/10.0) * sin(y/10.0) * 20.0; */
   struct perlin_settings *s = (struct perlin_settings*)data;
   double e =  perlin2d(x, y, s->freq, s->depth)
             + s->o1s * perlin2d(s->o1 * x, s->o1 * y, s->freq, s->depth)
@@ -124,8 +125,8 @@ terrain_create(struct terrain *terrain, struct perlin_settings *perlin) {
     del_indices[nv+2] = nv+2;
   }
 
-  printf("faces %d tris %d points %d\n",
-         del->num_faces, tri->num_triangles, tri->num_points);
+  /* printf("faces %d tris %d points %d\n", */
+  /*        del->num_faces, tri->num_triangles, tri->num_points); */
 
   terrain->geom.num_verts = num_verts;
   terrain->geom.vertices = (float*)del_verts;
