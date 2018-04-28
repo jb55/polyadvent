@@ -14,6 +14,7 @@ struct perlin_settings {
   double ox, oy;
   double o1, o1s;
   double o2, o2s;
+  double scale;
   double exp;
 };
 
@@ -26,7 +27,7 @@ struct terrain {
 };
 
 void terrain_init(struct terrain *terrain);
-void terrain_create(struct terrain *terrain, struct perlin_settings *);
+void terrain_create(struct terrain *terrain);
 void terrain_destroy(struct terrain *terrain);
 
 

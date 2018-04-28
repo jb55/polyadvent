@@ -14,6 +14,7 @@ void game_init(struct game *game) {
   float *mvp = game->test_resources.test_mvp;
   float *normal = game->test_resources.normal_matrix;
   float *camera = game->test_resources.camera;
+  float *terrain = game->test_resources.terrain_node;
   float *player = game->test_resources.player;
   float *light_dir = game->test_resources.light_dir;
 
@@ -30,6 +31,7 @@ void game_init(struct game *game) {
   mat4_copy(cam_init, camera);
 
   mat4_id(player);
+  mat4_id(terrain);
   mat4_scale(player, V3(0.36,0.36,1.7), player);
 
   input_init(&game->input);

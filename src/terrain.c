@@ -21,7 +21,10 @@ static const u32 plane_indices[] = {
 
 double old_noisy_boi(void *data, double x, double y) {
   /* return cos(x/10.0) * sin(y/10.0) * 20.0; */
-  struct perlin_settings *s = (struct perlin_settings*)data;
+  struct terrain *t = (struct terrain*)data;
+  struct perlin_settings *s = &t->settings;
+  x *= s->scale;
+  y *= s->scale;
   double e =  perlin2d(x, y, s->freq, s->depth)
             + s->o1s * perlin2d(s->o1 * x, s->o1 * y, s->freq, s->depth)
             + s->o2s * perlin2d(s->o2 * x, s->o2 * y, s->freq, s->depth);
@@ -43,34 +46,40 @@ terrain_init(struct terrain *terrain) {
 }
 
 void
-terrain_create(struct terrain *terrain, struct perlin_settings *perlin) {
+terrain_create(struct terrain *terrain) {
   u32 i;
   const double size = terrain->size;
   const double hsize = size;
   int num_verts = hsize*hsize;
   float tmp1[3], tmp2[3];
   del_point2d_t *points = calloc(num_verts, sizeof(*points));
+  struct perlin_settings *perlin = &terrain->settings;
   float *verts = calloc(num_verts * 3, sizeof(*verts));
   float *normals = calloc(num_verts * 3, sizeof(*normals));
-  double ox = perlin->ox;
-  double oy = perlin->oy;
+  double ox = perlin->ox * (1/perlin->scale);
+  double oy = perlin->oy * (1/perlin->scale);
 
   // 100 random samples from our noise function
   for (i = 0; i < (u32)terrain->n_samples; i++) {
     int n = i*3;
-    double dx, dy, x, y;
+    double x, y;
 
     x = terrain->samples[i].x;
     y = terrain->samples[i].y;
 
-    double z = old_noisy_boi((void*)perlin, ox+x, oy+y);
+    double z = old_noisy_boi((void*)terrain, ox+x, oy+y);
 
     points[i].x = x;
     points[i].y = y;
 
     verts[n] = (float)x;
     verts[n+1] = (float)y;
-    verts[n+2] = (float)z;
+
+    static const double limit = 1.4;
+    if (x < limit || x > size-limit || y < limit || y > size-limit)
+      verts[n+2] = 0;
+    else
+      verts[n+2] = (float)z;
   }
 
   delaunay2d_t *del = delaunay2d_from(points, terrain->n_samples);

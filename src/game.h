@@ -26,6 +26,7 @@ struct resources {
       gpu_addr normal;
     } attributes;
 
+    float terrain_node[MAT4_ELEMS];
     float normal_matrix[MAT4_ELEMS];
     float test_mvp[MAT4_ELEMS];
     float light_dir[3];
