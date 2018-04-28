@@ -2,6 +2,26 @@
 #include "util.h"
 #include <stdlib.h>
 
+int clampi(int a, int mina, int maxa) {
+  if (a > maxa)
+    return maxa;
+
+  if (a < mina)
+    return mina;
+
+  return a;
+}
+
+double clamp(double a, double mina, double maxa) {
+  if (a > maxa)
+    return maxa;
+
+  if (a < mina)
+    return mina;
+
+  return a;
+}
+
 void check_gl() {
   unsigned int e = glGetError();
   if (e != GL_NO_ERROR) {

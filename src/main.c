@@ -13,10 +13,22 @@
 #include "terrain.h"
 #include <assert.h>
 #include <time.h>
+#include "poisson.h"
 
 
 int main(void)
 {
+  int nsamples;
+  struct point *samples;
+  const double size = 500;
+  const double point_dist = 20;
+
+  srand(time(NULL));
+
+  samples = poisson_disk_samples(point_dist, size, 30, &nsamples);
+  draw_samples(samples, point_dist, nsamples, size);
+  exit(0);
+
   struct game game;
   struct slab slab;
   struct geometry slab_geom;
@@ -31,8 +43,6 @@ int main(void)
   SDL_Window *window = SDL_CreateWindow(
     "SDL2/OpenGL Demo", 0, 0, width, height,
     SDL_WINDOW_OPENGL|SDL_WINDOW_RESIZABLE);
-
-  srand(time(NULL));
 
   SDL_GL_CreateContext(window);
   init_gl(&game.test_resources, width, height);
