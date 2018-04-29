@@ -12,6 +12,7 @@ int clampi(int a, int mina, int maxa);
 double clamp(double a, double mina, double maxa);
 double max(double a, double b);
 double min(double a, double b);
+mat4 *look_at(vec3 *eye, vec3 *target, vec3 *up);
 
 double rand_0to1();
 

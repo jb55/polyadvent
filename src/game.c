@@ -7,7 +7,7 @@ mat4 *cam_init = (float[16]){
   0.955761, 0.228018, -0.185425, 0.000000,
   -0.293528, 0.779583, -0.552437, 0.000000,
   0.018780, 0.580299, 0.802257, 0.000000,
-  -58.746227, -62.404854, -34.097778, 1.000000
+  -71.766136, -47.881512, -44.216671, 1.000000
 };
 
 void game_init(struct game *game) {
@@ -16,11 +16,13 @@ void game_init(struct game *game) {
   float *camera = game->test_resources.camera;
   float *terrain = game->test_resources.terrain_node;
   float *player = game->test_resources.player;
+  float *player_cam = game->test_resources.player_cam;
   float *light_dir = game->test_resources.light_dir;
 
   mat4_id(mvp);
   mat4_id(normal);
   mat4_id(camera);
+  mat4_id(player_cam);
 
   light_dir[0] = 0.5;
   light_dir[1] = 1;
@@ -35,7 +37,7 @@ void game_init(struct game *game) {
 
   terrain[14] = 20.0;
 
-  mat4_scale(player, V3(0.36,0.36,1.7), player);
+  mat4_scale(player, V3(0.36,0.36,PLAYER_HEIGHT), player);
 
   input_init(&game->input);
 }

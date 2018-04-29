@@ -70,10 +70,18 @@ void update (struct game *game, u32 dt) {
 
   if (game->input.modifiers & KMOD_LALT) {
     movement(game, res->camera);
-    mat4_loo
+    /* mat4_multiply(res->player, res->ca era, res->player); */
+  }
+  if (game->input.modifiers & KMOD_LCTRL) {
+    movement(game, res->terrain_node);
+    /* mat4_multiply(res->player, res->ca era, res->player); */
   }
   else {
-    movement(game, res->terrain_node);
+    movement(game, res->player);
+    res->player[14] =
+      game->terrain->fn(game->terrain, res->player[M_X], res->player[M_Y]) +
+        PLAYER_HEIGHT;
+    camera_follow(camera, player);
     /* movement(game, res->camera); */
   }
 

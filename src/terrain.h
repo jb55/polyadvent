@@ -18,13 +18,17 @@ struct perlin_settings {
   double exp;
 };
 
+
 struct terrain {
   struct geometry geom;
   struct perlin_settings settings;
   struct point *samples;
+  double (*fn)(struct terrain *, double, double);
   int n_samples;
   double size;
 };
+
+double old_noisy_boi(struct terrain *, double x, double y);
 
 void terrain_init(struct terrain *terrain);
 void terrain_create(struct terrain *terrain);

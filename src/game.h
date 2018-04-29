@@ -5,6 +5,8 @@
 #include "buffer.h"
 #include "input.h"
 
+#define PLAYER_HEIGHT 1.7
+
 /*
  * Global data used by our render callback:
  * NOTE: just for testing right now
@@ -33,6 +35,7 @@ struct resources {
     float light_dir[3];
     float camera[MAT4_ELEMS];
     float player[MAT4_ELEMS];
+    float player_cam[MAT4_ELEMS];
     float camera_persp[MAT4_ELEMS];
     GLfloat fade_factor;
 };

@@ -5,6 +5,9 @@
 #include <stdbool.h>
 
 #define MAT3_ELEMS 9
+#define M_X 12
+#define M_Y 13
+#define M_Z 14
 #define MAT4_ELEMS 16
 
 #define SLAB(f) "etc/slab/" f

@@ -19,9 +19,8 @@ static const u32 plane_indices[] = {
 };
 
 
-double old_noisy_boi(void *data, double x, double y) {
+double old_noisy_boi(struct terrain *t, double x, double y) {
   /* return cos(x/10.0) * sin(y/10.0) * 20.0; */
-  struct terrain *t = (struct terrain*)data;
   struct perlin_settings *s = &t->settings;
   x *= s->scale;
   y *= s->scale;
@@ -45,6 +44,13 @@ void
 terrain_init(struct terrain *terrain) {
 }
 
+double offset_fn(struct terrain* terrain, double x, double y) {
+  struct perlin_settings *perlin = &terrain->settings;
+  double ox = perlin->ox * (1/perlin->scale);
+  double oy = perlin->oy * (1/perlin->scale);
+  return old_noisy_boi(terrain, ox+x, oy+y);
+}
+
 void
 terrain_create(struct terrain *terrain) {
   u32 i;
@@ -53,12 +59,10 @@ terrain_create(struct terrain *terrain) {
   float tmp1[3], tmp2[3];
   assert(terrain->n_samples > 0);
   del_point2d_t *points = calloc(terrain->n_samples, sizeof(*points));
-  struct perlin_settings *perlin = &terrain->settings;
 
   float *verts = calloc(terrain->n_samples * 3, sizeof(*verts));
 
-  double ox = perlin->ox * (1/perlin->scale);
-  double oy = perlin->oy * (1/perlin->scale);
+  terrain->fn = offset_fn;
 
   // 100 random samples from our noise function
   for (i = 0; i < (u32)terrain->n_samples; i++) {
@@ -68,7 +72,7 @@ terrain_create(struct terrain *terrain) {
     x = terrain->samples[i].x;
     y = terrain->samples[i].y;
 
-    double z = old_noisy_boi((void*)terrain, ox+x, oy+y);
+    double z = terrain->fn(terrain, x, y);
 
     points[i].x = x;
     points[i].y = y;

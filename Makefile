@@ -36,13 +36,13 @@ OBJS += $(SRC)/util.o
 
 SRCS=$(OBJS:.o=.c)
 
-# include $(OBJS:.o=.d)
+include $(OBJS:.o=.d)
 
 all: $(BIN)
 
-# src/%.d: src/%.c
-# 	@rm -f $@; \
-# 	$(CC) -MM $(CFLAGS) $< > $@
+src/%.d: src/%.c
+	@rm -f $@; \
+	$(CC) -MM $(CFLAGS) $< > $@
 
 %.o: %.c %.h
 	$(CC) $(CFLAGS) -fPIC $(DEFS) -c $< -o $@
