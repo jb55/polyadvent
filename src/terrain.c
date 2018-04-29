@@ -49,16 +49,16 @@ void
 terrain_create(struct terrain *terrain) {
   u32 i;
   const double size = terrain->size;
-  const double hsize = size;
-  int num_verts = hsize*hsize;
+
   float tmp1[3], tmp2[3];
-  del_point2d_t *points = calloc(num_verts, sizeof(*points));
+  assert(terrain->n_samples > 0);
+  del_point2d_t *points = calloc(terrain->n_samples, sizeof(*points));
   struct perlin_settings *perlin = &terrain->settings;
-  float *verts = calloc(num_verts * 3, sizeof(*verts));
-  float *normals = calloc(num_verts * 3, sizeof(*normals));
+
+  float *verts = calloc(terrain->n_samples * 3, sizeof(*verts));
+
   double ox = perlin->ox * (1/perlin->scale);
   double oy = perlin->oy * (1/perlin->scale);
-  double scale = terrain->settings.scale;
 
   // 100 random samples from our noise function
   for (i = 0; i < (u32)terrain->n_samples; i++) {
@@ -86,7 +86,7 @@ terrain_create(struct terrain *terrain) {
   delaunay2d_t *del = delaunay2d_from(points, terrain->n_samples);
   tri_delaunay2d_t *tri = tri_delaunay2d_from(del);
 
-  num_verts = tri->num_triangles * 3;
+  int num_verts = tri->num_triangles * 3;
   float *del_verts = calloc(num_verts * 3, sizeof(*del_verts));
   float *del_norms = calloc(num_verts * 3, sizeof(*del_norms));
   u32   *del_indices = calloc(num_verts, sizeof(*del_indices));
@@ -151,7 +151,6 @@ terrain_create(struct terrain *terrain) {
 
   free(points);
   free(verts);
-  free(normals);
   free(del_verts);
   free(del_norms);
   free(del_indices);

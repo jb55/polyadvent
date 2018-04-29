@@ -45,11 +45,13 @@ int main(void)
   game_init(&game);
   game.terrain = &terrain;
 
-  const double size = 200;
+  const double size = 1000;
   const double pdist = 1.7;
+  const double scale = 0.01;
   /* printf("samples seed %d\n", seed); */
-  const int n_samples = (int)(size * size);
-  struct point *samples = uniform_samples((int)(size*size), size);
+  const int n_samples =
+    (size * size) * scale*scale;
+  struct point *samples = uniform_samples(n_samples, size);
   terrain.n_samples = n_samples;
 
   /* struct point *samples = poisson_disk_samples(pdist, size, 30, &terrain.n_samples); */

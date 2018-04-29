@@ -32,6 +32,9 @@ void game_init(struct game *game) {
 
   mat4_id(player);
   mat4_id(terrain);
+
+  terrain[14] = 20.0;
+
   mat4_scale(player, V3(0.36,0.36,1.7), player);
 
   input_init(&game->input);

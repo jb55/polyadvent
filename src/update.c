@@ -6,6 +6,7 @@
 #include "mat4/mat4.h"
 #include "vec3/vec3.h"
 #include "poisson.h"
+#include "uniform.h"
 
 void movement(struct game *game, float *obj) {
   float amt = 0.25;
@@ -51,7 +52,6 @@ void movement(struct game *game, float *obj) {
 
 void update (struct game *game, u32 dt) {
   static int passed = 0;
-  static int last_input = 0;
   static int last_gen_time = 50;
   static float n = 1;
   static int first = 1;
@@ -68,8 +68,10 @@ void update (struct game *game, u32 dt) {
     first = 0;
   }
 
-  if (game->input.modifiers & KMOD_LALT)
+  if (game->input.modifiers & KMOD_LALT) {
     movement(game, res->camera);
+    mat4_loo
+  }
   else {
     movement(game, res->terrain_node);
     /* movement(game, res->camera); */
@@ -83,10 +85,8 @@ void update (struct game *game, u32 dt) {
   int space_down = game->input.keystates[SDL_SCANCODE_SPACE];
   int ctrl_down = game->input.modifiers & KMOD_CTRL;
   int now = SDL_GetTicks();
-  int dinput = now - last_input;
 
-  if (dinput > 100 && space_down) {
-    last_input = SDL_GetTicks();
+  if (space_down) {
     if (!stopped) {
       printf("terrain amp %f exp %f freq %f (%d ms)\n",
              ts->amplitude,
@@ -114,7 +114,7 @@ void update (struct game *game, u32 dt) {
       for (int i = 12; i < 14; ++i)
         tnode[i] = max(tnode[i], 0);
 
-      tnode[14] = max(tnode[14], 20.0);
+      last_oz = tnode[14] = max(tnode[14], 20.0);
 
       double scale = tnode[14] * 0.01;
       if (scale == 0) scale = 1.0;
@@ -137,16 +137,20 @@ void update (struct game *game, u32 dt) {
       terrain_init(game->terrain);
 
       int t1 = SDL_GetTicks();
-      /* free(game->terrain->samples); */
+      free(game->terrain->samples);
 
       /* const double pdist = min(5.0, max(1.1, 1.0/scale*1.4)); */
 
       /* printf("pdist %f\n", pdist); */
 
-      /* struct point *samples = */
-      /*   poisson_disk_samples(pdist, game->terrain->size, 30, &game->terrain->n_samples); */
+      int n_samples =
+        (game->terrain->size * game->terrain->size) * scale*scale;
 
-      /* game->terrain->samples = samples; */
+      struct point *samples =
+        uniform_samples(n_samples, game->terrain->size);
+
+      game->terrain->samples = samples;
+      game->terrain->n_samples = n_samples;
 
       terrain_create(game->terrain);
       int t2 = SDL_GetTicks();
