@@ -21,4 +21,9 @@ typedef signed short s16;
 typedef unsigned int u32;
 typedef signed int s32;
 
+struct point {
+  double x, y;
+};
+
+
 #endif /* POLYADVENT_COMMON_H */

@@ -54,8 +54,8 @@ void update (struct game *game, u32 dt) {
   static int last_input = 0;
   static int last_gen_time = 50;
   static float n = 1;
-  static double offset = 0.5;
   static int first = 1;
+  static double last_ox, last_oy, last_oz;
   struct resources *res = &game->test_resources;
   static int stopped = 0;
   struct perlin_settings *ts = &game->terrain->settings;
@@ -105,7 +105,12 @@ void update (struct game *game, u32 dt) {
   } else {
     passed = 0;
 
-    if (!stopped) {
+    double ox = tnode[12];
+    double oy = tnode[13];
+
+    bool changed = last_ox != ox || last_oy != oy || last_oz != tnode[14];
+
+    if (!stopped && changed) {
       for (int i = 12; i < 14; ++i)
         tnode[i] = max(tnode[i], 0);
 
@@ -113,13 +118,11 @@ void update (struct game *game, u32 dt) {
 
       double scale = tnode[14] * 0.01;
       if (scale == 0) scale = 1.0;
-      double ox = tnode[12];
-      double oy = tnode[13];
 
       printf("terrain %f %f %f\n", tnode[12], tnode[13], tnode[14]);
 
-      ts->ox = ox;
-      ts->oy = oy;
+      last_ox = ts->ox = ox;
+      last_oy = ts->oy = oy;
 
       ts->scale = scale;
       /* ts.o1s = fabs(sin(1/n) * 0.25); */

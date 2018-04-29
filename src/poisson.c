@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include "util.h"
+#include "common.h"
 #include "poisson.h"
 
 

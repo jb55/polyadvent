@@ -19,6 +19,7 @@ OBJS += $(SRC)/event.o
 OBJS += $(SRC)/file.o
 OBJS += $(SRC)/perlin.o
 OBJS += $(SRC)/poisson.o
+OBJS += $(SRC)/uniform.o
 OBJS += $(SRC)/game.o
 OBJS += $(SRC)/mat4/mat4.o
 OBJS += $(SRC)/vec3/vec3.o

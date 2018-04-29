@@ -15,6 +15,7 @@
 #include <assert.h>
 #include <time.h>
 #include "poisson.h"
+#include "uniform.h"
 
 
 int main(void)
@@ -47,9 +48,13 @@ int main(void)
   const double size = 200;
   const double pdist = 1.7;
   /* printf("samples seed %d\n", seed); */
+  const int n_samples = (int)(size * size);
+  struct point *samples = uniform_samples((int)(size*size), size);
+  terrain.n_samples = n_samples;
+
   /* struct point *samples = poisson_disk_samples(pdist, size, 30, &terrain.n_samples); */
-  struct point *samples = load_samples(NULL, &terrain.n_samples);
-  /* draw_samples(samples, pdist, terrain.n_samples, size); */
+  /* struct point *samples = load_samples(NULL, &terrain.n_samples); */
+  draw_samples(samples, pdist, terrain.n_samples, size);
   /* save_samples(samples, seed, terrain.n_samples); */
 
   terrain.settings = (struct perlin_settings){

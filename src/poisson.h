@@ -2,9 +2,7 @@
 #ifndef POLYADVENT_POISSON_H
 #define POLYADVENT_POISSON_H
 
-struct point {
-  double x, y;
-};
+struct point;
 
 void draw_samples(struct point *samples, double point_dist,
                   const int nsamples, const int size);
