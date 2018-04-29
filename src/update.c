@@ -5,6 +5,7 @@
 #include "util.h"
 #include "mat4/mat4.h"
 #include "vec3/vec3.h"
+#include "poisson.h"
 
 void movement(struct game *game, float *obj) {
   float amt = 0.25;
@@ -105,10 +106,15 @@ void update (struct game *game, u32 dt) {
     passed = 0;
 
     if (!stopped) {
-      double scale = tnode[14] * 0.02;
+      for (int i = 12; i < 14; ++i)
+        tnode[i] = max(tnode[i], 0);
 
-      double ox = min(tnode[12], 0);
-      double oy = min(tnode[13], 0);
+      tnode[14] = max(tnode[14], 20.0);
+
+      double scale = tnode[14] * 0.01;
+      if (scale == 0) scale = 1.0;
+      double ox = tnode[12];
+      double oy = tnode[13];
 
       printf("terrain %f %f %f\n", tnode[12], tnode[13], tnode[14]);
 
@@ -120,14 +126,25 @@ void update (struct game *game, u32 dt) {
       /* ts.o1 = fabs(cos(n*0.2) * 0.5); */
       /* ts.o2s = fabs(cos(n+2) * 0.5); */
       /* ts.o2 = fabs(sin(n*0.02) * 2); */
-      /* ts->freq = 1/scale*0.2; */
-      /* ts->exp = fabs(cos(n)*2.0*cos(n)) + 4.0; */
-      /* ts->amplitude = fabs(cos(1/n)*cos(n) + 0.5); */
+      ts->freq = scale * 0.15;
+
+      ts->amplitude = 1/scale;
 
       terrain_destroy(game->terrain);
       terrain_init(game->terrain);
 
       int t1 = SDL_GetTicks();
+      /* free(game->terrain->samples); */
+
+      /* const double pdist = min(5.0, max(1.1, 1.0/scale*1.4)); */
+
+      /* printf("pdist %f\n", pdist); */
+
+      /* struct point *samples = */
+      /*   poisson_disk_samples(pdist, game->terrain->size, 30, &game->terrain->n_samples); */
+
+      /* game->terrain->samples = samples; */
+
       terrain_create(game->terrain);
       int t2 = SDL_GetTicks();
       last_gen_time = t2 - t1;

@@ -18,6 +18,7 @@ struct resources {
       GLint light_dir;
       GLint mvp;
       GLint local;
+      GLint tscale;
       GLint normal_matrix;
     } uniforms;
 

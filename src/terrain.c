@@ -58,6 +58,7 @@ terrain_create(struct terrain *terrain) {
   float *normals = calloc(num_verts * 3, sizeof(*normals));
   double ox = perlin->ox * (1/perlin->scale);
   double oy = perlin->oy * (1/perlin->scale);
+  double scale = terrain->settings.scale;
 
   // 100 random samples from our noise function
   for (i = 0; i < (u32)terrain->n_samples; i++) {

@@ -120,6 +120,9 @@ init_gl(struct resources *resources, int width, int height) {
   resources->uniforms.mvp
     = glGetUniformLocation(resources->program, "mvp");
 
+  resources->uniforms.tscale
+    = glGetUniformLocation(resources->program, "tscale");
+
   resources->uniforms.local
     = glGetUniformLocation(resources->program, "local");
 
@@ -193,13 +196,14 @@ static void render_geom (struct resources *res,
 }
 
 
-void render (struct resources * res, struct geometry *geom) {
+void render (struct game *game, struct geometry *geom) {
   glClearColor( 1.0f, 1.0f, 1.0f, 1.0f ); //clear background screen to black
   glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
   check_gl();
 
   static float id[MAT4_ELEMS] = { 0 };
   mat4_id(id);
+  struct resources *res = &game->test_resources;
 
   float *mvp = res->test_mvp;
   float *normal = res->normal_matrix;
@@ -222,6 +226,7 @@ void render (struct resources * res, struct geometry *geom) {
 
   glUniform3f(res->uniforms.light_dir, light[0], light[1], light[2]);
   glUniform1f(res->uniforms.fade_factor, fade_factor);
+  glUniform1f(res->uniforms.tscale, res->uniforms.tscale);
   glUniformMatrix4fv(res->uniforms.mvp, 1, 0, tmp_matrix);
 
   glUniformMatrix4fv(res->uniforms.local, 1, 0, player);

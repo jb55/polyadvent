@@ -3,8 +3,10 @@
 
 #include "geometry.h"
 
+struct game;
+
 void init_gl(struct resources *resources, int width, int height);
-void render (struct resources *resources, struct geometry *geom);
+void render (struct game *game, struct geometry *geom);
 
 void wireframe_mode_on();
 void wireframe_mode_off();

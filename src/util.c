@@ -12,6 +12,10 @@ int clampi(int a, int mina, int maxa) {
   return a;
 }
 
+double max(double a, double b) {
+  return a > b ? a : b;
+}
+
 double min(double a, double b) {
   return a < b ? a : b;
 }

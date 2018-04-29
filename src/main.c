@@ -49,8 +49,8 @@ int main(void)
   /* printf("samples seed %d\n", seed); */
   /* struct point *samples = poisson_disk_samples(pdist, size, 30, &terrain.n_samples); */
   struct point *samples = load_samples(NULL, &terrain.n_samples);
-  draw_samples(samples, pdist, terrain.n_samples, size);
-  save_samples(samples, seed, terrain.n_samples);
+  /* draw_samples(samples, pdist, terrain.n_samples, size); */
+  /* save_samples(samples, seed, terrain.n_samples); */
 
   terrain.settings = (struct perlin_settings){
     .depth = 1,
@@ -93,7 +93,7 @@ int main(void)
     update(&game, ticks-last);
 
     last = ticks;
-    render(&game.test_resources, &terrain.geom);
+    render(&game, &terrain.geom);
 
     /* Swap front and back buffers */
     SDL_GL_SwapWindow(window);
