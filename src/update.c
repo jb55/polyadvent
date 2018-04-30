@@ -9,29 +9,29 @@
 #include "poisson.h"
 #include "uniform.h"
 
-void movement(struct game *game, vec3 *obj) {
+void movement(struct game *game, struct node *node) {
   float amt = 0.25;
 
   if (game->input.modifiers & KMOD_SHIFT)
     amt *= 6;
 
   if (game->input.keystates[SDL_SCANCODE_A])
-    obj[0] -= amt;
+    node_translate(node, V3(-amt,0,0));
 
   if (game->input.keystates[SDL_SCANCODE_E])
-    obj[2] += amt;
+    node_translate(node, V3(0,0,amt));
 
   if (game->input.keystates[SDL_SCANCODE_Q])
-    obj[2] -= amt;
+    node_translate(node, V3(0,0,-amt));
 
   if (game->input.keystates[SDL_SCANCODE_D])
-    obj[0] += amt;
+    node_translate(node, V3(amt,0,0));
 
   if (game->input.keystates[SDL_SCANCODE_W])
-    obj[1] += amt;
+    node_translate(node, V3(0,amt,0));
 
   if (game->input.keystates[SDL_SCANCODE_S])
-    obj[1] -= amt;
+    node_translate(node, V3(0,-amt,0));
 
   /* if (obj == game->test_resources.camera) { */
   /*   if (game->input.keystates[SDL_SCANCODE_UP]) */
@@ -72,7 +72,7 @@ void update (struct game *game, u32 dt) {
   }
 
   if (game->input.modifiers & KMOD_LALT) {
-    movement(game, res->camera_pos);
+    movement(game, &res->camera);
     /* mat4_multiply(res->player, res->ca era, res->player); */
   }
   if (game->input.modifiers & KMOD_LCTRL) {
@@ -80,12 +80,16 @@ void update (struct game *game, u32 dt) {
     /* mat4_multiply(res->player, res->ca era, res->player); */
   }
   else {
-    movement(game, res->player_pos);
-    mat4_copy(res->player, player_prev);
-    res->player_pos[2] =
-      game->terrain->fn(game->terrain, res->player_pos[0], res->player_pos[1]) +
+    movement(game, &res->player);
+    /* mat4_copy(res->player, player_prev); */
+
+    res->player.pos[2] =
+      game->terrain->fn(game->terrain, res->player.pos[0], res->player.pos[1]) +
         PLAYER_HEIGHT;
-    camera_follow(res->camera_pos, res->player_pos, res->player_pos, res->camera);
+    res->player.needs_recalc = 1;
+
+    camera_follow(res->camera.pos, res->player.pos, res->player.pos, res->camera.mat);
+    res->camera.needs_recalc = 1;
     /* movement(game, res->camera); */
   }
 

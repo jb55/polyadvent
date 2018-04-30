@@ -207,12 +207,10 @@ void render (struct game *game, struct geometry *geom) {
 
   mat4 *mvp = res->test_mvp;
   mat4 *normal = res->normal_matrix;
-  mat4 *camera = res->camera;
   mat4 *persp = res->camera_persp;
   mat4 *light = res->light_dir;
-  mat4 *player = res->player;
-  vec3 *camera_pos = res->camera_pos;
-  vec3 *player_pos = res->player_pos;
+  struct node *player = &res->player;
+  struct node *camera = &res->camera;
 
   float fade_factor = res->fade_factor;
 
@@ -222,9 +220,9 @@ void render (struct game *game, struct geometry *geom) {
   /* v3[1] = fade_factor * 1.4f; */
   /* mat4_rotate(mvp, 0.004f, v3, mvp); */
   /* printf("camera_pos %f %f %f", camera_pos[0], camera_pos[1], camera_pos[2]); */
-  mat4_rotate(camera, -45, V3(1,0,0), tmp_matrix);
-  mat4_translate(tmp_matrix, V3(-camera_pos[0], -camera_pos[1], -camera_pos[2]), tmp_matrix);
-  mat4_multiply(persp, tmp_matrix, mvp);
+  node_recalc(camera);
+  /* mat4_print(camera->mat); */
+  mat4_multiply(persp, camera->mat, mvp);
   /* mat4_multiply(mvp, tmp_matrix, tmp_matrix); */
 
   glUniform3f(res->uniforms.light_dir, light[0], light[1], light[2]);
@@ -232,10 +230,8 @@ void render (struct game *game, struct geometry *geom) {
   glUniform1f(res->uniforms.tscale, res->uniforms.tscale);
 
   //player
-  /* mat4_rotate(camera, -45, V3(1,0,0), tmp_matrix); */
-  /* mat4_translate(tmp_matrix, V3(-camera_pos[0], -camera_pos[1], -camera_pos[2]), tmp_matrix); */
-  mat4_translate(player, player_pos, tmp_matrix);
-  mat4_multiply(mvp, tmp_matrix, tmp_matrix);
+  node_recalc(player);
+  mat4_multiply(mvp, player->mat, tmp_matrix);
   glUniformMatrix4fv(res->uniforms.mvp, 1, 0, tmp_matrix);
   /* mat4_multiply(persp, tmp_matrix, mvp); */
   render_cube(res);

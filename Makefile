@@ -34,6 +34,7 @@ OBJS += $(SRC)/delaunay.o
 OBJS += $(SRC)/geometry.o
 OBJS += $(SRC)/input.o
 OBJS += $(SRC)/util.o
+OBJS += $(SRC)/node.o
 
 SRCS=$(OBJS:.o=.c)
 

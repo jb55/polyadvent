@@ -4,6 +4,7 @@
 
 #include "buffer.h"
 #include "input.h"
+#include "node.h"
 
 #define PLAYER_HEIGHT 1.7
 
@@ -29,15 +30,13 @@ struct resources {
       gpu_addr normal;
     } attributes;
 
+    struct node player;
+    struct node camera;
+
     float terrain_node[MAT4_ELEMS];
     float normal_matrix[MAT4_ELEMS];
     float test_mvp[MAT4_ELEMS];
     float light_dir[3];
-    float player_pos[3];
-    float camera[MAT4_ELEMS];
-    float camera_pos[3];
-    float player[MAT4_ELEMS];
-    float player_cam[MAT4_ELEMS];
     float camera_persp[MAT4_ELEMS];
     GLfloat fade_factor;
 };

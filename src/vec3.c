@@ -184,6 +184,13 @@ float vec3_distsq(vec3 *vec, vec3 *vec2) {
 }
 
 
+vec3 *vec3_all(vec3 *vec, float n) {
+  vec[0] = n;
+  vec[1] = n;
+  vec[2] = n;
+  return vec;
+}
+
 /* vec3 *vec3_unproject(vec3 *vec, mat4 view, mat4 proj, vec4_t viewport, vec3 *dest) { */
 /*     if (!dest) { dest = vec; } */
 
@@ -207,3 +214,12 @@ float vec3_distsq(vec3 *vec, vec3 *vec2) {
 
 /*     return dest; */
 /* } */
+
+int vec3_isall(vec3 *vec, float n) {
+  for (int i = 0; i < 3; ++i) {
+    if (vec[i] != n)
+      return 0;
+  }
+
+  return 1;
+}
