@@ -197,7 +197,7 @@ static void render_geom (struct resources *res,
 
 
 void render (struct game *game, struct geometry *geom) {
-  glClearColor( 1.0f, 1.0f, 1.0f, 1.0f ); //clear background screen to black
+  glClearColor( 0.5294f, 0.8078f, 0.9216f, 1.0f ); //clear background screen to black
   glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
   check_gl();
 

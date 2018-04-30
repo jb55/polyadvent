@@ -38,6 +38,8 @@ int node_recalc(struct node *node) {
   if (node->scale[0] != 1 || node->scale[1] != 1 || node->scale[2] != 1)
     mat4_scale(node->mat, node->scale, node->mat);
 
+  float m = node->mirrored ? -1 : 1;
+
   // FIXME: this seems bad?
   for (int i = 0; i < 3; ++i) {
     if (node->rot[i] != 0) {
@@ -45,14 +47,24 @@ int node_recalc(struct node *node) {
       rotate_axis[1] = 0;
       rotate_axis[2] = 0;
       rotate_axis[i] = 1;
+      float x = node->pos[0];
+      float y = node->pos[1];
+      float z = node->pos[2];
+      if (!node->mirrored)
+        mat4_translate(node->mat, V3(x, y, z), node->mat);
       mat4_rotate(node->mat, node->rot[i], rotate_axis, node->mat);
+      if (!node->mirrored)
+        mat4_translate(node->mat, V3(-x, -y, -z), node->mat);
     }
   }
 
-  float m = node->mirrored ? -1 : 1;
   if (node->pos[0] || node->pos[1] || node->pos[2])
     mat4_translate(node->mat, V3(node->pos[0]*m,node->pos[1]*m,node->pos[2]*m),
                    node->mat);
+
+
+  /* if (node->pos[0] || node->pos[1] || node->pos[2]) */
+  /*   mat4_translate(node->mat, node->pos, node->mat); */
 
   return 1;
 }

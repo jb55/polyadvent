@@ -33,19 +33,17 @@ void movement(struct game *game, struct node *node) {
   if (game->input.keystates[SDL_SCANCODE_S])
     node_translate(node, V3(0,-amt,0));
 
-  /* if (obj == game->test_resources.camera) { */
-  /*   if (game->input.keystates[SDL_SCANCODE_UP]) */
-  /*     mat4_rotate(obj, amt*0.1, (float[]){1,0,0}, obj); */
+  if (game->input.keystates[SDL_SCANCODE_UP])
+    node->rot[0] += amt * 0.01;
 
-  /*   if (game->input.keystates[SDL_SCANCODE_RIGHT]) */
-  /*     mat4_rotate(obj, amt*0.1, (float[]){0,1,0}, obj); */
+  if (game->input.keystates[SDL_SCANCODE_RIGHT])
+    node->rot[2] -= amt * 0.01;
 
-  /*   if (game->input.keystates[SDL_SCANCODE_LEFT]) */
-  /*     mat4_rotate(obj, -(amt*0.1), (float[]){0,1,0}, obj); */
+  if (game->input.keystates[SDL_SCANCODE_LEFT])
+    node->rot[2] += amt * 0.01;
 
-  /*   if (game->input.keystates[SDL_SCANCODE_DOWN]) */
-  /*     mat4_rotate(obj, -(amt*0.1), (float[]){1,0,0}, obj); */
-  /* } */
+  if (game->input.keystates[SDL_SCANCODE_DOWN])
+    node->rot[0] -= amt * 0.01;
 
   /* if (game->input.keystates[SDL_SCANCODE_P]) */
   /*   mat4_print(obj); */
@@ -88,6 +86,7 @@ void update (struct game *game, u32 dt) {
         PLAYER_HEIGHT;
     res->player.needs_recalc = 1;
 
+    node_recalc(&res->camera);
     camera_follow(res->camera.pos, res->player.pos, res->player.pos, res->camera.mat);
     res->camera.needs_recalc = 1;
     /* movement(game, res->camera); */
