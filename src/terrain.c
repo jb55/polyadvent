@@ -2,7 +2,7 @@
 #include "terrain.h"
 #include "util.h"
 #include "delaunay.h"
-#include "vec3/vec3.h"
+#include "vec3.h"
 #include "perlin.h"
 #include "poisson.h"
 

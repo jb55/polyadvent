@@ -3,62 +3,65 @@
 #include "update.h"
 #include "terrain.h"
 #include "util.h"
-#include "mat4/mat4.h"
-#include "vec3/vec3.h"
+#include "mat4.h"
+#include "vec3.h"
+#include "camera.h"
 #include "poisson.h"
 #include "uniform.h"
 
-void movement(struct game *game, float *obj) {
+void movement(struct game *game, vec3 *obj) {
   float amt = 0.25;
 
   if (game->input.modifiers & KMOD_SHIFT)
     amt *= 6;
 
   if (game->input.keystates[SDL_SCANCODE_A])
-    mat4_translate(obj, -amt, 0, 0, obj);
+    obj[0] -= amt;
 
   if (game->input.keystates[SDL_SCANCODE_E])
-    mat4_translate(obj, 0, 0, amt, obj);
+    obj[2] += amt;
 
   if (game->input.keystates[SDL_SCANCODE_Q])
-    mat4_translate(obj, 0, 0, -amt, obj);
+    obj[2] -= amt;
 
   if (game->input.keystates[SDL_SCANCODE_D])
-    mat4_translate(obj, amt, 0, 0, obj);
+    obj[0] += amt;
 
   if (game->input.keystates[SDL_SCANCODE_W])
-    mat4_translate(obj, 0, amt, 0, obj);
+    obj[1] += amt;
 
   if (game->input.keystates[SDL_SCANCODE_S])
-    mat4_translate(obj, 0, -amt, 0, obj);
+    obj[1] -= amt;
 
-  if (obj == game->test_resources.camera) {
-    if (game->input.keystates[SDL_SCANCODE_UP])
-      mat4_rotate(obj, amt*0.1, (float[]){1,0,0}, obj);
+  /* if (obj == game->test_resources.camera) { */
+  /*   if (game->input.keystates[SDL_SCANCODE_UP]) */
+  /*     mat4_rotate(obj, amt*0.1, (float[]){1,0,0}, obj); */
 
-    if (game->input.keystates[SDL_SCANCODE_RIGHT])
-      mat4_rotate(obj, amt*0.1, (float[]){0,1,0}, obj);
+  /*   if (game->input.keystates[SDL_SCANCODE_RIGHT]) */
+  /*     mat4_rotate(obj, amt*0.1, (float[]){0,1,0}, obj); */
 
-    if (game->input.keystates[SDL_SCANCODE_LEFT])
-      mat4_rotate(obj, -(amt*0.1), (float[]){0,1,0}, obj);
+  /*   if (game->input.keystates[SDL_SCANCODE_LEFT]) */
+  /*     mat4_rotate(obj, -(amt*0.1), (float[]){0,1,0}, obj); */
 
-    if (game->input.keystates[SDL_SCANCODE_DOWN])
-      mat4_rotate(obj, -(amt*0.1), (float[]){1,0,0}, obj);
-  }
+  /*   if (game->input.keystates[SDL_SCANCODE_DOWN]) */
+  /*     mat4_rotate(obj, -(amt*0.1), (float[]){1,0,0}, obj); */
+  /* } */
 
-  if (game->input.keystates[SDL_SCANCODE_P])
-    mat4_print(obj);
+  /* if (game->input.keystates[SDL_SCANCODE_P]) */
+  /*   mat4_print(obj); */
 }
 
 void update (struct game *game, u32 dt) {
   static int passed = 0;
   static int last_gen_time = 50;
   static float n = 1;
+  static float nn = 1;
   static int first = 1;
   static double last_ox, last_oy, last_oz;
   struct resources *res = &game->test_resources;
   static int stopped = 0;
   struct perlin_settings *ts = &game->terrain->settings;
+  float player_prev[MAT4_ELEMS];
   float *tnode = game->test_resources.terrain_node;
   float *light = res->light_dir;
 
@@ -69,19 +72,20 @@ void update (struct game *game, u32 dt) {
   }
 
   if (game->input.modifiers & KMOD_LALT) {
-    movement(game, res->camera);
+    movement(game, res->camera_pos);
     /* mat4_multiply(res->player, res->ca era, res->player); */
   }
   if (game->input.modifiers & KMOD_LCTRL) {
-    movement(game, res->terrain_node);
+    /* movement(game, res->terrain_node); */
     /* mat4_multiply(res->player, res->ca era, res->player); */
   }
   else {
-    movement(game, res->player);
-    res->player[14] =
-      game->terrain->fn(game->terrain, res->player[M_X], res->player[M_Y]) +
+    movement(game, res->player_pos);
+    mat4_copy(res->player, player_prev);
+    res->player_pos[2] =
+      game->terrain->fn(game->terrain, res->player_pos[0], res->player_pos[1]) +
         PLAYER_HEIGHT;
-    camera_follow(camera, player);
+    camera_follow(res->camera_pos, res->player_pos, res->player_pos, res->camera);
     /* movement(game, res->camera); */
   }
 
@@ -167,7 +171,6 @@ void update (struct game *game, u32 dt) {
       n += 0.01f;
     }
 
-    /* res->light_dir[0] = cos(n) * 0.8; */
   }
 
 }

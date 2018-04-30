@@ -5,8 +5,8 @@
 
 #include "gl.h"
 #include "game.h"
-#include "mat4/mat4.h"
-#include "vec3/vec3.h"
+#include "mat4.h"
+#include "vec3.h"
 #include "buffer.h"
 #include "buffer_geometry.h"
 #include "shader.h"
@@ -205,12 +205,14 @@ void render (struct game *game, struct geometry *geom) {
   mat4_id(id);
   struct resources *res = &game->test_resources;
 
-  float *mvp = res->test_mvp;
-  float *normal = res->normal_matrix;
-  float *camera = res->camera;
-  float *persp = res->camera_persp;
-  float *light = res->light_dir;
-  float *player = res->player;
+  mat4 *mvp = res->test_mvp;
+  mat4 *normal = res->normal_matrix;
+  mat4 *camera = res->camera;
+  mat4 *persp = res->camera_persp;
+  mat4 *light = res->light_dir;
+  mat4 *player = res->player;
+  vec3 *camera_pos = res->camera_pos;
+  vec3 *player_pos = res->player_pos;
 
   float fade_factor = res->fade_factor;
 
@@ -219,20 +221,27 @@ void render (struct game *game, struct geometry *geom) {
   /* static float v3[] = { 1, 1, 0 }; */
   /* v3[1] = fade_factor * 1.4f; */
   /* mat4_rotate(mvp, 0.004f, v3, mvp); */
-  mat4_multiply(persp, camera, tmp_matrix);
-  mat4_multiply(tmp_matrix, mvp, tmp_matrix);
-
-  recalc_normals(res->uniforms.normal_matrix, tmp_matrix, normal);
+  /* printf("camera_pos %f %f %f", camera_pos[0], camera_pos[1], camera_pos[2]); */
+  mat4_rotate(camera, -45, V3(1,0,0), tmp_matrix);
+  mat4_translate(tmp_matrix, V3(-camera_pos[0], -camera_pos[1], -camera_pos[2]), tmp_matrix);
+  mat4_multiply(persp, tmp_matrix, mvp);
+  /* mat4_multiply(mvp, tmp_matrix, tmp_matrix); */
 
   glUniform3f(res->uniforms.light_dir, light[0], light[1], light[2]);
   glUniform1f(res->uniforms.fade_factor, fade_factor);
   glUniform1f(res->uniforms.tscale, res->uniforms.tscale);
+
+  //player
+  /* mat4_rotate(camera, -45, V3(1,0,0), tmp_matrix); */
+  /* mat4_translate(tmp_matrix, V3(-camera_pos[0], -camera_pos[1], -camera_pos[2]), tmp_matrix); */
+  mat4_translate(player, player_pos, tmp_matrix);
+  mat4_multiply(mvp, tmp_matrix, tmp_matrix);
   glUniformMatrix4fv(res->uniforms.mvp, 1, 0, tmp_matrix);
-
-  glUniformMatrix4fv(res->uniforms.local, 1, 0, player);
+  /* mat4_multiply(persp, tmp_matrix, mvp); */
   render_cube(res);
-  glUniformMatrix4fv(res->uniforms.local, 1, 0, id);
 
+  // terrain
+  glUniformMatrix4fv(res->uniforms.mvp, 1, 0, mvp);
   render_geom(res, geom, GL_TRIANGLES);
   /* glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); */
   /* render_geom(res, geom, GL_TRIANGLES); */

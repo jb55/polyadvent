@@ -1,6 +1,10 @@
 
 typedef float mat4;
 
+#define M_X 12
+#define M_Y 13
+#define M_Z 14
+
 mat4 *mat4_scale(mat4 *a, float v[3], mat4 *out);
 mat4 *mat4_frustum (float left, float right, float bottom,
                     float top, float near, float far, mat4 *dest);
@@ -8,7 +12,7 @@ mat4 *mat4_frustum (float left, float right, float bottom,
 mat4 *mat4_perspective(float fov, float aspect, float near,
                        float far, mat4 *dest);
 
-mat4 *mat4_translate (mat4 *mat, float x, float y, float z, mat4 *dest);
+mat4 *mat4_translate (mat4 *mat, float *vec3, mat4 *dest);
 mat4 *mat4_transpose(mat4 *src, mat4 *dest);
 mat4 *mat4_inverse(mat4 *src, mat4 *dest);
 mat4 *mat4_copy(const mat4 *src, mat4 *dst);

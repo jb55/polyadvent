@@ -13,16 +13,17 @@ SRC=src
 
 OBJS  = $(SRC)/window.o
 OBJS += $(SRC)/buffer.o
-#OBJS += $(SRC)/camera.o
+OBJS += $(SRC)/camera.o
 OBJS += $(SRC)/debug.o
 OBJS += $(SRC)/event.o
 OBJS += $(SRC)/file.o
 OBJS += $(SRC)/perlin.o
+OBJS += $(SRC)/main.o
 OBJS += $(SRC)/poisson.o
 OBJS += $(SRC)/uniform.o
 OBJS += $(SRC)/game.o
-OBJS += $(SRC)/mat4/mat4.o
-OBJS += $(SRC)/vec3/vec3.o
+OBJS += $(SRC)/mat4.o
+OBJS += $(SRC)/vec3.o
 OBJS += $(SRC)/render.o
 OBJS += $(SRC)/shader.o
 OBJS += $(SRC)/update.o
@@ -36,18 +37,18 @@ OBJS += $(SRC)/util.o
 
 SRCS=$(OBJS:.o=.c)
 
-include $(OBJS:.o=.d)
 
 all: $(BIN)
 
-src/%.d: src/%.c
+include $(OBJS:.o=.d)
+
+%.d: %.c
 	@rm -f $@; \
-	$(CC) -MM $(CFLAGS) $< > $@
+	$(CC) -MM $(CFLAGS) $< > $@.$$$$; \
+	sed 's,\(.*\)\.o[ :]*,src/\1.o $@ : ,g' < $@.$$$$ > $@; \
+	rm -f $@.$$$$
 
-%.o: %.c %.h
-	$(CC) $(CFLAGS) -fPIC $(DEFS) -c $< -o $@
-
-$(BIN): $(SRC)/main.o $(OBJS)
+$(BIN): $(OBJS)
 	$(CC) $(CFLAGS) $(DEFS) $^ $(LDFLAGS) -o $@
 
 install: $(BIN)
@@ -61,6 +62,6 @@ TAGS:
 	etags $(SRCS)
 
 clean:
-	rm -f src/main.o $(OBJS) $(SHLIB) $(BIN) *.d
+	rm -f src/main.o $(OBJS) $(SHLIB) $(BIN) $(SRC)/*.d*
 
 .PHONY: TAGS

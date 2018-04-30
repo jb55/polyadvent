@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <math.h>
 
-#include "mat4/mat4.h"
+#include "mat4.h"
 #include "vec3.h"
 
 vec3 *vec3_create(vec3 *vec) {
@@ -130,9 +130,13 @@ vec3 *vec3_cross (vec3 *vec, vec3 *vec2, vec3 *dest) {
     return dest;
 }
 
+float vec3_lengthsq(vec3 *vec) {
+  float x = vec[0], y = vec[1], z = vec[2];
+  return x * x + y * y + z * z;
+}
+
 float vec3_length(vec3 *vec) {
-    float x = vec[0], y = vec[1], z = vec[2];
-    return sqrt(x * x + y * y + z * z);
+    return sqrt(vec3_lengthsq(vec));
 }
 
 float vec3_dot(vec3 *vec, vec3 *vec2) {
@@ -171,7 +175,7 @@ vec3 *vec3_lerp(vec3 *vec, vec3 *vec2, float lerp, vec3 *dest) {
     return dest;
 }
 
-float vec3_lengthsq(vec3 *vec, vec3 *vec) {
+float vec3_distsq(vec3 *vec, vec3 *vec2) {
   float x = vec2[0] - vec[0],
         y = vec2[1] - vec[1],
         z = vec2[2] - vec[2];
@@ -179,10 +183,6 @@ float vec3_lengthsq(vec3 *vec, vec3 *vec) {
   return x*x + y*y + z*z;
 }
 
-
-float vec3_length(vec3 *vec, vec3 *vec2) {
-  return sqrt(vec3_lengthsq(vec, vec2));
-}
 
 /* vec3 *vec3_unproject(vec3 *vec, mat4 view, mat4 proj, vec4_t viewport, vec3 *dest) { */
 /*     if (!dest) { dest = vec; } */

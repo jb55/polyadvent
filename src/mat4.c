@@ -3,7 +3,7 @@
 #include <math.h>
 #include <stdio.h>
 #include <string.h>
-#include "../vec3/vec3.h"
+#include "vec3.h"
 
 #define PI 3.14159265f
 
@@ -113,7 +113,11 @@ mat4 *mat4_frustum (float left, float right, float bottom,
  * Returns:
  * dest if specified, mat otherwise
  */
-mat4 *mat4_translate (mat4 *mat, float x, float y, float z, mat4 *dest) {
+mat4 *mat4_translate (mat4 *mat, float *v3, mat4 *dest) {
+  const float x = v3[0];
+  const float y = v3[1];
+  const float z = v3[2];
+
 	if(!dest || mat == dest) {
 		mat[12] = mat[0]*x + mat[4]*y + mat[8]*z + mat[12];
 		mat[13] = mat[1]*x + mat[5]*y + mat[9]*z + mat[13];
