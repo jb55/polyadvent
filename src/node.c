@@ -20,7 +20,7 @@ void node_translate(struct node *node, vec3 *p) {
   if (vec3_isall(p, 0))
     return;
 
-  printf("translating %f %f %f\n", p[0], p[1], p[2]);
+  /* printf("translating %f %f %f\n", p[0], p[1], p[2]); */
   vec3_add(node->pos, p, node->pos);
   node->needs_recalc = 1;
 }
@@ -32,6 +32,7 @@ int node_recalc(struct node *node) {
     return 0;
 
   mat4_id(node->mat);
+
 
   node->needs_recalc = 0;
 
