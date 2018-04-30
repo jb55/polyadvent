@@ -39,6 +39,7 @@ int node_recalc(struct node *node) {
   if (node->scale[0] != 1 || node->scale[1] != 1 || node->scale[2] != 1)
     mat4_scale(node->mat, node->scale, node->mat);
 
+  //seomthing
   float m = node->mirrored ? -1 : 1;
 
   // FIXME: this seems bad?

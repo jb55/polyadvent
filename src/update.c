@@ -60,7 +60,7 @@ void update (struct game *game, u32 dt) {
   static int stopped = 0;
   struct perlin_settings *ts = &game->terrain->settings;
   float player_prev[MAT4_ELEMS];
-  float *tnode = game->test_resources.terrain_node;
+  struct node *tnode = &game->test_resources.terrain_node;
   float *light = res->light_dir;
 
   if (first) {
@@ -74,7 +74,7 @@ void update (struct game *game, u32 dt) {
     /* mat4_multiply(res->player, res->ca era, res->player); */
   }
   if (game->input.modifiers & KMOD_LCTRL) {
-    /* movement(game, res->terrain_node); */
+    movement(game, &res->terrain_node);
     /* mat4_multiply(res->player, res->ca era, res->player); */
   }
   else {
@@ -120,21 +120,21 @@ void update (struct game *game, u32 dt) {
   } else {
     passed = 0;
 
-    double ox = tnode[12];
-    double oy = tnode[13];
+    double ox = tnode->pos[0];
+    double oy = tnode->pos[1];
 
-    bool changed = last_ox != ox || last_oy != oy || last_oz != tnode[14];
+    bool changed = last_ox != ox || last_oy != oy || last_oz != tnode->pos[2];
 
     if (!stopped && changed) {
-      for (int i = 12; i < 14; ++i)
-        tnode[i] = max(tnode[i], 0);
+      for (int i = 0; i < 2; ++i)
+        tnode->pos[i] = max(tnode->pos[i], 0);
 
-      last_oz = tnode[14] = max(tnode[14], 20.0);
+      last_oz = tnode->pos[2] = max(tnode->pos[2], 20.0);
 
-      double scale = tnode[14] * 0.01;
+      double scale = tnode->pos[2] * 0.01;
       if (scale == 0) scale = 1.0;
 
-      printf("terrain %f %f %f\n", tnode[12], tnode[13], tnode[14]);
+      printf("terrain %f %f %f\n", tnode->pos[0], tnode->pos[1], tnode->pos[2]);
 
       last_ox = ts->ox = ox;
       last_oy = ts->oy = oy;

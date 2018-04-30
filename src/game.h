@@ -32,8 +32,8 @@ struct resources {
 
     struct node player;
     struct node camera;
+    struct node terrain_node;
 
-    float terrain_node[MAT4_ELEMS];
     float normal_matrix[MAT4_ELEMS];
     float test_mvp[MAT4_ELEMS];
     float light_dir[3];

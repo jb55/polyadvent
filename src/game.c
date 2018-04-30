@@ -13,8 +13,8 @@ mat4 *cam_init = (float[16]){
 void game_init(struct game *game) {
   mat4 *mvp = game->test_resources.test_mvp;
   struct node *camera = &game->test_resources.camera;
-  mat4 *terrain = game->test_resources.terrain_node;
   struct node *player = &game->test_resources.player;
+  struct node *terrain_node = &game->test_resources.terrain_node;
   mat4 *light_dir = game->test_resources.light_dir;
 
   mat4_id(mvp);
@@ -25,6 +25,7 @@ void game_init(struct game *game) {
 
   node_init(player);
   node_init(camera);
+  node_init(terrain_node);
 
   /* vec3_all(camera->scale, -1); */
   camera->mirrored = 1;
@@ -39,9 +40,7 @@ void game_init(struct game *game) {
   /* mat4_copy(cam_init, camera); */
   /* mat4_id(camera_pos); */
 
-  mat4_id(terrain);
-
-  terrain[M_Z] = 20.0;
+  terrain_node->pos[2] = 20.0;
 
   /* mat4_scale(player, V3(0.36,0.36,PLAYER_HEIGHT), player); */
 
