@@ -30,11 +30,12 @@ struct resources {
       gpu_addr normal;
     } attributes;
 
+    struct node root;
     struct node player;
+    struct node player_camera;
     struct node camera;
     struct node terrain_node;
 
-    float normal_matrix[MAT4_ELEMS];
     float test_mvp[MAT4_ELEMS];
     float light_dir[3];
     float camera_persp[MAT4_ELEMS];

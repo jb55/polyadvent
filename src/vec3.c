@@ -223,3 +223,16 @@ int vec3_isall(vec3 *vec, float n) {
 
   return 1;
 }
+
+int vec3_eq(vec3 *a, vec3 *b, float precision) {
+  return fabs(a[0] - b[0]) <= precision &&
+         fabs(a[1] - b[1]) <= precision &&
+         fabs(a[2] - b[2]) <= precision;
+}
+
+
+void vec3_copy(vec3 *a, vec3 *dest) {
+  dest[0] = a[0];
+  dest[1] = a[1];
+  dest[2] = a[2];
+}

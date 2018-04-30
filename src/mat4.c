@@ -327,3 +327,40 @@ void mat4_print(const mat4 *m) {
   }
   printf("\n");
 }
+
+/* mat4 *mat4_create_transform(float *pos, float *scale, float *rot, mat4 *dest) { */
+/*     if (!dest) { dest = mat4.create(); } */
+
+/*     float halfAngle = 0.5*angle; */
+/*     float sin_ = sin(halfAngle); */
+
+/*     dest[0] = sin_*axis[0]; */
+/*     dest[1] = sin_*axis[1]; */
+/*     dest[2] = sin_*axis[2]; */
+/*     dest[3] = cos(halfAngle); */
+
+/*     var rot = quat4.toMat3(orientation); */
+
+/*     dest[0] = scale[0] * rot[0]; */
+/*     dest[1] = scale[0] * rot[1]; */
+/*     dest[2] = scale[0] * rot[2]; */
+/*     dest[3] = 0; */
+
+/*     dest[4] = scale[1] * rot[3]; */
+/*     dest[5] = scale[1] * rot[4]; */
+/*     dest[6] = scale[1] * rot[5]; */
+/*     dest[7] = 0; */
+
+/*     dest[8] = scale[2] * rot[6]; */
+/*     dest[9] = scale[2] * rot[7]; */
+/*     dest[10] = scale[2] * rot[8]; */
+/*     dest[11] = 0; */
+
+/*     dest[12] = position[0]; */
+/*     dest[13] = position[1]; */
+/*     dest[14] = position[2]; */
+/*     dest[15] = 1; */
+
+/*     return dest; */
+/*   } */
+/* } */

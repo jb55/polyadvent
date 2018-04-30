@@ -9,7 +9,7 @@
 #include "poisson.h"
 #include "uniform.h"
 
-void movement(struct game *game, struct node *node) {
+static void movement(struct game *game, struct node *node) {
   float amt = 0.25;
 
   if (game->input.modifiers & KMOD_SHIFT)
@@ -33,6 +33,7 @@ void movement(struct game *game, struct node *node) {
   if (game->input.keystates[SDL_SCANCODE_S])
     node_translate(node, V3(0,-amt,0));
 
+  // TODO: mark as update
   if (game->input.keystates[SDL_SCANCODE_UP])
     node->rot[0] += amt * 0.01;
 
@@ -61,6 +62,7 @@ void update (struct game *game, u32 dt) {
   struct perlin_settings *ts = &game->terrain->settings;
   float player_prev[MAT4_ELEMS];
   struct node *tnode = &game->test_resources.terrain_node;
+  struct node *root = &game->test_resources.root;
   float *light = res->light_dir;
 
   if (first) {
@@ -73,23 +75,33 @@ void update (struct game *game, u32 dt) {
     movement(game, &res->camera);
     /* mat4_multiply(res->player, res->ca era, res->player); */
   }
-  if (game->input.modifiers & KMOD_LCTRL) {
+  else if (game->input.modifiers & KMOD_LCTRL) {
     movement(game, &res->terrain_node);
     /* mat4_multiply(res->player, res->ca era, res->player); */
   }
   else {
-    movement(game, &res->player);
     /* mat4_copy(res->player, player_prev); */
+    static vec3 last_pos[3] = {0};
 
-    res->player.pos[2] =
-      game->terrain->fn(game->terrain, res->player.pos[0], res->player.pos[1]) +
+    movement(game, &res->player);
+
+    if (!vec3_eq(res->player.pos, last_pos, 0.0001)) {
+      printf("else\n");
+
+      res->player.pos[2] =
+        game->terrain->fn(game->terrain, res->player.pos[0], res->player.pos[1]) +
         PLAYER_HEIGHT;
-    res->player.needs_recalc = 1;
 
-    node_recalc(&res->camera);
-    camera_follow(res->camera.pos, res->player.pos, res->player.pos, res->camera.mat);
-    res->camera.needs_recalc = 1;
-    /* movement(game, res->camera); */
+      vec3_copy(res->player.pos, last_pos);
+
+      /* node_recalc(&res->root); */
+      node_recalc(&res->root);
+      camera_follow(res->camera.pos, &res->player_camera.mat[M_X], res->camera.mat);
+      node_mark_for_recalc(&res->camera);
+      /* node_recalc(&res->camera); */
+
+      /* movement(game, res->camera); */
+    }
   }
 
   if (game->input.keystates[SDL_SCANCODE_C]) {
@@ -176,4 +188,5 @@ void update (struct game *game, u32 dt) {
 
   }
 
+  node_recalc(root);
 }

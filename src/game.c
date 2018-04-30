@@ -12,8 +12,10 @@ mat4 *cam_init = (float[16]){
 
 void game_init(struct game *game) {
   mat4 *mvp = game->test_resources.test_mvp;
+  struct node *root = &game->test_resources.root;
   struct node *camera = &game->test_resources.camera;
   struct node *player = &game->test_resources.player;
+  struct node *player_camera = &game->test_resources.player_camera;
   struct node *terrain_node = &game->test_resources.terrain_node;
   mat4 *light_dir = game->test_resources.light_dir;
 
@@ -23,17 +25,33 @@ void game_init(struct game *game) {
   light_dir[1] = 1;
   light_dir[2] = 0.8;
 
+  node_init(root);
   node_init(player);
   node_init(camera);
+  node_init(player_camera);
   node_init(terrain_node);
+
+  root->label = "root";
+  player->label = "player";
+  camera->label = "camera";
+  player_camera->label = "player_camera";
+  terrain_node->label = "terrain_node";
+
+  node_attach(player, root);
+  node_attach(player_camera, player);
+  node_attach(camera, root);
 
   /* vec3_all(camera->scale, -1); */
   camera->mirrored = 1;
 
   node_translate(player, V3(10,10,0));
-  node_translate(camera, V3(50,0,20));
+  node_translate(camera, V3(0,0,20));
+  node_translate(player_camera, V3(10,10,20));
+  /* node_recalc(camera); */
 
-  camera->rot[0] = -45;
+  /* player_camera->mirrored = 1; */
+  /* camera->parent = player_camera; */
+  camera->rot[0] = 45;
 
   // move the camera a bit
   /* mat4_translate(camera, 1.0f, 1.0f, 20.0f, camera); */
