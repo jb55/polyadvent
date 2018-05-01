@@ -28,4 +28,6 @@ void main()
       v_hcol = vec4(0.5, 0.5, 0.5, 1.0);
     else
       v_hcol = vec4(1.0, 1.0, 1.0, 1.0);
+
+    v_hcol = v_hcol * 0.5;
 }
