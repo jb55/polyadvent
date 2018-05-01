@@ -2,6 +2,7 @@
 #include "util.h"
 #include "vec3.h"
 #include "mat4.h"
+#include "quat.h"
 #include <stdlib.h>
 
 int clampi(int a, int mina, int maxa) {
@@ -86,4 +87,5 @@ void look_at(vec3 *eye, vec3 *target, vec3 *up, mat4 *dest) {
   dest[10] = z[2];
   /* dest[11] = -vec3_dot(z, eye); */
 }
+
 

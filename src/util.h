@@ -15,8 +15,6 @@ double clamp(double a, double mina, double maxa);
 double max(double a, double b);
 double min(double a, double b);
 
-void look_at(vec3 *eye, vec3 *target, vec3 *up, mat4 *dest);
-
 double rand_0to1();
 
 #endif /* PA_UTIL_H */

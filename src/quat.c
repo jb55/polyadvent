@@ -36,3 +36,35 @@ void quat_axis_angle(float *axis, float angle, quat *dest) {
   dest[2] = axis[2] * s;
   dest[3] = cos(half_angle);
 }
+
+void quat_to_mat3(quat *quat, float *dest) {
+	float x = quat[0], y = quat[1], z = quat[2], w = quat[3];
+
+	float x2 = x + x;
+	float y2 = y + y;
+	float z2 = z + z;
+
+	float xx = x*x2;
+	float xy = x*y2;
+	float xz = x*z2;
+
+	float yy = y*y2;
+	float yz = y*z2;
+	float zz = z*z2;
+
+	float wx = w*x2;
+	float wy = w*y2;
+	float wz = w*z2;
+
+	dest[0] = 1 - (yy + zz);
+	dest[1] = xy - wz;
+	dest[2] = xz + wy;
+
+	dest[3] = xy + wz;
+	dest[4] = 1 - (xx + zz);
+	dest[5] = yz - wx;
+
+	dest[6] = xz - wy;
+	dest[7] = yz + wx;
+	dest[8] = 1 - (xx + yy);
+}

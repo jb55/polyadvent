@@ -1,8 +1,6 @@
 
 #include "camera.h"
-#include "util.h"
-#include "mat4.h"
-#include "vec3.h"
+#include "mat_util.h"
 
 // should probably be a scene node
 struct camera *camera_init(struct camera *cam) {

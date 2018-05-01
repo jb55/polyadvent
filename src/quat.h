@@ -8,5 +8,6 @@ typedef float quat;
 void quat_id(quat *dest);
 void quat_multiply(quat *a, quat *b, quat *dest);
 void quat_axis_angle(float *axis, float angle, quat *dest);
+void quat_to_mat3(quat *quat, float *dest);
 
 #endif /* POLYADVENT_QUAT4_ */

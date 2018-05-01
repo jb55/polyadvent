@@ -1,6 +1,5 @@
 
-#include "mat4.h"
-#include "vec3.h"
+#include "mat_util.h"
 #include "game.h"
 
 mat4 *cam_init = (float[16]){
@@ -51,7 +50,7 @@ void game_init(struct game *game) {
 
   /* player_camera->mirrored = 1; */
   /* camera->parent = player_camera; */
-  camera->rot[0] = 45;
+  quat_axis_angle(V3(1,0,0), 45, camera->orientation);
 
   // move the camera a bit
   /* mat4_translate(camera, 1.0f, 1.0f, 20.0f, camera); */
