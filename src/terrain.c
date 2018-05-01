@@ -42,6 +42,8 @@ void deriv(double (*noisefn)(void*, double, double), void* data, double x,
 
 void
 terrain_init(struct terrain *terrain) {
+  terrain->samples = NULL;
+  terrain->n_samples = 0;
 }
 
 double offset_fn(struct terrain* terrain, double x, double y) {

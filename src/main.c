@@ -28,7 +28,6 @@ int main(void)
   struct game game;
   struct slab slab;
   struct geometry slab_geom;
-  struct terrain terrain;
 
   size_t length;
 
@@ -43,55 +42,6 @@ int main(void)
   SDL_GL_CreateContext(window);
   init_gl(&game.test_resources, width, height);
   game_init(&game);
-  game.terrain = &terrain;
-
-  const double size = 1000;
-  const double pdist = 1.7;
-  const double scale = 0.01;
-  /* printf("samples seed %d\n", seed); */
-  const int n_samples =
-    (size * size) * scale*scale;
-  struct point *samples = uniform_samples(n_samples, size);
-  terrain.n_samples = n_samples;
-
-  /* struct point *samples = poisson_disk_samples(pdist, size, 30, &terrain.n_samples); */
-  /* struct point *samples = load_samples(NULL, &terrain.n_samples); */
-  draw_samples(samples, pdist, terrain.n_samples, size);
-  /* save_samples(samples, seed, terrain.n_samples); */
-
-  terrain.settings = (struct perlin_settings){
-    .depth = 1,
-    .freq  = 0.02,
-    .o1 = 2.0, .o1s = 0.5,
-    .o2 = 4.0, .o2s = 0.25,
-    .amplitude  = 1.0,
-    .ox = 0,
-    .oy = 0,
-    .exp = 6.3,
-    .scale = 1.0
-  };
-
-  terrain_init(&terrain);
-  terrain.size = size;
-  terrain.samples = samples;
-  terrain_create(&terrain);
-
-  /* slab_buffer = file_contents(SLAB("test.slab"), &length); */
-  /* slab_parse(&slab, slab_buffer); */
-  /* slab_show(&slab); */
-  /* slab_alloc_arrays(&slab, &slab_geom, NULL); */
-  /* slab_arrays(&slab, */
-  /*             slab_geom.vertices, */
-  /*             slab_geom.normals, */
-  /*             slab_geom.indices, */
-  /*             &slab_geom.num_elements); */
-
-  /* make_buffer_geometry(&slab_geom); */
-  // mesh it -> load into vbo
-
-  /* Loop until the user closes the window */
-
-
   u32 last = SDL_GetTicks();
 
   while (1) {
@@ -100,7 +50,7 @@ int main(void)
     update(&game, ticks-last);
 
     last = ticks;
-    render(&game, &terrain.geom);
+    render(&game, &game.terrain.geom);
 
     /* Swap front and back buffers */
     SDL_GL_SwapWindow(window);

@@ -1,6 +1,7 @@
 
 #include "mat_util.h"
 #include "game.h"
+#include "terrain.h"
 
 mat4 *cam_init = (float[16]){
   0.955761, 0.228018, -0.185425, 0.000000,
@@ -23,7 +24,26 @@ void game_init(struct game *game) {
   struct node *camera = &game->test_resources.camera;
   struct node *player = &game->test_resources.player;
   struct node *terrain_node = &game->test_resources.terrain_node;
+  struct terrain *terrain = &game->terrain;
   mat4 *light_dir = game->test_resources.light_dir;
+
+  const double size = 1000;
+  const double pdist = 1.7;
+
+  terrain->settings = (struct perlin_settings){
+    .depth = 1,
+    .freq  = 0.02,
+    .o1 = 2.0, .o1s = 0.5,
+    .o2 = 4.0, .o2s = 0.25,
+    .amplitude  = 1.0,
+    .ox = 0,
+    .oy = 0,
+    .exp = 6.3
+  };
+
+  terrain_init(terrain);
+  terrain->size = size;
+
 
   mat4_id(mvp);
 
@@ -52,7 +72,7 @@ void game_init(struct game *game) {
   /* vec3_all(camera->scale, -1); */
   /* camera->mirrored = 1; */
 
-  node_translate(player, V3(20,20,0));
+  node_translate(player, V3(terrain->size/2.,terrain->size/2.,0));
   node_translate(camera, V3(0,-30,20));
   /* node_recalc(camera); */
 

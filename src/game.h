@@ -5,6 +5,7 @@
 #include "buffer.h"
 #include "input.h"
 #include "node.h"
+#include "terrain.h"
 
 #define PLAYER_HEIGHT 1.7
 
@@ -41,12 +42,11 @@ struct resources {
     GLfloat fade_factor;
 };
 
-
 struct game {
   int counter;
   struct resources test_resources;
   struct input input;
-  struct terrain *terrain;
+  struct terrain terrain;
 };
 
 void game_init(struct game *game);
