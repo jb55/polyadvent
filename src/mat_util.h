@@ -8,5 +8,6 @@
 
 void look_at(vec3 *eye, vec3 *target, vec3 *up, mat4 *dest);
 mat4 *mat4_create_transform(float *pos, float *scale, quat *orientation, mat4 *dest);
+vec3 *vec3_forward(vec3 *p, quat orientation, vec3 *dest);
 
 #endif /* POLYADVENT_MAT_UTIL_H */

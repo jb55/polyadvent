@@ -9,12 +9,19 @@ mat4 *cam_init = (float[16]){
   -71.766136, -47.881512, -44.216671, 1.000000
 };
 
+static void camera_update(struct node *node) {
+  mat4 *persp = (float*)node->custom_update_data;
+  mat4 *mat = (float*)node->mat;
+
+  mat4_inverse(mat, mat);
+  mat4_multiply(persp, mat, mat);
+}
+
 void game_init(struct game *game) {
   mat4 *mvp = game->test_resources.test_mvp;
   struct node *root = &game->test_resources.root;
   struct node *camera = &game->test_resources.camera;
   struct node *player = &game->test_resources.player;
-  struct node *player_camera = &game->test_resources.player_camera;
   struct node *terrain_node = &game->test_resources.terrain_node;
   mat4 *light_dir = game->test_resources.light_dir;
 
@@ -27,30 +34,30 @@ void game_init(struct game *game) {
   node_init(root);
   node_init(player);
   node_init(camera);
-  node_init(player_camera);
   node_init(terrain_node);
 
   root->label = "root";
   player->label = "player";
   camera->label = "camera";
-  player_camera->label = "player_camera";
   terrain_node->label = "terrain_node";
 
   node_attach(player, root);
-  node_attach(player_camera, player);
-  node_attach(camera, root);
+  node_attach(camera, player);
+
+  quat_axis_angle(V3(1,0,0), -45, camera->orientation);
+
+  /* camera->custom_update = camera_update; */
+  /* camera->custom_update_data = (void*)game->test_resources.camera_persp; */
 
   /* vec3_all(camera->scale, -1); */
-  camera->mirrored = 1;
+  /* camera->mirrored = 1; */
 
-  node_translate(player, V3(10,10,0));
-  node_translate(camera, V3(0,0,20));
-  node_translate(player_camera, V3(10,10,20));
+  node_translate(player, V3(20,20,0));
+  node_translate(camera, V3(0,-30,20));
   /* node_recalc(camera); */
 
   /* player_camera->mirrored = 1; */
   /* camera->parent = player_camera; */
-  quat_axis_angle(V3(1,0,0), 45, camera->orientation);
 
   // move the camera a bit
   /* mat4_translate(camera, 1.0f, 1.0f, 20.0f, camera); */

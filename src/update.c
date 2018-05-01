@@ -16,35 +16,35 @@ static void movement(struct game *game, struct node *node) {
     amt *= 6;
 
   if (game->input.keystates[SDL_SCANCODE_A])
-    node_translate(node, V3(-amt,0,0));
+    node_forward(node, V3(-amt,0,0));
 
   if (game->input.keystates[SDL_SCANCODE_E])
-    node_translate(node, V3(0,0,amt));
+    node_forward(node, V3(0,0,amt));
 
   if (game->input.keystates[SDL_SCANCODE_Q])
-    node_translate(node, V3(0,0,-amt));
+    node_forward(node, V3(0,0,-amt));
 
   if (game->input.keystates[SDL_SCANCODE_D])
-    node_translate(node, V3(amt,0,0));
+    node_forward(node, V3(amt,0,0));
 
   if (game->input.keystates[SDL_SCANCODE_W])
-    node_translate(node, V3(0,amt,0));
+    node_forward(node, V3(0,amt,0));
 
   if (game->input.keystates[SDL_SCANCODE_S])
-    node_translate(node, V3(0,-amt,0));
+    node_forward(node, V3(0,-amt,0));
 
   // TODO: mark as update
-  if (game->input.keystates[SDL_SCANCODE_UP])
-    node_rotate(node, V3(amt * 0.01,0,0));
+  /* if (game->input.keystates[SDL_SCANCODE_UP]) */
+  /*   node_rotate(node, V3(amt * 0.01,0,0)); */
 
   if (game->input.keystates[SDL_SCANCODE_RIGHT])
-    node_rotate(node, V3(0, 0, -amt * 0.01));
-
-  if (game->input.keystates[SDL_SCANCODE_LEFT])
     node_rotate(node, V3(0, 0, amt * 0.01));
 
-  if (game->input.keystates[SDL_SCANCODE_DOWN])
-    node_rotate(node, V3(-amt * 0.01, 0, 0));
+  if (game->input.keystates[SDL_SCANCODE_LEFT])
+    node_rotate(node, V3(0, 0, -amt * 0.01));
+
+  /* if (game->input.keystates[SDL_SCANCODE_DOWN]) */
+  /*   node_rotate(node, V3(-amt * 0.01, 0, 0)); */
 
   if (game->input.keystates[SDL_SCANCODE_P])
     mat4_print(node->mat);
@@ -92,16 +92,18 @@ void update (struct game *game, u32 dt) {
         game->terrain->fn(game->terrain, res->player.pos[0], res->player.pos[1]) +
         PLAYER_HEIGHT;
 
+      node_recalc(&res->camera);
+
       vec3_copy(res->player.pos, last_pos);
-
-      /* node_recalc(&res->root); */
-      node_recalc(&res->root);
-      camera_follow(res->camera.pos, &res->player_camera.mat[M_X], res->camera.mat);
-      node_mark_for_recalc(&res->camera);
-      /* node_recalc(&res->camera); */
-
-      /* movement(game, res->camera); */
     }
+
+    node_recalc(&res->camera);
+    vec3 *camera_world = node_world(&res->camera);
+    float cam_terrain_z =
+      game->terrain->fn(game->terrain, camera_world[0], camera_world[1]);
+
+    if (camera_world[2] < cam_terrain_z)
+      camera_world[2] = cam_terrain_z + 10.0;
   }
 
   if (game->input.keystates[SDL_SCANCODE_C]) {

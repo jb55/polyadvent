@@ -27,3 +27,4 @@ mat4 *mat4_create_transform(float *pos, float *scale, quat *orientation, mat4 *d
 
   return dest;
 }
+

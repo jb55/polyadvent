@@ -10,9 +10,9 @@ struct camera *camera_init(struct camera *cam) {
 
 void
 camera_follow(vec3 *cam_pos, vec3 *target, mat4 *cam) {
-  cam_pos[0] = target[0] - 10;
-  cam_pos[1] = target[1] - 20;
-  cam_pos[2] = target[2] + 15;
+  /* cam_pos[0] = target[0] - 10; */
+  /* cam_pos[1] = target[1] - 20; */
+  /* cam_pos[2] = target[2] + 15; */
   /* printf("cam %f %f %f looking at player %f %f %f\n", */
   /*        cam_pos[0], cam_pos[1], cam_pos[2], */
   /*        target[0], target[1], target[2]); */

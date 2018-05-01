@@ -211,7 +211,6 @@ void render (struct game *game, struct geometry *geom) {
 
   struct node *player = &res->player;
   struct node *camera = &res->camera;
-  struct node *player_camera = &res->player_camera;
 
   float fade_factor = res->fade_factor;
 
@@ -223,7 +222,9 @@ void render (struct game *game, struct geometry *geom) {
   /* printf("camera_pos %f %f %f", camera_pos[0], camera_pos[1], camera_pos[2]); */
   /* mat4_print(camera->mat); */
   /* node_recalc(&res->camera); */
-  mat4_multiply(persp, camera->mat, mvp);
+  /* mat4_multiply(persp, camera->mat, mvp); */
+  mat4_inverse(camera->mat, tmp_matrix);
+  mat4_multiply(persp, tmp_matrix, mvp);
   /* mat4_multiply(mvp, tmp_matrix, tmp_matrix); */
 
   glUniform3f(res->uniforms.light_dir, light[0], light[1], light[2]);
@@ -235,13 +236,6 @@ void render (struct game *game, struct geometry *geom) {
   glUniformMatrix4fv(res->uniforms.mvp, 1, 0, tmp_matrix);
   /* mat4_multiply(persp, tmp_matrix, mvp); */
   /* mat4_print(player->mat); */
-  render_cube(res);
-
-  //player camera
-
-  mat4_multiply(mvp, player_camera->mat, tmp_matrix);
-  glUniformMatrix4fv(res->uniforms.mvp, 1, 0, tmp_matrix);
-  /* mat4_multiply(persp, tmp_matrix, mvp); */
   render_cube(res);
 
   // terrain

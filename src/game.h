@@ -32,7 +32,6 @@ struct resources {
 
     struct node root;
     struct node player;
-    struct node player_camera;
     struct node camera;
     struct node terrain_node;
 
