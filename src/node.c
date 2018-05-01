@@ -117,10 +117,10 @@ void node_forward(struct node *node, float *dir) {
   quat_inverse(node->orientation, q);
   quat_multiply_vec3(q, dir, movement);
   vec3_add(node->pos, movement, node->pos);
-  printf("dir %f %f %f\nmovement %f %f %f\nquat %f %f %f %f\n",
-         dir[0], dir[1], dir[2],
-         movement[0], movement[1], movement[2],
-         node->orientation[0], node->orientation[1],
-         node->orientation[2], node->orientation[3]);
+  /* printf("dir %f %f %f\nmovement %f %f %f\nquat %f %f %f %f\n", */
+  /*        dir[0], dir[1], dir[2], */
+  /*        movement[0], movement[1], movement[2], */
+  /*        node->orientation[0], node->orientation[1], */
+  /*        node->orientation[2], node->orientation[3]); */
   node_mark_for_recalc(node);
 }

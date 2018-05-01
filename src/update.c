@@ -18,10 +18,10 @@ static void movement(struct game *game, struct node *node) {
   if (game->input.keystates[SDL_SCANCODE_A])
     node_forward(node, V3(-amt,0,0));
 
-  if (game->input.keystates[SDL_SCANCODE_E])
+  if (game->input.keystates[SDL_SCANCODE_RIGHT])
     node_forward(node, V3(0,0,amt));
 
-  if (game->input.keystates[SDL_SCANCODE_Q])
+  if (game->input.keystates[SDL_SCANCODE_LEFT])
     node_forward(node, V3(0,0,-amt));
 
   if (game->input.keystates[SDL_SCANCODE_D])
@@ -37,10 +37,10 @@ static void movement(struct game *game, struct node *node) {
   /* if (game->input.keystates[SDL_SCANCODE_UP]) */
   /*   node_rotate(node, V3(amt * 0.01,0,0)); */
 
-  if (game->input.keystates[SDL_SCANCODE_RIGHT])
+  if (game->input.keystates[SDL_SCANCODE_E])
     node_rotate(node, V3(0, 0, amt * 0.01));
 
-  if (game->input.keystates[SDL_SCANCODE_LEFT])
+  if (game->input.keystates[SDL_SCANCODE_Q])
     node_rotate(node, V3(0, 0, -amt * 0.01));
 
   /* if (game->input.keystates[SDL_SCANCODE_DOWN]) */
