@@ -45,7 +45,7 @@ int main(void)
   game_init(&game);
   game.terrain = &terrain;
 
-  const double size = 1000;
+  const double size = 2000;
   const double pdist = 1.7;
   const double scale = 0.01;
   /* printf("samples seed %d\n", seed); */

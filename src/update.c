@@ -35,19 +35,19 @@ static void movement(struct game *game, struct node *node) {
 
   // TODO: mark as update
   if (game->input.keystates[SDL_SCANCODE_UP])
-    node->rot[0] += amt * 0.01;
+    node_rotate(node, V3(amt * 0.01,0,0));
 
   if (game->input.keystates[SDL_SCANCODE_RIGHT])
-    node->rot[2] -= amt * 0.01;
+    node_rotate(node, V3(0, 0, -amt * 0.01));
 
   if (game->input.keystates[SDL_SCANCODE_LEFT])
-    node->rot[2] += amt * 0.01;
+    node_rotate(node, V3(0, 0, amt * 0.01));
 
   if (game->input.keystates[SDL_SCANCODE_DOWN])
-    node->rot[0] -= amt * 0.01;
+    node_rotate(node, V3(-amt * 0.01, 0, 0));
 
-  /* if (game->input.keystates[SDL_SCANCODE_P]) */
-  /*   mat4_print(obj); */
+  if (game->input.keystates[SDL_SCANCODE_P])
+    mat4_print(node->mat);
 }
 
 void update (struct game *game, u32 dt) {
@@ -141,7 +141,7 @@ void update (struct game *game, u32 dt) {
       for (int i = 0; i < 2; ++i)
         tnode->pos[i] = max(tnode->pos[i], 0);
 
-      last_oz = tnode->pos[2] = max(tnode->pos[2], 20.0);
+      last_oz = tnode->pos[2] = max(tnode->pos[2], 5.0);
 
       double scale = tnode->pos[2] * 0.01;
       if (scale == 0) scale = 1.0;
@@ -158,7 +158,7 @@ void update (struct game *game, u32 dt) {
       /* ts.o2 = fabs(sin(n*0.02) * 2); */
       ts->freq = scale * 0.15;
 
-      ts->amplitude = 1/scale;
+      ts->amplitude = 3/scale;
 
       terrain_destroy(game->terrain);
       terrain_init(game->terrain);
@@ -171,7 +171,7 @@ void update (struct game *game, u32 dt) {
       /* printf("pdist %f\n", pdist); */
 
       int n_samples =
-        (game->terrain->size * game->terrain->size) * scale*scale;
+        (game->terrain->size * game->terrain->size) * scale*scale*scale;
 
       struct point *samples =
         uniform_samples(n_samples, game->terrain->size);

@@ -31,6 +31,15 @@ void node_translate(struct node *node, vec3 *p) {
   node_mark_for_recalc(node);
 }
 
+void node_rotate(struct node *node, vec3 *p) {
+  if (vec3_isall(p, 0))
+    return;
+
+  /* printf("translating %f %f %f\n", p[0], p[1], p[2]); */
+  vec3_add(node->rot, p, node->rot);
+  node_mark_for_recalc(node);
+}
+
 int node_needs_recalc(struct node *node) {
   return (node->parent && node->parent->needs_recalc) || node->needs_recalc;
 }

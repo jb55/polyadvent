@@ -9,6 +9,7 @@ struct node {
   float rot[3];
   float scale[3];
   float mat[16];
+  float local[16];
   float orientation[4];
   char *label;
   int needs_recalc;
@@ -24,5 +25,6 @@ void node_attach(struct node *node, struct node *to);
 void node_mark_for_recalc(struct node *node);
 struct node *node_init(struct node *node);
 void node_translate(struct node *node, float *p);
+void node_rotate(struct node *node, float *p);
 
 #endif /* POLYADVENT_NODE_H */
