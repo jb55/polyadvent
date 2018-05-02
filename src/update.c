@@ -116,6 +116,36 @@ void update_terrain(struct game *game) {
   terrain_create(&game->terrain);
 }
 
+
+static void player_movement(struct game *game) {
+  struct resources *res = &game->test_resources;
+
+  // player movement
+  static vec3 last_pos[3] = {0};
+
+  movement(game, &res->player);
+
+  if (!vec3_eq(res->player.pos, last_pos, 0.0001)) {
+
+    res->player.pos[2] =
+      game->terrain.fn(&game->terrain, res->player.pos[0], res->player.pos[1]) +
+      PLAYER_HEIGHT;
+
+    node_recalc(&res->camera);
+
+    vec3_copy(res->player.pos, last_pos);
+  }
+
+  node_recalc(&res->camera);
+  vec3 *camera_world = node_world(&res->camera);
+  float cam_terrain_z =
+    game->terrain.fn(&game->terrain, camera_world[0], camera_world[1]);
+
+  if (camera_world[2] < cam_terrain_z)
+    camera_world[2] = cam_terrain_z + 10.0;
+}
+
+
 void update (struct game *game, u32 dt) {
   static int passed = 0;
   static double last_ox, last_oy, last_oz;
@@ -136,45 +166,12 @@ void update (struct game *game, u32 dt) {
 
   if (game->input.modifiers & KMOD_LALT) {
     movement(game, &res->camera);
-    /* mat4_multiply(res->player, res->ca era, res->player); */
   }
   else if (game->input.modifiers & KMOD_LCTRL) {
     movement(game, &res->terrain_node);
-    /* mat4_multiply(res->player, res->ca era, res->player); */
   }
   else {
-    /* mat4_copy(res->player, player_prev); */
-    static vec3 last_pos[3] = {0};
-
-    movement(game, &res->player);
-    /* printf("player pos %f %f %f\n", */
-    /*        res->player.pos[0], */
-    /*        res->player.pos[1], */
-    /*        res->player.pos[2]); */
-    /* printf("camera pos %f %f %f\n", */
-    /*        res->camera.mat[M_X], */
-    /*        res->camera.mat[M_Y], */
-    /*        res->camera.mat[M_Z]); */
-
-    if (!vec3_eq(res->player.pos, last_pos, 0.0001)) {
-
-      res->player.pos[2] =
-        game->terrain.fn(&game->terrain, res->player.pos[0], res->player.pos[1]) +
-        PLAYER_HEIGHT;
-
-      node_recalc(&res->camera);
-
-
-      vec3_copy(res->player.pos, last_pos);
-    }
-
-    node_recalc(&res->camera);
-    vec3 *camera_world = node_world(&res->camera);
-    float cam_terrain_z =
-      game->terrain.fn(&game->terrain, camera_world[0], camera_world[1]);
-
-    if (camera_world[2] < cam_terrain_z)
-      camera_world[2] = cam_terrain_z + 10.0;
+    player_movement(game);
   }
 
   if (game->input.keystates[SDL_SCANCODE_C]) {
@@ -183,8 +180,6 @@ void update (struct game *game, u32 dt) {
   }
 
   int space_down = game->input.keystates[SDL_SCANCODE_SPACE];
-  int ctrl_down = game->input.modifiers & KMOD_CTRL;
-  int now = SDL_GetTicks();
 
   if (space_down) {
     if (!stopped) {
