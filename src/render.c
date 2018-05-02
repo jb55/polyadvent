@@ -160,9 +160,6 @@ render_cube (struct resources * resources) {
   bind_vbo(&resources->vertex_buffer,
            resources->attributes.position);
 
-  bind_vbo(&resources->vertex_buffer,
-           resources->attributes.position);
-
   bind_vbo(&resources->normal_buffer,
            resources->attributes.normal);
 
