@@ -68,13 +68,13 @@ void update_terrain(struct game *game) {
 
   if (first) {
     terrain_init(terrain);
-    /* ts->ox = rand_0to1() * 1000.0; */
-    /* ts->oy = rand_0to1() * 1000.0; */
+    tnode->pos[0] = rand_0to1() * 1000.0;
+    tnode->pos[1] = rand_0to1() * 1000.0;
     first = 0;
   }
 
-  for (int i = 0; i < 2; ++i)
-    tnode->pos[i] = max(tnode->pos[i], 0);
+  ts->ox = tnode->pos[0];
+  ts->oy = tnode->pos[1];
 
   double scale = tnode->pos[2] * 0.0015;
   if (scale == 0) scale = 1.0;

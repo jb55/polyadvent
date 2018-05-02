@@ -49,8 +49,8 @@ terrain_init(struct terrain *terrain) {
 
 double offset_fn(struct terrain* terrain, double x, double y) {
   struct perlin_settings *perlin = &terrain->settings;
-  double ox = perlin->ox * (1/perlin->scale);
-  double oy = perlin->oy * (1/perlin->scale);
+  double ox = perlin->ox;
+  double oy = perlin->oy;
   return old_noisy_boi(terrain, ox+x, oy+y);
 }
 
