@@ -108,23 +108,17 @@ init_gl(struct resources *resources, int width, int height) {
   assert(resources->program != 0);
 
   // Program variables
-  resources->uniforms.fade_factor
-    = glGetUniformLocation(resources->program, "fade_factor");
+  resources->uniforms.camera_position
+    = glGetUniformLocation(resources->program, "camera_position");
 
   resources->uniforms.light_dir
     = glGetUniformLocation(resources->program, "light_dir");
 
-  resources->uniforms.normal_matrix
-    = glGetUniformLocation(resources->program, "normal_matrix");
-
   resources->uniforms.mvp
     = glGetUniformLocation(resources->program, "mvp");
 
-  resources->uniforms.tscale
-    = glGetUniformLocation(resources->program, "tscale");
-
-  resources->uniforms.local
-    = glGetUniformLocation(resources->program, "local");
+  resources->uniforms.view
+    = glGetUniformLocation(resources->program, "view");
 
   resources->attributes.normal
     = (gpu_addr)glGetAttribLocation(resources->program, "normal");
@@ -199,6 +193,7 @@ void render (struct game *game, struct geometry *geom) {
   check_gl();
 
   static float id[MAT4_ELEMS] = { 0 };
+  static float view[MAT4_ELEMS] = { 0 };
   mat4_id(id);
   struct resources *res = &game->test_resources;
 
@@ -209,8 +204,6 @@ void render (struct game *game, struct geometry *geom) {
   struct node *player = &res->player;
   struct node *camera = &res->camera;
 
-  float fade_factor = res->fade_factor;
-
   glUseProgram(res->program);
 
   /* static float v3[] = { 1, 1, 0 }; */
@@ -220,23 +213,29 @@ void render (struct game *game, struct geometry *geom) {
   /* mat4_print(camera->mat); */
   /* node_recalc(&res->camera); */
   /* mat4_multiply(persp, camera->mat, mvp); */
-  mat4_inverse(camera->mat, tmp_matrix);
-  mat4_multiply(persp, tmp_matrix, mvp);
+  mat4_inverse(camera->mat, view);
+  mat4_multiply(persp, view, mvp);
   /* mat4_multiply(mvp, tmp_matrix, tmp_matrix); */
 
+  glUniform3f(res->uniforms.camera_position,
+              camera->mat[M_X],
+              camera->mat[M_Y],
+              camera->mat[M_Z]);
+
   glUniform3f(res->uniforms.light_dir, light[0], light[1], light[2]);
-  glUniform1f(res->uniforms.fade_factor, fade_factor);
-  glUniform1f(res->uniforms.tscale, res->uniforms.tscale);
 
   //player
   mat4_multiply(mvp, player->mat, tmp_matrix);
   glUniformMatrix4fv(res->uniforms.mvp, 1, 0, tmp_matrix);
+  mat4_multiply(view, player->mat, tmp_matrix);
+  glUniformMatrix4fv(res->uniforms.view, 1, 0, tmp_matrix);
   /* mat4_multiply(persp, tmp_matrix, mvp); */
   /* mat4_print(player->mat); */
   render_cube(res);
 
   // terrain
   glUniformMatrix4fv(res->uniforms.mvp, 1, 0, mvp);
+  glUniformMatrix4fv(res->uniforms.view, 1, 0, view);
   render_geom(res, geom, GL_TRIANGLES);
   /* glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); */
   /* render_geom(res, geom, GL_TRIANGLES); */

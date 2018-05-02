@@ -18,12 +18,10 @@ struct resources {
     GLuint vertex_shader, fragment_shader, program;
 
     struct uniforms {
-      GLint fade_factor;
+      GLint camera_position;
       GLint light_dir;
       GLint mvp;
-      GLint local;
-      GLint tscale;
-      GLint normal_matrix;
+      GLint view;
     } uniforms;
 
     struct attributes {
@@ -39,7 +37,6 @@ struct resources {
     float test_mvp[MAT4_ELEMS];
     float light_dir[3];
     float camera_persp[MAT4_ELEMS];
-    GLfloat fade_factor;
 };
 
 struct game {
