@@ -27,7 +27,7 @@ void game_init(struct game *game) {
   struct terrain *terrain = &game->terrain;
   mat4 *light_dir = game->test_resources.light_dir;
 
-  const double size = 1000;
+  const double size = 5000;
   const double pdist = 1.7;
 
   terrain->settings = (struct perlin_settings){
@@ -38,7 +38,7 @@ void game_init(struct game *game) {
     .amplitude  = 1.0,
     .ox = 0,
     .oy = 0,
-    .exp = 6.3,
+    .exp = 5.3,
     .scale = 1.0
   };
 

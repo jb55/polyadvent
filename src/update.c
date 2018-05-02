@@ -47,8 +47,13 @@ static void movement(struct game *game, struct node *node) {
   /* if (game->input.keystates[SDL_SCANCODE_DOWN]) */
   /*   node_rotate(node, V3(-amt * 0.01, 0, 0)); */
 
-  if (game->input.keystates[SDL_SCANCODE_P])
+  if (game->input.keystates[SDL_SCANCODE_P]) {
+    printf("%f %f %f\n",
+           node->pos[0],
+           node->pos[1],
+           node->pos[2]);
     mat4_print(node->mat);
+  }
 }
 
 void update_terrain(struct game *game) {
@@ -58,9 +63,6 @@ void update_terrain(struct game *game) {
   struct perlin_settings *ts = &game->terrain.settings;
   struct node *tnode = &game->test_resources.terrain_node;
   struct terrain *terrain = &game->terrain;
-
-  double ox = tnode->pos[0];
-  double oy = tnode->pos[1];
 
   printf("updating terrain\n");
 
@@ -74,18 +76,17 @@ void update_terrain(struct game *game) {
   for (int i = 0; i < 2; ++i)
     tnode->pos[i] = max(tnode->pos[i], 0);
 
-  double scale = tnode->pos[2] * 0.01;
+  double scale = tnode->pos[2] * 0.0015;
   if (scale == 0) scale = 1.0;
 
   printf("terrain %f %f %f\n", tnode->pos[0], tnode->pos[1], tnode->pos[2]);
 
-  ts->scale = scale;
   /* ts.o1s = fabs(sin(1/n) * 0.25); */
   /* ts.o1 = fabs(cos(n*0.2) * 0.5); */
   /* ts.o2s = fabs(cos(n+2) * 0.5); */
   /* ts.o2 = fabs(sin(n*0.02) * 2); */
-  ts->freq = scale * 0.15;
-  ts->amplitude = 2.0/scale;
+  ts->freq = scale * 0.05;
+  ts->amplitude = 50.0;
 
   if (terrain->fn)
     terrain_destroy(&game->terrain);
@@ -102,7 +103,7 @@ void update_terrain(struct game *game) {
       free(terrain->samples);
 
     int n_samples =
-      (terrain->size * game->terrain.size) * scale*scale;
+      (terrain->size * game->terrain.size) * scale * scale;
 
     struct point *samples =
       uniform_samples(n_samples, game->terrain.size);

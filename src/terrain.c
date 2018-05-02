@@ -22,8 +22,8 @@ static const u32 plane_indices[] = {
 double old_noisy_boi(struct terrain *t, double x, double y) {
   /* return cos(x/10.0) * sin(y/10.0) * 20.0; */
   struct perlin_settings *s = &t->settings;
-  x *= s->scale;
-  y *= s->scale;
+  /* x *= s->scale; */
+  /* y *= s->scale; */
   double e =  perlin2d(x, y, s->freq, s->depth)
             + s->o1s * perlin2d(s->o1 * x, s->o1 * y, s->freq, s->depth)
             + s->o2s * perlin2d(s->o2 * x, s->o2 * y, s->freq, s->depth);

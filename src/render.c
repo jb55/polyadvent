@@ -99,7 +99,7 @@ init_gl(struct resources *resources, int width, int height) {
   assert(resources->fragment_shader != 0);
 
   // camera
-  mat4_perspective(90 /* fov */, (float)width / height, 1, 1000, resources->camera_persp);
+  mat4_perspective(90 /* fov */, (float)width / height, 1, 5000, resources->camera_persp);
 
   // Shader program
   resources->program = make_program(resources->vertex_shader,
