@@ -7,6 +7,7 @@
 
 struct node *node_init(struct node *node) {
   mat4_id(node->mat);
+  mat4_id(node->local);
   vec3_all(node->pos, 0);
   vec3_all(node->rot, 0);
   vec3_all(node->scale, 1.0);

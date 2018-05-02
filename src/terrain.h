@@ -5,6 +5,8 @@
 
 #include "geometry.h"
 
+#define MAX_OCTAVES 6
+
 struct point;
 
 struct perlin_settings {
@@ -12,9 +14,7 @@ struct perlin_settings {
   int depth;
   double amplitude;
   double ox, oy;
-  double o1, o1s;
-  double o2, o2s;
-  double scale;
+  double n_octaves;
   double exp;
 };
 

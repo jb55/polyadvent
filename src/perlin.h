@@ -2,6 +2,7 @@
 #ifndef POLYADVENT_PERLIN_H
 #define POLYADVENT_PERLIN_H
 
-float perlin2d(float x, float y, float freq, int depth);
+double perlin2d(double x, double y, double freq, double persistence,
+                double lacunarity, int octaves, int seed);
 
 #endif /* POLYADVENT_PERLIN_H */

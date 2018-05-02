@@ -22,12 +22,9 @@ static const u32 plane_indices[] = {
 double old_noisy_boi(struct terrain *t, double x, double y) {
   /* return cos(x/10.0) * sin(y/10.0) * 20.0; */
   struct perlin_settings *s = &t->settings;
-  x *= s->scale;
-  y *= s->scale;
-  double e =  perlin2d(x, y, s->freq, s->depth)
-            + s->o1s * perlin2d(s->o1 * x, s->o1 * y, s->freq, s->depth)
-            + s->o2s * perlin2d(s->o2 * x, s->o2 * y, s->freq, s->depth);
-  return pow(e, s->exp) * s->amplitude;
+  double z = perlin2d(x, y, s->freq, 1.0, 1.0, 3, 0);
+
+  return pow(z, s->exp) * s->amplitude;
 }
 
 void deriv(double (*noisefn)(void*, double, double), void* data, double x,
@@ -48,8 +45,8 @@ terrain_init(struct terrain *terrain) {
 
 double offset_fn(struct terrain* terrain, double x, double y) {
   struct perlin_settings *perlin = &terrain->settings;
-  double ox = perlin->ox * (1/perlin->scale);
-  double oy = perlin->oy * (1/perlin->scale);
+  double ox = perlin->ox * (1/perlin->freq);
+  double oy = perlin->oy * (1/perlin->freq);
   return old_noisy_boi(terrain, ox+x, oy+y);
 }
 

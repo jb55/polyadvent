@@ -9,6 +9,7 @@ struct node {
   float rot[3];
   float scale[3];
   float mat[16];
+  float local[16];
   float orientation[4];
   char *label;
   int needs_recalc;

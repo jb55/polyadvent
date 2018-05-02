@@ -27,14 +27,12 @@ void game_init(struct game *game) {
   struct terrain *terrain = &game->terrain;
   mat4 *light_dir = game->test_resources.light_dir;
 
-  const double size = 1000;
-  const double pdist = 1.7;
+  const double terrain_size = 3000;
+  /* const double pdist = 1.7; */
 
   terrain->settings = (struct perlin_settings){
     .depth = 1,
     .freq  = 0.02,
-    .o1 = 2.0, .o1s = 0.5,
-    .o2 = 4.0, .o2s = 0.25,
     .amplitude  = 1.0,
     .ox = 0,
     .oy = 0,
@@ -42,7 +40,7 @@ void game_init(struct game *game) {
   };
 
   terrain_init(terrain);
-  terrain->size = size;
+  terrain->size = terrain_size;
 
 
   mat4_id(mvp);
@@ -66,27 +64,13 @@ void game_init(struct game *game) {
 
   quat_axis_angle(V3(1,0,0), -45, camera->orientation);
 
-  /* camera->custom_update = camera_update; */
-  /* camera->custom_update_data = (void*)game->test_resources.camera_persp; */
-
-  /* vec3_all(camera->scale, -1); */
-  /* camera->mirrored = 1; */
-
   node_translate(player, V3(terrain->size/2.,terrain->size/2.,0));
+  float scale[3] = {0.3, 0.3, 1.7};
+  mat4_scale(player->local, scale, player->local);
   node_translate(camera, V3(0,-30,20));
   /* node_recalc(camera); */
 
-  /* player_camera->mirrored = 1; */
-  /* camera->parent = player_camera; */
-
-  // move the camera a bit
-  /* mat4_translate(camera, 1.0f, 1.0f, 20.0f, camera); */
-  /* mat4_copy(cam_init, camera); */
-  /* mat4_id(camera_pos); */
-
-  terrain_node->pos[2] = 20.0;
-
-  /* mat4_scale(player, V3(0.36,0.36,PLAYER_HEIGHT), player); */
+  terrain_node->pos[2] = 21.0;
 
   input_init(&game->input);
 }

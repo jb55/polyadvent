@@ -15,7 +15,7 @@ uniform vec3 light_dir;
 void main()
 {
     vec4 trans_normal = vec4(normal, 1);
-    gl_Position = mvp * vec4(position.xyz, 1.0);
+    gl_Position = mvp * local * vec4(position.xyz, 1.0);
     v_dot = dot(trans_normal, vec4(light_dir, 0));
 
     if (position.z <= 0.1)

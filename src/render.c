@@ -26,12 +26,12 @@
 //  v2------v3
 
 static const GLfloat cube_vertices[] = {
-  1, 1, 1,  -1, 1, 1,  -1,-1, 1,   1,-1, 1,    // v0-v1-v2-v3 front
-  1, 1,-1,   1, 1, 1,   1,-1, 1,   1,-1,-1,    // v5-v0-v3-v4 right
- -1, 1, 1,   1, 1, 1,   1, 1,-1,  -1, 1,-1,    // v1-v0-v5-v6 top
- -1, 1, 1,  -1, 1,-1,  -1,-1,-1,  -1,-1, 1,    // v1-v6-v7-v2 left
-  1,-1, 1,  -1,-1, 1,  -1,-1,-1,   1,-1,-1,    // v3-v2-v7-v4 bottom
- -1, 1,-1,   1, 1,-1,   1,-1,-1,  -1,-1,-1     // v4-v7-v6-v5 back
+  0.5, 0.5, 0.5,  -0.5, 0.5, 0.5,  -0.5,-0.5, 0.5,   0.5,-0.5, 0.5,    // v0-v0.5-v2-v3 front
+  0.5, 0.5,-0.5,   0.5, 0.5, 0.5,   0.5,-0.5, 0.5,   0.5,-0.5,-0.5,    // v5-v0-v3-v4 right
+ -0.5, 0.5, 0.5,   0.5, 0.5, 0.5,   0.5, 0.5,-0.5,  -0.5, 0.5,-0.5,    // v0.5-v0-v5-v6 top
+ -0.5, 0.5, 0.5,  -0.5, 0.5,-0.5,  -0.5,-0.5,-0.5,  -0.5,-0.5, 0.5,    // v0.5-v6-v7-v2 left
+  0.5,-0.5, 0.5,  -0.5,-0.5, 0.5,  -0.5,-0.5,-0.5,   0.5,-0.5,-0.5,    // v3-v2-v7-v4 bottom
+ -0.5, 0.5,-0.5,   0.5, 0.5,-0.5,   0.5,-0.5,-0.5,  -0.5,-0.5,-0.5     // v4-v7-v6-v5 back
 };
 
 
@@ -234,9 +234,12 @@ void render (struct game *game, struct geometry *geom) {
   //player
   mat4_multiply(mvp, player->mat, tmp_matrix);
   glUniformMatrix4fv(res->uniforms.mvp, 1, 0, tmp_matrix);
+  glUniformMatrix4fv(res->uniforms.local, 1, 0, player->local);
   /* mat4_multiply(persp, tmp_matrix, mvp); */
   /* mat4_print(player->mat); */
   render_cube(res);
+
+  glUniformMatrix4fv(res->uniforms.local, 1, 0, id);
 
   // terrain
   glUniformMatrix4fv(res->uniforms.mvp, 1, 0, mvp);
