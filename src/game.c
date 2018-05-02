@@ -76,17 +76,7 @@ void game_init(struct game *game) {
   node_translate(camera, V3(0,-30,20));
   /* node_recalc(camera); */
 
-  /* player_camera->mirrored = 1; */
-  /* camera->parent = player_camera; */
-
-  // move the camera a bit
-  /* mat4_translate(camera, 1.0f, 1.0f, 20.0f, camera); */
-  /* mat4_copy(cam_init, camera); */
-  /* mat4_id(camera_pos); */
-
   terrain_node->pos[2] = 20.0;
-
-  /* mat4_scale(player, V3(0.36,0.36,PLAYER_HEIGHT), player); */
 
   input_init(&game->input);
 }
