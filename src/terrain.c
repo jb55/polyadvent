@@ -44,6 +44,7 @@ void
 terrain_init(struct terrain *terrain) {
   terrain->samples = NULL;
   terrain->n_samples = 0;
+  terrain->fn = 0;
 }
 
 double offset_fn(struct terrain* terrain, double x, double y) {

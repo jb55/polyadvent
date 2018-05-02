@@ -87,14 +87,15 @@ void update_terrain(struct game *game) {
   ts->freq = scale * 0.15;
   ts->amplitude = 2.0/scale;
 
-  terrain_destroy(&game->terrain);
+  if (terrain->fn)
+    terrain_destroy(&game->terrain);
 
 
   /* const double pdist = min(5.0, max(1.1, 1.0/scale*1.4)); */
 
   /* printf("pdist %f\n", pdist); */
 
-  if (last_scale == -1 || fabs(scale - last_scale) > 0.00001) {
+  if (last_scale == -1.0 || fabs(scale - last_scale) > 0.00001) {
     printf("generating new samples\n");
 
     if (terrain->samples)

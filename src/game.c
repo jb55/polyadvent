@@ -38,7 +38,8 @@ void game_init(struct game *game) {
     .amplitude  = 1.0,
     .ox = 0,
     .oy = 0,
-    .exp = 6.3
+    .exp = 6.3,
+    .scale = 1.0
   };
 
   terrain_init(terrain);
