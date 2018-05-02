@@ -10,18 +10,19 @@
 #include "uniform.h"
 
 static void movement(struct game *game, struct node *node) {
-  float amt = 0.25;
+  float amt = 0.03;
+  static const float turn = 0.01;
 
   if (game->input.modifiers & KMOD_SHIFT)
-    amt *= 6;
+    amt *= 50;
 
   if (game->input.keystates[SDL_SCANCODE_A])
     node_forward(node, V3(-amt,0,0));
 
-  if (game->input.keystates[SDL_SCANCODE_RIGHT])
+  if (game->input.keystates[SDL_SCANCODE_UP])
     node_forward(node, V3(0,0,amt));
 
-  if (game->input.keystates[SDL_SCANCODE_LEFT])
+  if (game->input.keystates[SDL_SCANCODE_DOWN])
     node_forward(node, V3(0,0,-amt));
 
   if (game->input.keystates[SDL_SCANCODE_D])
@@ -38,10 +39,10 @@ static void movement(struct game *game, struct node *node) {
   /*   node_rotate(node, V3(amt * 0.01,0,0)); */
 
   if (game->input.keystates[SDL_SCANCODE_E])
-    node_rotate(node, V3(0, 0, amt * 0.01));
+    node_rotate(node, V3(0, 0, turn));
 
   if (game->input.keystates[SDL_SCANCODE_Q])
-    node_rotate(node, V3(0, 0, -amt * 0.01));
+    node_rotate(node, V3(0, 0, -turn));
 
   /* if (game->input.keystates[SDL_SCANCODE_DOWN]) */
   /*   node_rotate(node, V3(-amt * 0.01, 0, 0)); */
@@ -79,13 +80,12 @@ void update_terrain(struct game *game) {
   printf("terrain %f %f %f\n", tnode->pos[0], tnode->pos[1], tnode->pos[2]);
 
   ts->scale = scale;
-
   /* ts.o1s = fabs(sin(1/n) * 0.25); */
   /* ts.o1 = fabs(cos(n*0.2) * 0.5); */
   /* ts.o2s = fabs(cos(n+2) * 0.5); */
   /* ts.o2 = fabs(sin(n*0.02) * 2); */
   ts->freq = scale * 0.15;
-  ts->amplitude = 3/scale;
+  ts->amplitude = 2.0/scale;
 
   terrain_destroy(&game->terrain);
 
@@ -101,7 +101,7 @@ void update_terrain(struct game *game) {
       free(terrain->samples);
 
     int n_samples =
-      (terrain->size * game->terrain.size) * scale*scale*scale;
+      (terrain->size * game->terrain.size) * scale*scale;
 
     struct point *samples =
       uniform_samples(n_samples, game->terrain.size);
@@ -145,6 +145,14 @@ void update (struct game *game, u32 dt) {
     static vec3 last_pos[3] = {0};
 
     movement(game, &res->player);
+    /* printf("player pos %f %f %f\n", */
+    /*        res->player.pos[0], */
+    /*        res->player.pos[1], */
+    /*        res->player.pos[2]); */
+    /* printf("camera pos %f %f %f\n", */
+    /*        res->camera.mat[M_X], */
+    /*        res->camera.mat[M_Y], */
+    /*        res->camera.mat[M_Z]); */
 
     if (!vec3_eq(res->player.pos, last_pos, 0.0001)) {
 
@@ -153,6 +161,7 @@ void update (struct game *game, u32 dt) {
         PLAYER_HEIGHT;
 
       node_recalc(&res->camera);
+
 
       vec3_copy(res->player.pos, last_pos);
     }
