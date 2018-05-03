@@ -24,6 +24,7 @@ struct resources {
     GLint normal_matrix;
     GLint view;
     GLint fog_on;
+    GLint diffuse_on;
     GLint model_view;
     GLint world;
   } uniforms;
@@ -38,7 +39,7 @@ struct resources {
   struct node camera;
   struct node terrain_node;
 
-  bool fog_on;
+  bool fog_on, diffuse_on;
 
   float test_mvp[MAT4_ELEMS];
   float light_dir[3];

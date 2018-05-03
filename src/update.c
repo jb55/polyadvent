@@ -150,7 +150,7 @@ void update (struct game *game, u32 dt) {
   static int passed = 0;
   static double last_ox, last_oy, last_oz;
   static int last_gen_time = 50;
-  static int toggle_fog = 0;
+  static int toggle_fog = 0, toggle_diffuse = 0;
   static float n = 1;
   static int first = 1;
   struct resources *res = &game->test_resources;
@@ -181,6 +181,9 @@ void update (struct game *game, u32 dt) {
   if (game->input.keystates[SDL_SCANCODE_F])
     toggle_fog = 1;
 
+  if (game->input.keystates[SDL_SCANCODE_G])
+    toggle_diffuse = 1;
+
   int space_down = game->input.keystates[SDL_SCANCODE_SPACE];
 
   if (space_down) {
@@ -203,6 +206,10 @@ void update (struct game *game, u32 dt) {
     if (toggle_fog) {
       res->fog_on = !res->fog_on;
       toggle_fog = 0;
+    }
+    if (toggle_diffuse) {
+      res->diffuse_on = !res->diffuse_on;
+      toggle_diffuse = 0;
     }
     passed = 0;
 
