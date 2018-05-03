@@ -142,7 +142,7 @@ static void player_movement(struct game *game) {
     game->terrain.fn(&game->terrain, camera_world[0], camera_world[1]);
 
   if (camera_world[2] < cam_terrain_z)
-    camera_world[2] = cam_terrain_z + 10.0;
+    camera_world[2] = cam_terrain_z + 20.0;
 }
 
 
