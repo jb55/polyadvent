@@ -12,7 +12,7 @@ uniform bool fog_on;
 uniform mat4 normal_matrix;
 
 vec3 apply_fog(in vec3 rgb, in float distance, in vec3 ray_orig, in vec3 ray_dir) {
-  const float b = 0.000046;
+  const float b = 0.00046;
   const float v = 1.0;
   const float zs = 1.0;
 
@@ -22,7 +22,7 @@ vec3 apply_fog(in vec3 rgb, in float distance, in vec3 ray_orig, in vec3 ray_dir
   // float fog_amount =
   //   exp(-ray_orig.z*b) * (1.0-exp( -distance*ray_dir.z*b))/ray_dir.z*b;
 
-  float fog_amount = 1.0 - exp(-distance*b) ;
+  float fog_amount = 1.0 - exp(-(pow(distance*b, 2.0))) ;
 
   vec3  fog_color  = vec3(0.5,0.6,0.7);
   return mix( rgb, fog_color, fog_amount);
