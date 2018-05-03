@@ -201,6 +201,7 @@ void render (struct game *game, struct geometry *geom) {
   static float normal_matrix[MAT4_ELEMS] = { 0 };
   static float model_view[MAT4_ELEMS] = { 0 };
   mat4_id(id);
+  mat4_id(model_view);
   struct resources *res = &game->test_resources;
 
   mat4 *mvp = res->test_mvp;
@@ -232,7 +233,8 @@ void render (struct game *game, struct geometry *geom) {
 
   //player
   mat4_multiply(view_proj, player->mat, mvp);
-  mat4_multiply(view, player->mat, model_view);
+  // y tho
+  mat4_copy(player->mat, model_view);
   glUniformMatrix4fv(res->uniforms.mvp, 1, 0, mvp);
   glUniformMatrix4fv(res->uniforms.model_view, 1, 0, model_view);
   glUniformMatrix4fv(res->uniforms.world, 1, 0, player->mat);
@@ -246,8 +248,8 @@ void render (struct game *game, struct geometry *geom) {
   glUniformMatrix4fv(res->uniforms.mvp, 1, 0, mvp);
   glUniformMatrix4fv(res->uniforms.model_view, 1, 0, id);
   glUniformMatrix4fv(res->uniforms.world, 1, 0, id);
-  glUniformMatrix4fv(res->uniforms.normal_matrix, 1, 0, id);
-  /* recalc_normals(res->uniforms.normal_matrix, model_view, normal_matrix); */
+  /* glUniformMatrix4fv(res->uniforms.normal_matrix, 1, 0, id); */
+  recalc_normals(res->uniforms.normal_matrix, model_view, normal_matrix);
   render_geom(res, geom, GL_TRIANGLES);
   /* glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); */
   /* render_geom(res, geom, GL_TRIANGLES); */
