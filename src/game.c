@@ -53,7 +53,7 @@ void game_init(struct game *game) {
   light_dir[2] = 0.8;
 
   game->test_resources.fog_on = 1;
-  game->test_resources.diffuse_on = 1;
+  game->test_resources.diffuse_on = 0;
 
   node_init(root);
   node_init(player);
