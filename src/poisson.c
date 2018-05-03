@@ -231,8 +231,12 @@ poisson_disk_samples(const double point_dist, double size,
         for (size_t j = 0; j < ARRAY_SIZE(nearby); ++j) {
           int neari = nearby[j];
 
-          assert(neari < cells);
+          if (neari < 0)
+            continue;
           struct point *near = &samples[neari];
+
+          assert(near);
+
           double dx = near->x - candidate.x;
           double dy = near->y - candidate.y;
           double dist = sqrt(dx * dx + dy * dy);
