@@ -55,6 +55,6 @@ void main() {
     color = frag;
   // fragmentColor = vec4(fog, 1.0);
   // vec3 color = (v_color * v_light).xyz;
-  fragmentColor = vec4(gamma_correct(color), 1.0);
+  fragmentColor = vec4(color, 1.0);
   // }
 }

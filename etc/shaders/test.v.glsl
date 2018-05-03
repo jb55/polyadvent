@@ -22,7 +22,7 @@ void main()
     vec4 trans_normal = normal_matrix * vec4(normal, 1);
     vec4 v4pos = vec4(position, 1.0);
     gl_Position = mvp * v4pos;
-    v_light = dot(trans_normal, vec4(light_dir, 0));
+    v_light = dot(trans_normal, vec4(normalize(light_dir), 0));
 
     if (position.z <= 1.0)
       v_color = vec4(0.0, 0.5, 0.79, 1.0);

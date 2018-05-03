@@ -226,10 +226,11 @@ void update (struct game *game, u32 dt) {
 
   }
 
-  /* res->light_dir[0] = fabs(cos(n)*0.2); */
-  /* res->light_dir[1] = fabs(cos(n+50.0)*0.07); */
-  /* res->light_dir[2] = fabs(cos(n+100.0)*0.2); */
-  /* n += 0.01f; */
+  /* res->light_dir[0] = fabs(cos(n)); */
+  /* res->light_dir[1] = fabs(sin(n+50.0)); */
+  /* res->light_dir[2] = 1; */
+  /* res->light_dir[2] = fabs(sin(n+100.0)*cos(n)); */
+  n += 0.001f;
 
   node_recalc(root);
 }
