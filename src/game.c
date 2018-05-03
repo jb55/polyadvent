@@ -48,9 +48,9 @@ void game_init(struct game *game) {
 
   mat4_id(mvp);
 
-  light_dir[0] = 0.2;
-  light_dir[1] = 0.07;
-  light_dir[2] = 0.2;
+  light_dir[0] = 0.5;
+  light_dir[1] = 0.5;
+  light_dir[2] = 0.5;
 
   node_init(root);
   node_init(player);

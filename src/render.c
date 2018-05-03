@@ -117,6 +117,9 @@ init_gl(struct resources *resources, int width, int height) {
   resources->uniforms.world
     = glGetUniformLocation(resources->program, "world");
 
+  resources->uniforms.fog_on
+    = glGetUniformLocation(resources->program, "fog_on");
+
   resources->uniforms.mvp
     = glGetUniformLocation(resources->program, "mvp");
 
@@ -223,6 +226,7 @@ void render (struct game *game, struct geometry *geom) {
               camera->mat[M_Y],
               camera->mat[M_Z]);
 
+  glUniform1i(res->uniforms.fog_on, res->fog_on);
   glUniform3f(res->uniforms.light_dir, light[0], light[1], light[2]);
 
   //player

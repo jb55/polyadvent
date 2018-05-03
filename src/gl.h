@@ -29,6 +29,7 @@ void glVertexAttribPointer(GLuint index, GLint size, GLenum type,
                            GLboolean normalized, GLsizei stride,
                            const GLvoid * pointer);
 
+void glUniform1i(GLint location, GLint i);
 void glUniform3f(GLint location, GLfloat v0, GLfloat v1, GLfloat v2);
 GLuint glCreateProgram(void);
 void glAttachShader(GLuint program, GLuint shader);

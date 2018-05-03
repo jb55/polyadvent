@@ -14,32 +14,35 @@
  * NOTE: just for testing right now
  */
 struct resources {
-    struct vbo vertex_buffer, element_buffer, normal_buffer;
-    GLuint vertex_shader, fragment_shader, program;
+  struct vbo vertex_buffer, element_buffer, normal_buffer;
+  GLuint vertex_shader, fragment_shader, program;
 
-    struct uniforms {
-      GLint camera_position;
-      GLint light_dir;
-      GLint mvp;
-      GLint normal_matrix;
-      GLint view;
-      GLint model_view;
-      GLint world;
-    } uniforms;
+  struct uniforms {
+    GLint camera_position;
+    GLint light_dir;
+    GLint mvp;
+    GLint normal_matrix;
+    GLint view;
+    GLint fog_on;
+    GLint model_view;
+    GLint world;
+  } uniforms;
 
-    struct attributes {
-      gpu_addr position;
-      gpu_addr normal;
-    } attributes;
+  struct attributes {
+    gpu_addr position;
+    gpu_addr normal;
+  } attributes;
 
-    struct node root;
-    struct node player;
-    struct node camera;
-    struct node terrain_node;
+  struct node root;
+  struct node player;
+  struct node camera;
+  struct node terrain_node;
 
-    float test_mvp[MAT4_ELEMS];
-    float light_dir[3];
-    float camera_persp[MAT4_ELEMS];
+  bool fog_on;
+
+  float test_mvp[MAT4_ELEMS];
+  float light_dir[3];
+  float camera_persp[MAT4_ELEMS];
 };
 
 struct game {

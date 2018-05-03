@@ -68,8 +68,8 @@ void update_terrain(struct game *game) {
 
   if (first) {
     terrain_init(terrain);
-    tnode->pos[0] = rand_0to1() * 1000.0;
-    tnode->pos[1] = rand_0to1() * 1000.0;
+    tnode->pos[0] = rand_0to1() * 100000.0;
+    tnode->pos[1] = rand_0to1() * 100000.0;
     first = 0;
   }
 
@@ -150,6 +150,7 @@ void update (struct game *game, u32 dt) {
   static int passed = 0;
   static double last_ox, last_oy, last_oz;
   static int last_gen_time = 50;
+  static int toggle_fog = 0;
   static float n = 1;
   static int first = 1;
   struct resources *res = &game->test_resources;
@@ -174,10 +175,11 @@ void update (struct game *game, u32 dt) {
     player_movement(game);
   }
 
-  if (game->input.keystates[SDL_SCANCODE_C]) {
+  if (game->input.keystates[SDL_SCANCODE_C])
     printf("light_dir %f %f %f\n", light[0], light[1], light[2]);
 
-  }
+  if (game->input.keystates[SDL_SCANCODE_F])
+    toggle_fog = 1;
 
   int space_down = game->input.keystates[SDL_SCANCODE_SPACE];
 
@@ -195,9 +197,13 @@ void update (struct game *game, u32 dt) {
     }
   }
 
-  if (space_down || passed < 50) {
+  if (space_down || passed < 500) {
     passed += dt;
   } else {
+    if (toggle_fog) {
+      res->fog_on = !res->fog_on;
+      toggle_fog = 0;
+    }
     passed = 0;
 
     double ox = tnode->pos[0];
