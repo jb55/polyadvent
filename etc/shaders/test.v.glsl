@@ -33,7 +33,7 @@ void main()
     else if (position.z <= 100.0)
       v_color = vec4(0.5, 0.5, 0.5, 1.0);
     else
-      v_color = vec4(1.0, 1.0, 1.0, 1.0);
+      v_color = vec4(1.0, 1.0, 1.0, 1.0) * 0.9;
 
     v_ray = camera_position - (world * v4pos).xyz;
 }
