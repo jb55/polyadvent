@@ -30,12 +30,13 @@ double old_noisy_boi(struct terrain *t, double x, double y) {
   return pow(e, s->exp) * s->amplitude;
 }
 
-void deriv(double (*noisefn)(void*, double, double), void* data, double x,
-           double y, double z1, double *dx, double *dy)
+typedef double (*noisefn)(void*,double,double);
+
+void deriv(noisefn fn, void* data, double x, double y, double z1, double *dx, double *dy)
 {
   static const double h = 0.01;
-  double zx = noisefn(data, x + h, y);
-  double zy = noisefn(data, x, y - h);
+  double zx = fn(data, x + h, y);
+  double zy = fn(data, x, y - h);
   *dx = (zx - z1)/h;
   *dy = (zy - z1)/h;
 }
@@ -64,13 +65,14 @@ terrain_create(struct terrain *terrain) {
   del_point2d_t *points = calloc(terrain->n_samples, sizeof(*points));
 
   float *verts = calloc(terrain->n_samples * 3, sizeof(*verts));
+  float *normals = calloc(terrain->n_samples * 3, sizeof(*verts));
 
   terrain->fn = offset_fn;
 
   // 100 random samples from our noise function
   for (i = 0; i < (u32)terrain->n_samples; i++) {
     int n = i*3;
-    double x, y;
+    double x, y, dx, dy;
 
     x = terrain->samples[i].x;
     y = terrain->samples[i].y;
@@ -127,6 +129,16 @@ terrain_create(struct terrain *terrain) {
     del_verts[ndv+6] = v[2][0];
     del_verts[ndv+7] = v[2][1];
     del_verts[ndv+8] = v[2][2];
+
+    // centroid normals
+    /* float c[3]; */
+    /* c[0] = (v[0][0] + v[1][0] + v[2][0]) / 3.0; */
+    /* c[1] = (v[0][1] + v[1][1] + v[2][1]) / 3.0; */
+    /* c[2] = (v[0][2] + v[1][2] + v[2][2]) / 3.0; */
+    /* double dx, dy; */
+    /* deriv((noisefn)terrain->fn, terrain, c[0], c[1], c[2], &dx, &dy); */
+    /* vec3_subtract(v[1], c, tmp1); */
+    /* vec3_subtract(v[2], c, tmp2); */
 
     vec3_subtract(v[1], v[0], tmp1);
     vec3_subtract(v[2], v[0], tmp2);

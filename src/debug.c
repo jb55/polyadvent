@@ -12,7 +12,7 @@ show_info_log(GLuint shader) {
 	char *buffer = malloc(msgLen);
 	glGetShaderInfoLog(shader, msgLen, &msgLen, buffer);
 
-  printf("shader error: %s\n", buffer);
+  printf("shader error: (%d) %.*s\n", msgLen, msgLen, buffer);
 
   free(buffer);
 }

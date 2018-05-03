@@ -102,8 +102,8 @@ init_gl(struct resources *resources, int width, int height) {
   mat4_perspective(90 /* fov */, (float)width / height, 1, 5000, resources->camera_persp);
 
   // Shader program
-  resources->program = make_program(resources->vertex_shader,
-                                    resources->fragment_shader);
+  resources->program =
+    make_program(resources->vertex_shader, resources->fragment_shader);
 
   assert(resources->program != 0);
 
@@ -114,14 +114,17 @@ init_gl(struct resources *resources, int width, int height) {
   resources->uniforms.light_dir
     = glGetUniformLocation(resources->program, "light_dir");
 
+  resources->uniforms.world
+    = glGetUniformLocation(resources->program, "world");
+
   resources->uniforms.mvp
     = glGetUniformLocation(resources->program, "mvp");
 
-  resources->uniforms.view
-    = glGetUniformLocation(resources->program, "view");
+  resources->uniforms.model_view
+    = glGetUniformLocation(resources->program, "model_view");
 
-  resources->uniforms.world
-    = glGetUniformLocation(resources->program, "world");
+  resources->uniforms.normal_matrix
+    = glGetUniformLocation(resources->program, "normal_matrix");
 
   resources->attributes.normal
     = (gpu_addr)glGetAttribLocation(resources->program, "normal");
@@ -134,9 +137,11 @@ init_gl(struct resources *resources, int width, int height) {
 
 
 static void
-recalc_normals(mat4 *mvp, mat4 *normal) {
-  mat4_inverse(mvp, normal);
+recalc_normals(GLint nm_uniform, mat4 *model_view, mat4 *normal) {
+  mat4_inverse(model_view, normal);
   mat4_transpose(normal, normal);
+  /* mat4_copy(model_view, normal); */
+  glUniformMatrix4fv(nm_uniform, 1, 0, normal);
 }
 
 
@@ -188,7 +193,9 @@ void render (struct game *game, struct geometry *geom) {
 
   static float id[MAT4_ELEMS] = { 0 };
   static float view[MAT4_ELEMS] = { 0 };
-  static float normal[MAT4_ELEMS] = { 0 };
+  static float view_proj[MAT4_ELEMS] = { 0 };
+  static float normal_matrix[MAT4_ELEMS] = { 0 };
+  static float model_view[MAT4_ELEMS] = { 0 };
   mat4_id(id);
   struct resources *res = &game->test_resources;
 
@@ -207,15 +214,10 @@ void render (struct game *game, struct geometry *geom) {
   /* printf("camera_pos %f %f %f", camera_pos[0], camera_pos[1], camera_pos[2]); */
   /* mat4_print(camera->mat); */
   /* node_recalc(&res->camera); */
-  /* mat4_multiply(persp, camera->mat, mvp); */
   mat4_inverse(camera->mat, view);
-  mat4_multiply(persp, view, mvp);
-  recalc_normals(mvp, normal);
-  check_gl();
-  glUniformMatrix4fv(res->uniforms.normal, 1, 0, normal);
+  mat4_multiply(persp, view, view_proj);
   /* mat4_multiply(mvp, tmp_matrix, tmp_matrix); */
 
-  glUniformMatrix4fv(res->uniforms.view, 1, 0, view);
   glUniform3f(res->uniforms.camera_position,
               camera->mat[M_X],
               camera->mat[M_Y],
@@ -224,16 +226,23 @@ void render (struct game *game, struct geometry *geom) {
   glUniform3f(res->uniforms.light_dir, light[0], light[1], light[2]);
 
   //player
-  mat4_multiply(mvp, player->mat, tmp_matrix);
-  glUniformMatrix4fv(res->uniforms.mvp, 1, 0, tmp_matrix);
+  mat4_multiply(view_proj, player->mat, mvp);
+  mat4_multiply(view, player->mat, model_view);
+  glUniformMatrix4fv(res->uniforms.mvp, 1, 0, mvp);
+  glUniformMatrix4fv(res->uniforms.model_view, 1, 0, model_view);
   glUniformMatrix4fv(res->uniforms.world, 1, 0, player->mat);
-  /* mat4_multiply(persp, tmp_matrix, mvp); */
-  /* mat4_print(player->mat); */
+  recalc_normals(res->uniforms.normal_matrix, model_view, normal_matrix);
   render_cube(res);
 
   // terrain
+  mat4_copy(view_proj, mvp);
+  mat4_copy(view, model_view);
+
   glUniformMatrix4fv(res->uniforms.mvp, 1, 0, mvp);
+  glUniformMatrix4fv(res->uniforms.model_view, 1, 0, id);
   glUniformMatrix4fv(res->uniforms.world, 1, 0, id);
+  glUniformMatrix4fv(res->uniforms.normal_matrix, 1, 0, id);
+  /* recalc_normals(res->uniforms.normal_matrix, model_view, normal_matrix); */
   render_geom(res, geom, GL_TRIANGLES);
   /* glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); */
   /* render_geom(res, geom, GL_TRIANGLES); */

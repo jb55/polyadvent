@@ -21,9 +21,9 @@ struct resources {
       GLint camera_position;
       GLint light_dir;
       GLint mvp;
-      GLint mv;
-      GLint normal;
+      GLint normal_matrix;
       GLint view;
+      GLint model_view;
       GLint world;
     } uniforms;
 

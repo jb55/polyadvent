@@ -195,7 +195,7 @@ void update (struct game *game, u32 dt) {
     }
   }
 
-  if (space_down || passed < last_gen_time) {
+  if (space_down || passed < 50) {
     passed += dt;
   } else {
     passed = 0;
@@ -204,6 +204,7 @@ void update (struct game *game, u32 dt) {
     double oy = tnode->pos[1];
 
     bool changed = last_ox != ox || last_oy != oy || last_oz != tnode->pos[2];
+
 
     if (!stopped && changed) {
       int t1 = SDL_GetTicks();
@@ -218,6 +219,11 @@ void update (struct game *game, u32 dt) {
     }
 
   }
+
+  /* res->light_dir[0] = fabs(cos(n)*0.2); */
+  /* res->light_dir[1] = fabs(cos(n+50.0)*0.07); */
+  /* res->light_dir[2] = fabs(cos(n+100.0)*0.2); */
+  /* n += 0.01f; */
 
   node_recalc(root);
 }

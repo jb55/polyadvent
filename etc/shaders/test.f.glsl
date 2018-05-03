@@ -8,14 +8,14 @@ in vec3 v_ray;
 out vec4 fragmentColor;
 
 uniform vec3 camera_position;
-uniform mat4 normal;
+uniform mat4 normal_matrix;
 
 vec3 apply_fog(in vec3 rgb, in float distance, in vec3 ray_orig, in vec3 ray_dir) {
-  const float b = 0.00004;
+  const float b = 0.00002;
   const float v = 1.0;
   const float zs = 1.0;
-  
-  
+
+
   const float c = 1.0;
 
   // float fog_amount =
@@ -33,19 +33,22 @@ vec3 gamma_correct(vec3 color) {
 
 void main() {
   float distance = length(v_ray);
-  
+
   // if (distance > 1000.0)
   //   fragmentColor = vec4(1.0, 0.0, 0.0, 0.0);
   // else {
 
   // fragmentColor = (vec4(v_ray, 0.0) * 0.001 - v_color) * v_light;
-  
+
   // fragmentColor = v_color * (1.0 - distance*0.0001) * v_light;
-  
+
  // vec3 diffuse = dot()
 
-  vec3 fog = apply_fog((v_color * v_light * 0.1).xyz, distance, camera_position, v_ray);
-  fragmentColor = vec4(gamma_correct(fog), 1.0);
-  // fragmentColor = vec4((v_color * v_light).xyz, 0.0);
+  vec3 frag = (v_color * v_light).xyz;
+  // vec3 fog = apply_fog(frag, distance, camera_position, v_ray);
+  vec3 color = gamma_correct(frag);
+  // fragmentColor = vec4(fog, 1.0);
+  // vec3 color = (v_color * v_light).xyz;
+  fragmentColor = vec4(color, 0.0);
   // }
 }
