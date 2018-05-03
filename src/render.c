@@ -120,6 +120,9 @@ init_gl(struct resources *resources, int width, int height) {
   resources->uniforms.view
     = glGetUniformLocation(resources->program, "view");
 
+  resources->uniforms.world
+    = glGetUniformLocation(resources->program, "world");
+
   resources->attributes.normal
     = (gpu_addr)glGetAttribLocation(resources->program, "normal");
 
@@ -130,19 +133,10 @@ init_gl(struct resources *resources, int width, int height) {
 }
 
 
-static mat4 *
-calc_normals(mat4 *mvp, mat4 *normal) {
+static void
+recalc_normals(mat4 *mvp, mat4 *normal) {
   mat4_inverse(mvp, normal);
   mat4_transpose(normal, normal);
-  return normal;
-}
-
-
-static void
-recalc_normals(GLint norm_uniform, mat4 *mvp, mat4 *normal) {
-  mat4 *calc = calc_normals(mvp, normal);
-  glUniformMatrix4fv(norm_uniform, 1, 0, calc);
-  check_gl();
 }
 
 
@@ -194,6 +188,7 @@ void render (struct game *game, struct geometry *geom) {
 
   static float id[MAT4_ELEMS] = { 0 };
   static float view[MAT4_ELEMS] = { 0 };
+  static float normal[MAT4_ELEMS] = { 0 };
   mat4_id(id);
   struct resources *res = &game->test_resources;
 
@@ -215,8 +210,12 @@ void render (struct game *game, struct geometry *geom) {
   /* mat4_multiply(persp, camera->mat, mvp); */
   mat4_inverse(camera->mat, view);
   mat4_multiply(persp, view, mvp);
+  recalc_normals(mvp, normal);
+  check_gl();
+  glUniformMatrix4fv(res->uniforms.normal, 1, 0, normal);
   /* mat4_multiply(mvp, tmp_matrix, tmp_matrix); */
 
+  glUniformMatrix4fv(res->uniforms.view, 1, 0, view);
   glUniform3f(res->uniforms.camera_position,
               camera->mat[M_X],
               camera->mat[M_Y],
@@ -227,15 +226,14 @@ void render (struct game *game, struct geometry *geom) {
   //player
   mat4_multiply(mvp, player->mat, tmp_matrix);
   glUniformMatrix4fv(res->uniforms.mvp, 1, 0, tmp_matrix);
-  mat4_multiply(view, player->mat, tmp_matrix);
-  glUniformMatrix4fv(res->uniforms.view, 1, 0, tmp_matrix);
+  glUniformMatrix4fv(res->uniforms.world, 1, 0, player->mat);
   /* mat4_multiply(persp, tmp_matrix, mvp); */
   /* mat4_print(player->mat); */
   render_cube(res);
 
   // terrain
   glUniformMatrix4fv(res->uniforms.mvp, 1, 0, mvp);
-  glUniformMatrix4fv(res->uniforms.view, 1, 0, view);
+  glUniformMatrix4fv(res->uniforms.world, 1, 0, id);
   render_geom(res, geom, GL_TRIANGLES);
   /* glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); */
   /* render_geom(res, geom, GL_TRIANGLES); */

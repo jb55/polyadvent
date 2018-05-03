@@ -3,8 +3,9 @@
 in vec3 position;
 in vec3 normal;
 
-uniform mat4 view;
+uniform mat4 world;
 uniform mat4 mvp;
+uniform mat4 world_normal;
 
 flat out float v_light;
 flat out vec4 v_color;
@@ -31,7 +32,5 @@ void main()
     else
       v_color = vec4(1.0, 1.0, 1.0, 1.0);
 
-    v_ray = (gl_Position - (mvp * vec4(camera_position, 1.0))).xyz;
-
-    v_color = v_color * 0.5;
+    v_ray = (vec4(camera_position, 1.0) - (world * v4pos)).xyz;
 }

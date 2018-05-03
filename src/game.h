@@ -21,7 +21,10 @@ struct resources {
       GLint camera_position;
       GLint light_dir;
       GLint mvp;
+      GLint mv;
+      GLint normal;
       GLint view;
+      GLint world;
     } uniforms;
 
     struct attributes {
