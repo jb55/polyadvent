@@ -7,11 +7,12 @@
 #include "vec3.h"
 #include "camera.h"
 #include "poisson.h"
+#include "player.h"
 #include "uniform.h"
 
 static void movement(struct game *game, struct node *node) {
-  float amt = 0.03;
-  static const float turn = 0.01;
+  float amt = 0.08;
+  static const float turn = 0.02;
 
   if (game->input.modifiers & KMOD_SHIFT)
     amt *= 50;
@@ -137,6 +138,9 @@ static void player_movement(struct game *game) {
     node_recalc(&res->camera);
 
     vec3_copy(res->player.pos, last_pos);
+
+    /* float *pos = res->player.pos; */
+    /* printf("player %f %f %f\n", pos[0], pos[1], pos[2]); */
   }
 
   node_recalc(&res->camera);
@@ -152,7 +156,7 @@ static void player_movement(struct game *game) {
 void update (struct game *game, u32 dt) {
   static int passed = 0;
   static double last_ox, last_oy, last_oz;
-  static int last_gen_time = 50;
+  //static int last_gen_time = 50;
   static int toggle_fog = 0, toggle_diffuse = 0;
   static float n = 1;
   static int first = 1;
@@ -190,17 +194,21 @@ void update (struct game *game, u32 dt) {
   int space_down = game->input.keystates[SDL_SCANCODE_SPACE];
 
   if (space_down) {
-    if (!stopped) {
-      printf("terrain amp %f exp %f freq %f (%d ms)\n",
-             ts->amplitude,
-             ts->exp,
-             ts->freq,
-             last_gen_time);
-      stopped = 1;
-    }
-    else {
-      stopped = 0;
-    }
+    // jump
+
+    player_jump(&game->test_resources.player);
+
+    /* if (!stopped) { */
+    /*   printf("terrain amp %f exp %f freq %f (%d ms)\n", */
+    /*          ts->amplitude, */
+    /*          ts->exp, */
+    /*          ts->freq, */
+    /*          last_gen_time); */
+    /*   stopped = 1; */
+    /* } */
+    /* else { */
+    /*   stopped = 0; */
+    /* } */
   }
 
   if (space_down || passed < 500) {
@@ -229,7 +237,7 @@ void update (struct game *game, u32 dt) {
       last_oy = ts->oy = oy;
       last_oz = tnode->pos[2] = max(tnode->pos[2], 5.0);
       int t2 = SDL_GetTicks();
-      last_gen_time = t2 - t1;
+      //last_gen_time = t2 - t1;
 
       n += 0.01f;
     }
