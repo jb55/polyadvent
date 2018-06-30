@@ -35,10 +35,8 @@ struct resources {
     gpu_addr normal;
   } attributes;
 
-  int num_entities;
-
   struct node root;
-  struct entity player;
+  struct entity *player;
   struct node camera;
   struct node terrain_node;
 
@@ -52,6 +50,7 @@ struct resources {
 struct game {
   int counter;
   struct entity *entities;
+  int num_entities;
   struct resources test_resources;
   struct input input;
   struct terrain terrain;

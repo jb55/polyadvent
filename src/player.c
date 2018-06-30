@@ -5,5 +5,5 @@
 
 void
 player_jump(struct entity *ent, float amt) {
-  vec3_add(ent->impulse, V3(0, 0, amt), ent->impulse);
+  vec3_add(ent->acceleration, V3(0, 0, amt), ent->acceleration);
 }

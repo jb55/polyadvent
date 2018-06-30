@@ -17,7 +17,6 @@ struct entity {
   u32 id;
   struct node node;
   struct geometry *geometry;
-  float impulse[3];
   float acceleration[3];
   float velocity[3];
   int flags;

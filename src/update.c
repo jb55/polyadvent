@@ -9,6 +9,94 @@
 #include "poisson.h"
 #include "player.h"
 #include "uniform.h"
+#include "entity.h"
+
+void update_entity(struct entity *ent, double dt) {
+  float new_accel[3];
+  float tmp[3], tmp2[3];
+
+  // position
+
+  // v(t) * dt
+  vec3_scale(ent->velocity, dt, tmp);
+
+  // p(t) + v(t)*dt
+  vec3_add(ent->node.pos, tmp, tmp);
+
+  // a(t)*dt*dt*(1/2)
+  vec3_scale(ent->acceleration, dt*dt*0.5, tmp2);
+
+  // p(t+dt) = p(t) + v(t)*dt + a(t)*dt*dt*(1/2)
+  vec3_add(tmp, tmp2, ent->node.pos);
+  node_mark_for_recalc(&ent->node);
+
+  // a(t + dt) = forces / mass
+  vec3_set(V3(0.0,0.0,-0.00001), tmp);
+
+  // a(t + dt) + a(t)
+  vec3_add(tmp, ent->acceleration, new_accel);
+
+  // 0.5 * dt * a(t) + a(t + dt)
+  vec3_scale(new_accel, dt*0.5, tmp);
+
+  // v(t + dt) = v(t) + 0.5 * dt * a(t) + a(t + dt)
+  vec3_add(ent->velocity, tmp, ent->velocity);
+
+  vec3_set(new_accel, ent->acceleration);
+}
+
+static void entity_movement(struct game *game, struct entity *entity) {
+  float amt = 0.08*0.001;
+  static const float turn = 0.02;
+
+  if (game->input.modifiers & KMOD_SHIFT)
+    amt *= 50;
+
+  if (game->input.keystates[SDL_SCANCODE_A])
+    vec3_set(V3(-amt,0,0), entity->acceleration);
+
+  if (game->input.keystates[SDL_SCANCODE_D])
+    vec3_set(V3(amt,0,0), entity->acceleration);
+
+  if (game->input.keystates[SDL_SCANCODE_W])
+    vec3_set(V3(0,amt,0), entity->acceleration);
+
+  if (game->input.keystates[SDL_SCANCODE_S])
+    vec3_set(V3(0,-amt,0), entity->acceleration);
+
+  /* if (game->input.keystates[SDL_SCANCODE_DOWN]) */
+  /*   node_forward(node, V3(0,0,-amt)); */
+
+  /* if (game->input.keystates[SDL_SCANCODE_D]) */
+  /*   node_forward(node, V3(amt,0,0)); */
+
+  /* if (game->input.keystates[SDL_SCANCODE_W]) */
+  /*   node_forward(node, V3(0,amt,0)); */
+
+  /* if (game->input.keystates[SDL_SCANCODE_S]) */
+  /*   node_forward(node, V3(0,-amt,0)); */
+
+  /* // TODO: mark as update */
+  /* /\* if (game->input.keystates[SDL_SCANCODE_UP]) *\/ */
+  /* /\*   node_rotate(node, V3(amt * 0.01,0,0)); *\/ */
+
+  /* if (game->input.keystates[SDL_SCANCODE_E]) */
+  /*   node_rotate(node, V3(0, 0, turn)); */
+
+  /* if (game->input.keystates[SDL_SCANCODE_Q]) */
+  /*   node_rotate(node, V3(0, 0, -turn)); */
+
+  /* if (game->input.keystates[SDL_SCANCODE_DOWN]) */
+  /*   node_rotate(node, V3(-amt * 0.01, 0, 0)); */
+
+  /* if (game->input.keystates[SDL_SCANCODE_P]) { */
+  /*   printf("%f %f %f\n", */
+  /*          node->pos[0], */
+  /*          node->pos[1], */
+  /*          node->pos[2]); */
+  /*   mat4_print(node->mat); */
+  /* } */
+}
 
 static void movement(struct game *game, struct node *node) {
   float amt = 0.08;
@@ -126,18 +214,23 @@ static void player_movement(struct game *game) {
 
   // player movement
   static vec3 last_pos[3] = {0};
+  float theight;
 
-  movement(game, &res->player.node);
+  entity_movement(game, res->player);
 
-  if (!vec3_eq(res->player.node.pos, last_pos, 0.0001)) {
+  if (!vec3_eq(res->player->node.pos, last_pos, 0.0001)) {
 
-    res->player.node.pos[2] =
-      game->terrain.fn(&game->terrain, res->player.node.pos[0], res->player.node.pos[1]) +
-      PLAYER_HEIGHT;
+    theight =
+      game->terrain.fn(&game->terrain, res->player->node.pos[0], res->player->node.pos[1]);
+
+    if (res->player->node.pos[2] - PLAYER_HEIGHT < theight) {
+      res->player->node.pos[2] = theight + PLAYER_HEIGHT;
+      res->player->acceleration[2] = 0;
+    }
 
     node_recalc(&res->camera);
 
-    vec3_copy(res->player.node.pos, last_pos);
+    vec3_copy(res->player->node.pos, last_pos);
 
     /* float *pos = res->player.pos; */
     /* printf("player %f %f %f\n", pos[0], pos[1], pos[2]); */
@@ -196,7 +289,7 @@ void update (struct game *game, u32 dt) {
   if (space_down) {
     // jump
 
-    player_jump(&game->test_resources.player);
+    player_jump(game->test_resources.player, 0.001);
 
     /* if (!stopped) { */
     /*   printf("terrain amp %f exp %f freq %f (%d ms)\n", */
@@ -243,6 +336,11 @@ void update (struct game *game, u32 dt) {
     }
 
   }
+
+  for (int i = 0; i < game->num_entities; ++i) {
+    update_entity(&game->entities[i], dt);
+  }
+
 
   /* res->light_dir[0] = fabs(cos(n)); */
   /* res->light_dir[1] = fabs(sin(n+50.0)); */

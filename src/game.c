@@ -23,13 +23,14 @@ void game_init(struct game *game) {
   mat4 *mvp = game->test_resources.test_mvp;
   struct node *root = &game->test_resources.root;
   struct node *camera = &game->test_resources.camera;
-  struct entity *player = &game->test_resources.player;
   struct node *terrain_node = &game->test_resources.terrain_node;
   struct terrain *terrain = &game->terrain;
 
   mat4 *light_dir = game->test_resources.light_dir;
 
   game->entities = malloc(sizeof(*game->entities) * MAX_ENTITIES);
+
+  struct entity *player = game->test_resources.player = &game->entities[0];
 
   const double size = 10000;
   //const double pdist = 1.7;
@@ -68,6 +69,9 @@ void game_init(struct game *game) {
   player->node.label = "player";
   camera->label = "camera";
   terrain_node->label = "terrain_node";
+
+  game->num_entities = 1;
+  game->entities[0] = *player;
 
   node_attach(&player->node, root);
   node_attach(camera, &player->node);

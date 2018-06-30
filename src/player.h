@@ -4,6 +4,6 @@
 
 #include "entity.h"
 
-void player_jump(struct entity *player);
+void player_jump(struct entity *player, float amt);
 
 #endif /* POLYADVENT_PLAYER_H */
