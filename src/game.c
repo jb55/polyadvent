@@ -23,7 +23,7 @@ void game_init(struct game *game) {
   mat4 *mvp = game->test_resources.test_mvp;
   struct node *root = &game->test_resources.root;
   struct node *camera = &game->test_resources.camera;
-  struct node *player = &game->test_resources.player;
+  struct entity *player = &game->test_resources.player;
   struct node *terrain_node = &game->test_resources.terrain_node;
   struct terrain *terrain = &game->terrain;
 
@@ -60,17 +60,17 @@ void game_init(struct game *game) {
   game->test_resources.diffuse_on = 0;
 
   node_init(root);
-  node_init(player);
+  entity_init(player);
   node_init(camera);
   node_init(terrain_node);
 
   root->label = "root";
-  player->label = "player";
+  player->node.label = "player";
   camera->label = "camera";
   terrain_node->label = "terrain_node";
 
-  node_attach(player, root);
-  node_attach(camera, player);
+  node_attach(&player->node, root);
+  node_attach(camera, &player->node);
 
   quat_axis_angle(V3(1,0,0), -45, camera->orientation);
 
@@ -80,7 +80,7 @@ void game_init(struct game *game) {
   /* vec3_all(camera->scale, -1); */
   /* camera->mirrored = 1; */
 
-  node_translate(player, V3(terrain->size/2.,terrain->size/2.,0));
+  node_translate(&player->node, V3(terrain->size/2.,terrain->size/2.,0));
   node_translate(camera, V3(0,-10,10));
   /* node_recalc(camera); */
 

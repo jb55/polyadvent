@@ -5,6 +5,7 @@
 #include "buffer.h"
 #include "input.h"
 #include "node.h"
+#include "entity.h"
 #include "terrain.h"
 
 #define PLAYER_HEIGHT 1.7
@@ -37,7 +38,7 @@ struct resources {
   int num_entities;
 
   struct node root;
-  struct node player;
+  struct entity player;
   struct node camera;
   struct node terrain_node;
 

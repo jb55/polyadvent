@@ -1,9 +1,9 @@
 
-#include "node.h"
+#include "entity.h"
 #include "vec3.h"
-#include "forces.h"
+
 
 void
-player_jump(struct node *player) {
-  force_apply(player, V3(0, 0, 0.5));
+player_jump(struct entity *ent, float amt) {
+  vec3_add(ent->impulse, V3(0, 0, amt), ent->impulse);
 }

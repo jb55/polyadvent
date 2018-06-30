@@ -211,7 +211,7 @@ void render (struct game *game, struct geometry *geom) {
   mat4 *persp = res->camera_persp;
   mat4 *light = res->light_dir;
 
-  struct node *player = &res->player;
+  struct entity *player = &res->player;
   struct node *camera = &res->camera;
 
   glUseProgram(res->program);
@@ -236,12 +236,12 @@ void render (struct game *game, struct geometry *geom) {
   glUniform3f(res->uniforms.light_dir, light[0], light[1], light[2]);
 
   //player
-  mat4_multiply(view_proj, player->mat, mvp);
+  mat4_multiply(view_proj, player->node.mat, mvp);
   // y tho
-  mat4_copy(player->mat, model_view);
+  mat4_copy(player->node.mat, model_view);
   glUniformMatrix4fv(res->uniforms.mvp, 1, 0, mvp);
   glUniformMatrix4fv(res->uniforms.model_view, 1, 0, model_view);
-  glUniformMatrix4fv(res->uniforms.world, 1, 0, player->mat);
+  glUniformMatrix4fv(res->uniforms.world, 1, 0, player->node.mat);
   recalc_normals(res->uniforms.normal_matrix, model_view, normal_matrix);
   render_cube(res);
 

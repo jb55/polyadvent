@@ -127,17 +127,17 @@ static void player_movement(struct game *game) {
   // player movement
   static vec3 last_pos[3] = {0};
 
-  movement(game, &res->player);
+  movement(game, &res->player.node);
 
-  if (!vec3_eq(res->player.pos, last_pos, 0.0001)) {
+  if (!vec3_eq(res->player.node.pos, last_pos, 0.0001)) {
 
-    res->player.pos[2] =
-      game->terrain.fn(&game->terrain, res->player.pos[0], res->player.pos[1]) +
+    res->player.node.pos[2] =
+      game->terrain.fn(&game->terrain, res->player.node.pos[0], res->player.node.pos[1]) +
       PLAYER_HEIGHT;
 
     node_recalc(&res->camera);
 
-    vec3_copy(res->player.pos, last_pos);
+    vec3_copy(res->player.node.pos, last_pos);
 
     /* float *pos = res->player.pos; */
     /* printf("player %f %f %f\n", pos[0], pos[1], pos[2]); */

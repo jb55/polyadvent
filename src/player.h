@@ -2,8 +2,8 @@
 #ifndef POLYADVENT_PLAYER_H
 #define POLYADVENT_PLAYER_H
 
-#include "node.h"
+#include "entity.h"
 
-void player_jump(struct node *player);
+void player_jump(struct entity *player);
 
 #endif /* POLYADVENT_PLAYER_H */

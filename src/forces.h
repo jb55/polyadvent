@@ -2,9 +2,11 @@
 #ifndef POLYADVENT_FORCES_H
 #define POLYADVENT_FORCES_H
 
-#include "node.h"
+#include "entity.h"
 
-void force_apply(struct node *node, float *force);
+void force_apply(struct entity *entity, float *force);
+
+void impulse_apply(struct entity *entity, float *impulse);
 
 
 #endif /* POLYADVENT_FORCES_H */
