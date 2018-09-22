@@ -65,7 +65,7 @@ terrain_create(struct terrain *terrain) {
   del_point2d_t *points = calloc(terrain->n_samples, sizeof(*points));
 
   float *verts = calloc(terrain->n_samples * 3, sizeof(*verts));
-  float *normals = calloc(terrain->n_samples * 3, sizeof(*verts));
+  /* float *normals = calloc(terrain->n_samples * 3, sizeof(*verts)); */
 
   terrain->fn = offset_fn;
 
