@@ -1,14 +1,14 @@
 NAME ?= polyadvent
 BIN ?= $(NAME)
 PREFIX ?= /usr/local
-CFLAGS = -ggdb -Ofast -I src -Wall -Werror -Wextra -std=c99 \
+DEFS= -DGLFW_INCLUDE_NONE -DDEBUG
+CFLAGS = $(DEFS) -ggdb -Ofast -I src -Wall -Werror -Wextra -std=c99 \
 						-Wno-unused-function \
 						-Wno-unused-parameter \
 						-Wno-unused-variable \
 						-Wno-cast-align \
 						-Wno-padded
 LDFLAGS = -lSDL2 -lGL
-DEFS= -DGLFW_INCLUDE_NONE
 SRC=src
 
 OBJS  = $(SRC)/window.o
@@ -52,7 +52,7 @@ include $(OBJS:.o=.d)
 	rm -f $@.$$$$
 
 $(BIN): $(OBJS)
-	$(CC) $(CFLAGS) $(DEFS) $^ $(LDFLAGS) -o $@
+	$(CC) $(CFLAGS) $^ $(LDFLAGS) -o $@
 
 install: $(BIN)
 	install -d $(PREFIX)/bin

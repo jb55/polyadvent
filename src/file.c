@@ -3,8 +3,17 @@
 #include <stdlib.h>
 #include "file.h"
 
-void *
-file_contents(const char *filename, size_t *length) {
+#include <sys/stat.h>
+
+time_t file_mtime(const char *filename) {
+	// TODO: windows file_mtime
+	struct stat stats;
+	stat(filename, &stats);
+
+	return stats.st_mtime;
+}
+
+void *file_contents(const char *filename, size_t *length) {
   FILE *f = fopen(filename, "r");
   void *buffer;
 

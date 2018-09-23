@@ -8,6 +8,8 @@
 #include "camera.h"
 #include "poisson.h"
 #include "uniform.h"
+#include "shader.h"
+#include "file.h"
 
 static void movement(struct game *game, struct node *node, float speed_mult) {
   float amt = 0.03;
@@ -151,98 +153,91 @@ static void player_movement(struct game *game) {
 }
 
 
+#ifdef DEBUG
+static int try_reload_shaders(struct resources *res) {
+	int ret;
+	printf("reloading shaders... ");
+
+	ret = reload_program(&res->program);
+
+	if (ret == 2)
+		printf("nothing to reload\n");
+	else if (ret == 1)
+		printf("success.\n");
+	else
+		printf("failed.\n");
+
+
+
+	return ret;
+}
+#endif
+
 void update (struct game *game, u32 dt) {
-  static int passed = 0;
-  static double last_ox, last_oy, last_oz;
-  static int last_gen_time = 50;
-  static int toggle_fog = 0, toggle_diffuse = 0;
-  static float n = 1;
-  static int first = 1;
-  struct resources *res = &game->test_resources;
-  static int stopped = 0;
-  struct perlin_settings *ts = &game->terrain.settings;
-  struct node *tnode = &game->test_resources.terrain_node;
-  struct node *root = &game->test_resources.root;
-  float *light = res->light_dir;
+	static double last_ox, last_oy, last_oz;
+	static int toggle_fog = 0, toggle_diffuse = 0;
+	static float n = 1;
+	static int first = 1;
+	struct resources *res = &game->test_resources;
+	struct perlin_settings *ts = &game->terrain.settings;
+	struct node *tnode = &game->test_resources.terrain_node;
+	struct node *root = &game->test_resources.root;
+	float *light = res->light_dir;
 
-  if (first) {
-    update_terrain(game);
-    first = 0;
-  }
+	if (first) {
+		update_terrain(game);
+		first = 0;
+	}
 
-  if (game->input.modifiers & KMOD_LALT) {
-    movement(game, &res->camera, 1.0);
-  }
-  else if (game->input.modifiers & KMOD_RCTRL) {
-    movement(game, &res->terrain_node, 5.0);
-  }
-  else {
-    player_movement(game);
-  }
+	if (game->input.modifiers & KMOD_LALT) {
+		movement(game, &res->camera, 1.0);
+	}
+	else if (game->input.modifiers & KMOD_RCTRL) {
+		movement(game, &res->terrain_node, 5.0);
+	}
+	else {
+		player_movement(game);
+	}
 
-  if (game->input.keystates[SDL_SCANCODE_C])
-    printf("light_dir %f %f %f\n", light[0], light[1], light[2]);
+#ifdef DEBUG
+	if (game->input.keystates[SDL_SCANCODE_R])
+		try_reload_shaders(res);
+#endif
 
-  if (game->input.keystates[SDL_SCANCODE_F])
-    toggle_fog = 1;
+	if (game->input.keystates[SDL_SCANCODE_C])
+		printf("light_dir %f %f %f\n", light[0], light[1], light[2]);
 
-  if (game->input.keystates[SDL_SCANCODE_G])
-    toggle_diffuse = 1;
+	if (game->input.keystates[SDL_SCANCODE_F])
+		toggle_fog = 1;
 
-  int space_down = game->input.keystates[SDL_SCANCODE_SPACE];
+	if (game->input.keystates[SDL_SCANCODE_G])
+		toggle_diffuse = 1;
 
-  if (space_down) {
-    if (!stopped) {
-      printf("terrain amp %f exp %f freq %f (%d ms)\n",
-             ts->amplitude,
-             ts->exp,
-             ts->freq,
-             last_gen_time);
-      stopped = 1;
-    }
-    else {
-      stopped = 0;
-    }
-  }
+	if (toggle_fog) {
+		res->fog_on = !res->fog_on;
+		toggle_fog = 0;
+	}
 
-  if (space_down ) {
-    passed += dt;
-  } else {
-    if (toggle_fog) {
-      res->fog_on = !res->fog_on;
-      toggle_fog = 0;
-    }
-    if (toggle_diffuse) {
-      res->diffuse_on = !res->diffuse_on;
-      toggle_diffuse = 0;
-    }
-    passed = 0;
+	if (toggle_diffuse) {
+		res->diffuse_on = !res->diffuse_on;
+		toggle_diffuse = 0;
+	}
 
-    double ox = tnode->pos[0];
-    double oy = tnode->pos[1];
+	double ox = tnode->pos[0];
+	double oy = tnode->pos[1];
 
-    bool changed = last_ox != ox || last_oy != oy || last_oz != tnode->pos[2];
+	bool changed = last_ox != ox || last_oy != oy || last_oz != tnode->pos[2];
 
+	if (changed) {
+		update_terrain(game);
+		last_ox = ts->ox = ox;
+		last_oy = ts->oy = oy;
+		last_oz = tnode->pos[2] = max(tnode->pos[2], 5.0);
 
-    if (!stopped && changed) {
-      int t1 = SDL_GetTicks();
-      update_terrain(game);
-      last_ox = ts->ox = ox;
-      last_oy = ts->oy = oy;
-      last_oz = tnode->pos[2] = max(tnode->pos[2], 5.0);
-      int t2 = SDL_GetTicks();
-      last_gen_time = t2 - t1;
+		n += 0.01f;
+	}
 
-      n += 0.01f;
-    }
+	n += 0.001f;
 
-  }
-
-  /* res->light_dir[0] = fabs(cos(n)); */
-  /* res->light_dir[1] = fabs(sin(n+50.0)); */
-  /* res->light_dir[2] = 1; */
-  /* res->light_dir[2] = fabs(sin(n+100.0)*cos(n)); */
-  n += 0.001f;
-
-  node_recalc(root);
+	node_recalc(root);
 }

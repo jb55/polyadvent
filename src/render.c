@@ -56,89 +56,93 @@ static const GLushort cube_indices[] = {
 
 void
 init_gl(struct resources *resources, int width, int height) {
-  float tmp_matrix[16];
-  glEnable(GL_DEPTH_TEST);
-  SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
-  SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
+	struct shader vertex, fragment;
+	float tmp_matrix[16];
+	int ok = 0;
 
-  // VBOs
-  make_vertex_buffer(
-    GL_ARRAY_BUFFER,
-    cube_vertices,
-    sizeof(cube_vertices),
-    &resources->vertex_buffer
-  );
+	glEnable(GL_DEPTH_TEST);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
 
-  // cube normals
-  make_vertex_buffer(
-    GL_ARRAY_BUFFER,
-    cube_normals,
-    sizeof(cube_normals),
-    &resources->normal_buffer
-  );
+	// VBOs
+	make_vertex_buffer(
+		GL_ARRAY_BUFFER,
+		cube_vertices,
+		sizeof(cube_vertices),
+		&resources->vertex_buffer
+	);
 
-  // cube indices
-  make_index_buffer(
-    GL_ELEMENT_ARRAY_BUFFER,
-    cube_indices,
-    sizeof(cube_indices),
-    &resources->element_buffer
-  );
+	// cube normals
+	make_vertex_buffer(
+		GL_ARRAY_BUFFER,
+		cube_normals,
+		sizeof(cube_normals),
+		&resources->normal_buffer
+	);
 
-  // Shaders
-  resources->vertex_shader = make_shader(
-      GL_VERTEX_SHADER,
-      SHADER("test.v.glsl")
-  );
+	// cube indices
+	make_index_buffer(
+		GL_ELEMENT_ARRAY_BUFFER,
+		cube_indices,
+		sizeof(cube_indices),
+		&resources->element_buffer
+	);
 
-  assert(resources->vertex_shader != 0);
-  resources->fragment_shader = make_shader(
-      GL_FRAGMENT_SHADER,
-      SHADER("test.f.glsl")
-  );
-  assert(resources->fragment_shader != 0);
+	// Shaders
+	ok =
+		make_shader(GL_VERTEX_SHADER, SHADER("test.v.glsl"), &vertex);
 
-  // camera
-  mat4_perspective(90 /* fov */, (float)width / height, 1, 5000, resources->camera_persp);
+	assert(ok);
 
-  // Shader program
-  resources->program =
-    make_program(resources->vertex_shader, resources->fragment_shader);
+	ok =
+		make_shader(GL_FRAGMENT_SHADER, SHADER("test.f.glsl"), &fragment);
 
-  assert(resources->program != 0);
+	assert(ok);
 
-  // Program variables
-  resources->uniforms.camera_position
-    = glGetUniformLocation(resources->program, "camera_position");
+	// camera
+	mat4_perspective(90 /* fov */,
+			 (float)width / height,
+			 1,
+			 5000,
+			 resources->camera_persp);
 
-  resources->uniforms.light_dir
-    = glGetUniformLocation(resources->program, "light_dir");
+	// Shader program
+	ok =
+		make_program(&vertex, &fragment, &resources->program);
 
-  resources->uniforms.world
-    = glGetUniformLocation(resources->program, "world");
+	assert(ok);
 
-  resources->uniforms.fog_on
-    = glGetUniformLocation(resources->program, "fog_on");
+	// Program variables
+	resources->uniforms.camera_position =
+		glGetUniformLocation(resources->program.handle, "camera_position");
 
-  resources->uniforms.diffuse_on
-    = glGetUniformLocation(resources->program, "diffuse_on");
+	resources->uniforms.light_dir =
+		glGetUniformLocation(resources->program.handle, "light_dir");
 
-  resources->uniforms.mvp
-    = glGetUniformLocation(resources->program, "mvp");
+	resources->uniforms.world =
+		glGetUniformLocation(resources->program.handle, "world");
 
-  resources->uniforms.model_view
-    = glGetUniformLocation(resources->program, "model_view");
+	resources->uniforms.fog_on =
+		glGetUniformLocation(resources->program.handle, "fog_on");
 
-  resources->uniforms.normal_matrix
-    = glGetUniformLocation(resources->program, "normal_matrix");
+	resources->uniforms.diffuse_on =
+		glGetUniformLocation(resources->program.handle, "diffuse_on");
 
-  resources->attributes.normal
-    = (gpu_addr)glGetAttribLocation(resources->program, "normal");
+	resources->uniforms.mvp =
+		glGetUniformLocation(resources->program.handle, "mvp");
 
-  resources->attributes.position
-    = (gpu_addr)glGetAttribLocation(resources->program, "position");
+	resources->uniforms.model_view =
+		glGetUniformLocation(resources->program.handle, "model_view");
 
-  assert(resources->program != 0);
+	resources->uniforms.normal_matrix =
+		glGetUniformLocation(resources->program.handle, "normal_matrix");
+
+	resources->attributes.normal =
+		(gpu_addr)glGetAttribLocation(resources->program.handle, "normal");
+
+	resources->attributes.position =
+		(gpu_addr)glGetAttribLocation(resources->program.handle, "position");
+
 }
 
 
@@ -214,7 +218,7 @@ void render (struct game *game, struct geometry *geom) {
   struct node *player = &res->player;
   struct node *camera = &res->camera;
 
-  glUseProgram(res->program);
+  glUseProgram(res->program.handle);
 
   /* static float v3[] = { 1, 1, 0 }; */
   /* v3[1] = fade_factor * 1.4f; */
