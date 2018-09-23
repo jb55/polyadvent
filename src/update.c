@@ -9,9 +9,11 @@
 #include "poisson.h"
 #include "uniform.h"
 
-static void movement(struct game *game, struct node *node) {
+static void movement(struct game *game, struct node *node, float speed_mult) {
   float amt = 0.03;
   static const float turn = 0.01;
+
+  amt *= speed_mult;
 
   if (game->input.modifiers & KMOD_SHIFT)
     amt *= 50;
@@ -126,7 +128,7 @@ static void player_movement(struct game *game) {
   // player movement
   static vec3 last_pos[3] = {0};
 
-  movement(game, &res->player);
+  movement(game, &res->player, 1.0);
 
   if (!vec3_eq(res->player.pos, last_pos, 0.0001)) {
 
@@ -169,10 +171,10 @@ void update (struct game *game, u32 dt) {
   }
 
   if (game->input.modifiers & KMOD_LALT) {
-    movement(game, &res->camera);
+    movement(game, &res->camera, 1.0);
   }
-  else if (game->input.modifiers & KMOD_LCTRL) {
-    movement(game, &res->terrain_node);
+  else if (game->input.modifiers & KMOD_RCTRL) {
+    movement(game, &res->terrain_node, 5.0);
   }
   else {
     player_movement(game);
@@ -203,7 +205,7 @@ void update (struct game *game, u32 dt) {
     }
   }
 
-  if (space_down || passed < 500) {
+  if (space_down ) {
     passed += dt;
   } else {
     if (toggle_fog) {

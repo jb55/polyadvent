@@ -72,7 +72,8 @@ terrain_create(struct terrain *terrain) {
   // 100 random samples from our noise function
   for (i = 0; i < (u32)terrain->n_samples; i++) {
     int n = i*3;
-    double x, y, dx, dy;
+    double x, y;
+    /* double dx, dy; */
 
     x = terrain->samples[i].x;
     y = terrain->samples[i].y;

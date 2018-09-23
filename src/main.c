@@ -22,14 +22,10 @@ int main(void)
 {
   int nsamples;
 
-  int seed = time(NULL);
-  srand(seed);
+  /* int seed = time(NULL); */
+  srand(42);
 
   struct game game;
-  struct slab slab;
-  struct geometry slab_geom;
-
-  size_t length;
 
   /* SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES); */
   int width = 640;
