@@ -46,13 +46,6 @@ float lambert(vec3 N, vec3 L)
 void main() {
   float distance = length(v_ray);
   vec3 light_position = vec3(2.0,1.0,5.0);
-  vec3 light_diffuse = vec3(0.1);
-
-  vec3 diffuse;
-  if (diffuse_on)
-    diffuse = light_diffuse * lambert(v_normal, light_position);
-  else
-    diffuse = vec3(0.0,0.0,0.0);
 
   vec3 color;
 
@@ -66,5 +59,5 @@ void main() {
     color = frag;
 
   // fragmentColor = vec4(color + diffuse, 1.0);
-  fragmentColor = vec4(color + diffuse, 1.0);
+  fragmentColor = vec4(color, 1.0);
 }
