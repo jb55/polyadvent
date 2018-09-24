@@ -14,7 +14,7 @@ uniform bool diffuse_on;
 uniform mat4 normal_matrix;
 
 vec3 apply_fog(in vec3 rgb, in float distance, in vec3 ray_orig, in vec3 ray_dir) {
-  const float b = 0.00036;
+  const float b = 0.00026;
   const float v = 1.0;
   const float zs = 1.0;
 
