@@ -22,8 +22,8 @@ int main(void)
 {
   int nsamples;
 
-  /* int seed = time(NULL); */
-  srand(42);
+  int seed = time(NULL);
+  srand(seed);
 
   struct game game;
 
