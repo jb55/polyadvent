@@ -77,7 +77,8 @@ void game_init(struct game *game) {
   /* camera->mirrored = 1; */
 
   node_translate(player, V3(terrain->size/2.,terrain->size/2.,0));
-  node_translate(camera, V3(0,-30,100));
+  node_rotate(camera, V3(100, 0, 0));
+  node_translate(camera, V3(0,-30,20));
   /* node_recalc(camera); */
 
   terrain_node->pos[2] = 20.0;
