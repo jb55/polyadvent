@@ -107,13 +107,13 @@ void update_terrain(struct game *game) {
       free(terrain->samples);
 
     int n_samples =
-      (terrain->size * game->terrain.size) * scale * scale;
+      (terrain->size * game->terrain.size) / (scale * scale);
 
     /* struct point *samples = */
     /*   uniform_samples(n_samples, game->terrain.size); */
 
     struct point *samples =
-      poisson_disk_samples(45.0, game->terrain.size, 30, &n_samples);
+      poisson_disk_samples(42.0, game->terrain.size, 30, &n_samples);
 
     terrain->samples = samples;
     terrain->n_samples = n_samples;
