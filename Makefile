@@ -30,13 +30,12 @@ OBJS += $(SRC)/poisson.o
 OBJS += $(SRC)/quat.o
 OBJS += $(SRC)/render.o
 OBJS += $(SRC)/shader.o
-OBJS += $(SRC)/slab.o
-OBJS += $(SRC)/slab_geom.o
 OBJS += $(SRC)/terrain.o
 OBJS += $(SRC)/uniform.o
 OBJS += $(SRC)/update.o
 OBJS += $(SRC)/util.o
 OBJS += $(SRC)/vec3.o
+OBJS += $(SRC)/ply.o
 
 SRCS=$(OBJS:.o=.c)
 
