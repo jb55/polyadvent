@@ -46,6 +46,8 @@ terrain_init(struct terrain *terrain) {
   terrain->samples = NULL;
   terrain->n_samples = 0;
   terrain->fn = 0;
+  // TODO: init model
+  init_geometry(&terrain->entity.model.geom);
 }
 
 double offset_fn(struct terrain* terrain, double x, double y) {
@@ -158,13 +160,13 @@ terrain_create(struct terrain *terrain) {
   /* printf("faces %d tris %d points %d\n", */
   /*        del->num_faces, tri->num_triangles, tri->num_points); */
 
-  terrain->geom.num_verts = num_verts;
-  terrain->geom.vertices = (float*)del_verts;
-  terrain->geom.normals = (float*)del_norms;
-  terrain->geom.indices = (u32*)del_indices;
-  terrain->geom.num_indices = num_verts;
+  terrain->entity.model.geom.num_verts = num_verts;
+  terrain->entity.model.geom.vertices = (float*)del_verts;
+  terrain->entity.model.geom.normals = (float*)del_norms;
+  terrain->entity.model.geom.indices = (u32*)del_indices;
+  terrain->entity.model.geom.num_indices = num_verts;
 
-  make_buffer_geometry(&terrain->geom);
+  make_buffer_geometry(&terrain->entity.model.geom);
 
   delaunay2d_release(del);
   tri_delaunay2d_release(tri);
@@ -178,5 +180,5 @@ terrain_create(struct terrain *terrain) {
 
 
 void terrain_destroy(struct terrain *terrain) {
-  destroy_buffer_geometry(&terrain->geom);
+  destroy_buffer_geometry(&terrain->entity.model.geom);
 }

@@ -8,7 +8,6 @@
 #include "mat4.h"
 #include "vec3.h"
 #include "buffer.h"
-#include "buffer_geometry.h"
 #include "shader.h"
 #include "geometry.h"
 #include "debug.h"
@@ -56,7 +55,7 @@ static const GLushort cube_indices[] = {
 
 void
 init_gl(struct resources *resources, int width, int height) {
-	struct shader vertex, fragment;
+	struct shader vertex, terrain_vertex, fragment;
 	float tmp_matrix[16];
 	int ok = 0;
 
@@ -64,33 +63,14 @@ init_gl(struct resources *resources, int width, int height) {
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
 
-	// VBOs
-	make_vertex_buffer(
-		GL_ARRAY_BUFFER,
-		cube_vertices,
-		sizeof(cube_vertices),
-		&resources->vertex_buffer
-	);
-
-	// cube normals
-	make_vertex_buffer(
-		GL_ARRAY_BUFFER,
-		cube_normals,
-		sizeof(cube_normals),
-		&resources->normal_buffer
-	);
-
-	// cube indices
-	make_index_buffer(
-		GL_ELEMENT_ARRAY_BUFFER,
-		cube_indices,
-		sizeof(cube_indices),
-		&resources->element_buffer
-	);
-
 	// Shaders
 	ok =
-		make_shader(GL_VERTEX_SHADER, SHADER("test.v.glsl"), &vertex);
+		make_shader(GL_VERTEX_SHADER, SHADER("vertex-color.glsl"), &vertex);
+
+	assert(ok);
+
+    ok =
+		make_shader(GL_VERTEX_SHADER, SHADER("terrain.glsl"), &terrain_vertex);
 
 	assert(ok);
 
@@ -108,41 +88,66 @@ init_gl(struct resources *resources, int width, int height) {
 
 	// Shader program
 	ok =
-		make_program(&vertex, &fragment, &resources->program);
+		make_program(&terrain_vertex, &fragment, &resources->terrain_program);
 
 	assert(ok);
 
-	// Program variables
-	resources->uniforms.camera_position =
-		glGetUniformLocation(resources->program.handle, "camera_position");
+    check_gl();
 
-	resources->uniforms.light_dir =
-		glGetUniformLocation(resources->program.handle, "light_dir");
+	ok =
+		make_program(&vertex, &fragment, &resources->program);
 
-	resources->uniforms.world =
-		glGetUniformLocation(resources->program.handle, "world");
+    check_gl();
 
-	resources->uniforms.fog_on =
-		glGetUniformLocation(resources->program.handle, "fog_on");
+	assert(ok);
 
-	resources->uniforms.diffuse_on =
-		glGetUniformLocation(resources->program.handle, "diffuse_on");
+    GLuint programs[] =
+        { resources->terrain_program.handle
+        , resources->program.handle
+        };
 
-	resources->uniforms.mvp =
-		glGetUniformLocation(resources->program.handle, "mvp");
+    // uniforms shared between all shaders
+    for (size_t i = 0; i < ARRAY_SIZE(programs); ++i) {
+        GLuint handle = programs[i];
 
-	resources->uniforms.model_view =
-		glGetUniformLocation(resources->program.handle, "model_view");
+        // Program variables
+        resources->uniforms.camera_position =
+            glGetUniformLocation(handle, "camera_position");
 
-	resources->uniforms.normal_matrix =
-		glGetUniformLocation(resources->program.handle, "normal_matrix");
+        resources->uniforms.light_dir =
+            glGetUniformLocation(handle, "light_dir");
 
-	resources->attributes.normal =
-		(gpu_addr)glGetAttribLocation(resources->program.handle, "normal");
+        resources->uniforms.world =
+            glGetUniformLocation(handle, "world");
 
-	resources->attributes.position =
-		(gpu_addr)glGetAttribLocation(resources->program.handle, "position");
+        resources->uniforms.fog_on =
+            glGetUniformLocation(handle, "fog_on");
 
+        resources->uniforms.diffuse_on =
+            glGetUniformLocation(handle, "diffuse_on");
+
+        resources->uniforms.mvp =
+            glGetUniformLocation(handle, "mvp");
+
+        resources->uniforms.model_view =
+            glGetUniformLocation(handle, "model_view");
+
+        resources->uniforms.normal_matrix =
+            glGetUniformLocation(handle, "normal_matrix");
+
+        resources->attributes.normal =
+            (gpu_addr)glGetAttribLocation(handle, "normal");
+
+        resources->attributes.position =
+            (gpu_addr)glGetAttribLocation(handle, "position");
+
+    }
+
+    // TODO: auto-generate these somehow?
+	resources->attributes.color =
+		(gpu_addr)glGetAttribLocation(resources->program.handle, "color");
+
+    check_gl();
 }
 
 
@@ -196,69 +201,75 @@ static void render_geom (struct resources *res,
 }
 
 
-void render (struct game *game, struct geometry *geom) {
-  static const float adjust = 1.0f;
-  glClearColor( 0.5294f * adjust, 0.8078f * adjust, 0.9216f * adjust, 1.0f ); //clear background screen to black
-  glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-  check_gl();
+void render (struct game *game) {
+    static const float adjust = 1.0f;
+    glClearColor( 0.5294f * adjust, 0.8078f * adjust, 0.9216f * adjust, 1.0f ); //clear background screen to black
+    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+    check_gl();
 
-  static float id[MAT4_ELEMS] = { 0 };
-  static float view[MAT4_ELEMS] = { 0 };
-  static float view_proj[MAT4_ELEMS] = { 0 };
-  static float normal_matrix[MAT4_ELEMS] = { 0 };
-  static float model_view[MAT4_ELEMS] = { 0 };
-  mat4_id(id);
-  mat4_id(model_view);
-  struct resources *res = &game->test_resources;
+    static float id[MAT4_ELEMS] = { 0 };
+    static float view[MAT4_ELEMS] = { 0 };
+    static float view_proj[MAT4_ELEMS] = { 0 };
+    static float normal_matrix[MAT4_ELEMS] = { 0 };
+    static float model_view[MAT4_ELEMS] = { 0 };
+    mat4_id(id);
+    mat4_id(model_view);
+    struct resources *res = &game->test_resources;
 
-  mat4 *mvp = res->test_mvp;
-  mat4 *persp = res->camera_persp;
-  mat4 *light = res->light_dir;
+    mat4 *mvp = res->test_mvp;
+    mat4 *persp = res->camera_persp;
+    mat4 *light = res->light_dir;
 
-  struct node *player = &res->player;
-  struct node *camera = &res->camera;
+    struct node *camera = &res->camera;
 
-  glUseProgram(res->program.handle);
+    struct entity *entities[] =
+        { &game->terrain.entity
+        , &game->test_resources.player
+        };
 
-  /* static float v3[] = { 1, 1, 0 }; */
-  /* v3[1] = fade_factor * 1.4f; */
-  /* mat4_rotate(mvp, 0.004f, v3, mvp); */
-  /* printf("camera_pos %f %f %f", camera_pos[0], camera_pos[1], camera_pos[2]); */
-  /* mat4_print(camera->mat); */
-  /* node_recalc(&res->camera); */
-  mat4_inverse(camera->mat, view);
-  mat4_multiply(persp, view, view_proj);
-  /* mat4_multiply(mvp, tmp_matrix, tmp_matrix); */
+    for (size_t i = 0; i < ARRAY_SIZE(entities); ++i) {
+        struct entity *entity = entities[i];
+        glUseProgram(entity->model.program);
+        check_gl();
 
-  glUniform3f(res->uniforms.camera_position,
-              camera->mat[M_X],
-              camera->mat[M_Y],
-              camera->mat[M_Z]);
+        mat4_inverse(camera->mat, view);
+        mat4_multiply(persp, view, view_proj);
 
-  glUniform1i(res->uniforms.fog_on, res->fog_on);
-  glUniform1i(res->uniforms.diffuse_on, res->diffuse_on);
-  glUniform3f(res->uniforms.light_dir, light[0], light[1], light[2]);
+        glUniform3f(res->uniforms.camera_position,
+                    camera->mat[M_X],
+                    camera->mat[M_Y],
+                    camera->mat[M_Z]);
 
-  //player
-  mat4_multiply(view_proj, player->mat, mvp);
-  // y tho
-  mat4_copy(player->mat, model_view);
-  glUniformMatrix4fv(res->uniforms.mvp, 1, 0, mvp);
-  glUniformMatrix4fv(res->uniforms.model_view, 1, 0, model_view);
-  glUniformMatrix4fv(res->uniforms.world, 1, 0, player->mat);
-  recalc_normals(res->uniforms.normal_matrix, model_view, normal_matrix);
-  render_cube(res);
+        glUniform1i(res->uniforms.fog_on, res->fog_on);
+        glUniform1i(res->uniforms.diffuse_on, res->diffuse_on);
+        glUniform3f(res->uniforms.light_dir, light[0], light[1], light[2]);
 
-  // terrain
-  mat4_copy(view_proj, mvp);
-  mat4_copy(view, model_view);
+        mat4_multiply(view_proj, entity->node.mat, mvp);
+        mat4_copy(entity->node.mat, model_view);
 
-  glUniformMatrix4fv(res->uniforms.mvp, 1, 0, mvp);
-  glUniformMatrix4fv(res->uniforms.model_view, 1, 0, id);
-  glUniformMatrix4fv(res->uniforms.world, 1, 0, id);
-  /* glUniformMatrix4fv(res->uniforms.normal_matrix, 1, 0, id); */
-  recalc_normals(res->uniforms.normal_matrix, model_view, normal_matrix);
-  render_geom(res, geom, GL_TRIANGLES);
-  /* glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); */
-  /* render_geom(res, geom, GL_TRIANGLES); */
+        glUniformMatrix4fv(res->uniforms.mvp, 1, 0, mvp);
+        glUniformMatrix4fv(res->uniforms.model_view, 1, 0, model_view);
+        glUniformMatrix4fv(res->uniforms.world, 1, 0, entity->node.mat);
+
+        recalc_normals(res->uniforms.normal_matrix, model_view, normal_matrix);
+
+        render_geom(res, &entity->model.geom, GL_TRIANGLES);
+
+        check_gl();
+    }
+
+
+    //player
+    // y tho
+
+    // terrain
+
+    /* glUniformMatrix4fv(res->uniforms.mvp, 1, 0, mvp); */
+    /* glUniformMatrix4fv(res->uniforms.model_view, 1, 0, id); */
+    /* glUniformMatrix4fv(res->uniforms.world, 1, 0, id); */
+    /* glUniformMatrix4fv(res->uniforms.normal_matrix, 1, 0, id); */
+    /* recalc_normals(res->uniforms.normal_matrix, model_view, normal_matrix); */
+    /* render_geom(res, geom, GL_TRIANGLES); */
+    /* glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); */
+    /* render_geom(res, geom, GL_TRIANGLES); */
 }

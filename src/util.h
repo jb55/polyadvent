@@ -7,9 +7,17 @@
 #include "mat4.h"
 #include <assert.h>
 
+
+#define check_gl() {                                    \
+        unsigned int e = glGetError();                  \
+        if (e != GL_NO_ERROR) {                         \
+            printf("Got error from OpenGL: %d\n", e);   \
+            assert(0);                                  \
+        }                                               \
+    }
+
 #define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
 
-void check_gl(void);
 int clampi(int a, int mina, int maxa);
 double clamp(double a, double mina, double maxa);
 double max(double a, double b);

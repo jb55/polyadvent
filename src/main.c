@@ -16,46 +16,49 @@
 #include <time.h>
 #include "poisson.h"
 #include "uniform.h"
+#include "ply.h"
 
 
 int main(void)
 {
-  int nsamples;
+    int nsamples;
 
-  int seed = time(NULL);
-  srand(seed);
+    int seed = time(NULL);
+    srand(seed);
 
-  struct game game;
+    struct game game;
 
-  /* SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES); */
-  int width = 640;
-  int height = 480;
+    /* SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES); */
+    int width = 640;
+    int height = 480;
 
-  SDL_Window *window = SDL_CreateWindow(
-    "SDL2/OpenGL Demo", 0, 0, width, height,
-    SDL_WINDOW_OPENGL|SDL_WINDOW_RESIZABLE);
+    SDL_Window *window = SDL_CreateWindow(
+        "SDL2/OpenGL Demo", 0, 0, width, height,
+        SDL_WINDOW_OPENGL|SDL_WINDOW_RESIZABLE);
 
-  SDL_GL_CreateContext(window);
-  init_gl(&game.test_resources, width, height);
-  game_init(&game);
-  u32 last = SDL_GetTicks();
+    SDL_GL_CreateContext(window);
+    init_gl(&game.test_resources, width, height);
+    game_init(&game);
 
-  while (1) {
-    process_events(game.test_resources.camera_persp, &game.input);
-    u32 ticks = SDL_GetTicks();
-    update(&game, ticks-last);
+    check_gl();
+    u32 last = SDL_GetTicks();
 
-    last = ticks;
-    render(&game, &game.terrain.geom);
+    while (1) {
+        process_events(game.test_resources.camera_persp, &game.input);
+        u32 ticks = SDL_GetTicks();
+        update(&game, ticks-last);
 
-    /* Swap front and back buffers */
-    SDL_GL_SwapWindow(window);
-  }
+        last = ticks;
+        render(&game);
 
-  /* free(slab_buffer); */
-  /* free_slab_geom(&geom, NULL) */
+        /* Swap front and back buffers */
+        SDL_GL_SwapWindow(window);
+    }
 
-  //SDL_GL_DeleteContext(gl);
-  //return 0;
+    /* free(slab_buffer); */
+    /* free_slab_geom(&geom, NULL) */
+
+    //SDL_GL_DeleteContext(gl);
+    //return 0;
 }
 

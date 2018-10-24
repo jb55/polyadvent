@@ -3,7 +3,8 @@
 #ifndef POLYADVENT_TERRAIN_H
 #define POLYADVENT_TERRAIN_H
 
-#include "geometry.h"
+#include "entity.h"
+#include "model.h"
 
 struct point;
 
@@ -20,12 +21,12 @@ struct perlin_settings {
 
 
 struct terrain {
-  struct geometry geom;
-  struct perlin_settings settings;
-  struct point *samples;
-  double (*fn)(struct terrain *, double, double);
-  int n_samples;
-  double size;
+    struct entity entity;
+    struct perlin_settings settings;
+    struct point *samples;
+    double (*fn)(struct terrain *, double, double);
+    int n_samples;
+    double size;
 };
 
 double old_noisy_boi(struct terrain *, double x, double y);

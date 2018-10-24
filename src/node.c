@@ -23,6 +23,10 @@ struct node *node_init(struct node *node) {
   return node;
 }
 
+void node_scale(struct node *node, float val) {
+    vec3_scale(node->scale, val, node->scale);
+}
+
 void node_translate(struct node *node, vec3 *p) {
   if (vec3_isall(p, 0))
     return;

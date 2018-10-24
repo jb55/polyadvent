@@ -36,6 +36,7 @@ OBJS += $(SRC)/update.o
 OBJS += $(SRC)/util.o
 OBJS += $(SRC)/vec3.o
 OBJS += $(SRC)/ply.o
+OBJS += $(SRC)/model.o
 
 SRCS=$(OBJS:.o=.c)
 

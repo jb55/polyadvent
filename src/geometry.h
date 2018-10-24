@@ -9,6 +9,7 @@ struct buffer_geometry {
     struct vbo vertex_buffer;
     struct vbo index_buffer;
     struct vbo normal_buffer;
+    struct vbo color_buffer;
 };
 
 struct geometry {
@@ -18,8 +19,10 @@ struct geometry {
     float *vertices;
     float *normals;
     u32 *indices;
+    float *colors;
 };
 
+void init_geometry(struct geometry *geom);
 void make_buffer_geometry(struct geometry *geom);
 void destroy_buffer_geometry(struct geometry *geom);
 

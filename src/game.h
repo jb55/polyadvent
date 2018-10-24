@@ -4,9 +4,11 @@
 
 #include "buffer.h"
 #include "input.h"
+#include "model.h"
 #include "node.h"
-#include "terrain.h"
 #include "shader.h"
+#include "entity.h"
+#include "terrain.h"
 
 #define PLAYER_HEIGHT 1.7
 
@@ -18,6 +20,7 @@ struct resources {
 	struct vbo vertex_buffer, element_buffer, normal_buffer;
 
 	struct gpu_program program;
+	struct gpu_program terrain_program;
 
 	struct uniforms {
 		GLint camera_position;
@@ -34,12 +37,12 @@ struct resources {
 	struct attributes {
 		gpu_addr position;
 		gpu_addr normal;
+		gpu_addr color;
 	} attributes;
 
 	struct node root;
-	struct node player;
+	struct entity player;
 	struct node camera;
-	struct node terrain_node;
 
 	bool fog_on, diffuse_on;
 

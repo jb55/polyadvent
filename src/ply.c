@@ -35,24 +35,24 @@ static int consume_string(const char **cursor, const char *str) {
 
 static int parse_element(const char **cursor, const char *element, int *nverts) {
     int ok;
-    ok = consume_string(cursor, "element ");
-    if (!ok)
-        return 0;
+    static char buffer[32];
 
-    ok  = consume_string(cursor, element);
-    ok |= consume_string(cursor, " ");
+    snprintf(buffer, sizeof(buffer), "element %s ", element);
+
+    ok = consume_string(cursor, buffer);
 
     if (!ok)
         return 0;
 
     *nverts = atoi(*cursor);
 
-    consume_string(cursor, "\n");
+    skip_line(cursor);
+
     return *nverts != 0;
 }
 
 
-static int parse_vertex(const char **cursor, float *v, float *n, u8 *c) {
+static inline int parse_vertex(const char **cursor, float *v, float *n, u8 *c) {
     int matched =
         sscanf(*cursor, "%f %f %f %f %f %f %hhu %hhu %hhu",
             &v[0], &v[1], &v[2],
@@ -77,9 +77,9 @@ static int parse_indices(const char **cursor, int *inds) {
 static int parse_header(const char **cursor, int *nverts, int *ninds) {
     int ok = 0;
     ok |= parse_element(cursor, "vertex", nverts);
-    ok |= parse_element(cursor, "faces", ninds);
+    ok |= parse_element(cursor, "face", ninds);
 
-    if (!ok)
+    if (ok)
         return 0;
 
     skip_line(cursor);
@@ -91,14 +91,14 @@ static int parse_magic(const char **cursor) {
 }
 
 
-int parse_ply(const char *filename, void *context, vertex_cb *vert_cb,
-              index_cb *ind_cb) {
+int parse_ply(const char *filename, struct geometry *geom) {
     size_t len;
     int nverts = 0;
     int ninds = 0;
-    int success = 0;
     int done = 0;
     int res = 0;
+    int cvert = 0;
+    int cind = 0;
 
     enum ply_state state = PLY_MAGIC;
     const char *data = file_contents(filename, &len);
@@ -114,6 +114,7 @@ int parse_ply(const char *filename, void *context, vertex_cb *vert_cb,
             res = parse_magic(&p);
             if (!res) {
                 printf("failed to parse ply magic header\n");
+                done = 1;
                 break;
             }
             state = PLY_HEADER;
@@ -127,6 +128,12 @@ int parse_ply(const char *filename, void *context, vertex_cb *vert_cb,
                     done = 1;
                     break;
                 }
+
+                geom->vertices = calloc(nverts * 3, sizeof(*geom->vertices));
+                geom->normals  = calloc(nverts * 3, sizeof(*geom->normals));
+                geom->colors   = calloc(nverts * 3, sizeof(*geom->colors));
+                geom->indices  = calloc(ninds * 3, sizeof(*geom->indices));
+
                 state = PLY_VERTICES;
             }
             break;
@@ -136,7 +143,24 @@ int parse_ply(const char *filename, void *context, vertex_cb *vert_cb,
                 done = 1;
                 break;
             }
-            (*vert_cb)(context, nverts, vert, norm, color);
+
+            geom->vertices[cvert * 3]     = vert[0];
+            geom->vertices[cvert * 3 + 1] = vert[1];
+            geom->vertices[cvert * 3 + 2] = vert[2];
+
+            geom->normals[cvert * 3]     = norm[0];
+            geom->normals[cvert * 3 + 1] = norm[1];
+            geom->normals[cvert * 3 + 2] = norm[2];
+
+            geom->colors[cvert * 3]     = color[0] / 255.0;
+            geom->colors[cvert * 3 + 1] = color[1] / 255.0;
+            geom->colors[cvert * 3 + 2] = color[2] / 255.0;
+
+            cvert++;
+
+            if (cvert == nverts)
+                state = PLY_INDICES;
+
             break;
         case PLY_INDICES:
             res = parse_indices(&p, inds);
@@ -144,7 +168,15 @@ int parse_ply(const char *filename, void *context, vertex_cb *vert_cb,
                 done = 1;
                 break;
             }
-            (*index_cb)(context, ninds, inds);
+
+            geom->indices[cind * 3]     = inds[0];
+            geom->indices[cind * 3 + 1] = inds[1];
+            geom->indices[cind * 3 + 2] = inds[2];
+
+            cind++;
+
+            if (cind == ninds)
+                done = 1;
 
             break;
         }
@@ -152,5 +184,10 @@ int parse_ply(const char *filename, void *context, vertex_cb *vert_cb,
 
     free((void*)data);
 
-    return success;
+    geom->num_indices = ninds * 3;
+    geom->num_verts = nverts * 3;
+
+    make_buffer_geometry(geom);
+
+    return state == PLY_INDICES;
 }

@@ -65,7 +65,7 @@ void update_terrain(struct game *game) {
   static float last_scale = -1.0;
 
   struct perlin_settings *ts = &game->terrain.settings;
-  struct node *tnode = &game->test_resources.terrain_node;
+  struct node *tnode = &game->terrain.entity.node;
   struct terrain *terrain = &game->terrain;
 
   printf("updating terrain\n");
@@ -130,17 +130,17 @@ static void player_movement(struct game *game) {
   // player movement
   static vec3 last_pos[3] = {0};
 
-  movement(game, &res->player, 1.0);
+  movement(game, &res->player.node, 1.0);
 
-  if (!vec3_eq(res->player.pos, last_pos, 0.0001)) {
+  if (!vec3_eq(res->player.node.pos, last_pos, 0.0001)) {
 
-    res->player.pos[2] =
-      game->terrain.fn(&game->terrain, res->player.pos[0], res->player.pos[1]) +
+    res->player.node.pos[2] =
+      game->terrain.fn(&game->terrain, res->player.node.pos[0], res->player.node.pos[1]) +
       PLAYER_HEIGHT;
 
     node_recalc(&res->camera);
 
-    vec3_copy(res->player.pos, last_pos);
+    vec3_copy(res->player.node.pos, last_pos);
   }
 
   node_recalc(&res->camera);
@@ -180,7 +180,7 @@ void update (struct game *game, u32 dt) {
 	static int first = 1;
 	struct resources *res = &game->test_resources;
 	struct perlin_settings *ts = &game->terrain.settings;
-	struct node *tnode = &game->test_resources.terrain_node;
+	struct node *tnode = &game->terrain.entity.node;
 	struct node *root = &game->test_resources.root;
 	float *light = res->light_dir;
 
@@ -193,7 +193,7 @@ void update (struct game *game, u32 dt) {
 		movement(game, &res->camera, 1.0);
 	}
 	else if (game->input.modifiers & KMOD_RCTRL) {
-		movement(game, &res->terrain_node, 5.0);
+		movement(game, tnode, 5.0);
 	}
 	else {
 		player_movement(game);

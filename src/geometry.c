@@ -8,6 +8,7 @@ destroy_buffer_geometry(struct geometry *geom) {
     gpu_addr buffers[] = {
         geom->buffer.vertex_buffer.handle,
         geom->buffer.normal_buffer.handle,
+        geom->buffer.color_buffer.handle,
         geom->buffer.index_buffer.handle
     };
     /* void glDeleteVertexArrays(GLsizei n, const GLuint *arrays); */
@@ -20,6 +21,11 @@ destroy_buffer_geometry(struct geometry *geom) {
     check_gl();
     glDeleteBuffers(ARRAY_SIZE(buffers), buffers);
     check_gl();
+}
+
+
+void init_geometry(struct geometry *geom) {
+    geom->colors = NULL;
 }
 
 void
@@ -46,6 +52,15 @@ make_buffer_geometry(struct geometry *geom) {
                         geom->normals,
                         geom->num_verts * 3 * (int)sizeof(*geom->normals),
                         &geom->buffer.normal_buffer
+                        );
+
+    // vertex colors
+    if (geom->colors != NULL)
+        make_vertex_buffer(
+                        GL_ARRAY_BUFFER,
+                        geom->colors,
+                        geom->num_verts * 3 * (int)sizeof(*geom->colors),
+                        &geom->buffer.color_buffer
                         );
 
     /* printf("making index buffer\n"); */

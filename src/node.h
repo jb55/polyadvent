@@ -26,6 +26,7 @@ struct node *node_init(struct node *node);
 void node_translate(struct node *node, float *p);
 void node_forward(struct node *node, float *p);
 void node_rotate(struct node *node, float *p);
+void node_scale(struct node *node, float val);
 float *node_world(struct node *node);
 
 #endif /* POLYADVENT_NODE_H */
