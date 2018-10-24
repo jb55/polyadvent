@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include "file.h"
 #include "common.h"
+#include "ply.h"
 
 /* void parse_vertex( */
 
@@ -32,9 +33,15 @@ static int consume_string(const char **cursor, const char *str) {
     return 1;
 }
 
-static int parse_element(const char **cursor, int *nverts) {
+static int parse_element(const char **cursor, const char *element, int *nverts) {
     int ok;
-    ok = consume_string(cursor, "element vertex ");
+    ok = consume_string(cursor, "element ");
+    if (!ok)
+        return 0;
+
+    ok  = consume_string(cursor, element);
+    ok |= consume_string(cursor, " ");
+
     if (!ok)
         return 0;
 
@@ -57,10 +64,23 @@ static int parse_vertex(const char **cursor, float *v, float *n, u8 *c) {
 }
 
 
-static int parse_header(const char **cursor, int *nverts) {
-    int res = parse_element(cursor, nverts);
-    if (res)
-        return 1;
+static int parse_indices(const char **cursor, int *inds) {
+    // NOTE: only support tris inds for now
+    int matched =
+        sscanf(*cursor, "3 %d %d %d", &inds[0], &inds[1], &inds[2]);
+
+    skip_line(cursor);
+
+    return matched == 3;
+}
+
+static int parse_header(const char **cursor, int *nverts, int *ninds) {
+    int ok = 0;
+    ok |= parse_element(cursor, "vertex", nverts);
+    ok |= parse_element(cursor, "faces", ninds);
+
+    if (!ok)
+        return 0;
 
     skip_line(cursor);
     return 0;
@@ -70,19 +90,24 @@ static int parse_magic(const char **cursor) {
     return consume_string(cursor, "ply\n");
 }
 
-int parse_ply(const char *filename) {
+
+int parse_ply(const char *filename, void *context, vertex_cb *vert_cb,
+              index_cb *ind_cb) {
     size_t len;
     int nverts = 0;
+    int ninds = 0;
     int success = 0;
     int done = 0;
     int res = 0;
+
     enum ply_state state = PLY_MAGIC;
     const char *data = file_contents(filename, &len);
     const char *p = data;
 
     float vert[3], norm[3];
+    int inds[3];
     u8 color[3];
- 
+
     while(!done) {
         switch (state) {
         case PLY_MAGIC:
@@ -94,11 +119,16 @@ int parse_ply(const char *filename) {
             state = PLY_HEADER;
             break;
         case PLY_HEADER:
-            res = parse_header(&p, &nverts);
-            if (res)
-                printf("got nverts %d\n", nverts);
-            if (consume_string(&p, "end_header\n"))
+            res = parse_header(&p, &nverts, &ninds);
+            if (consume_string(&p, "end_header\n")) {
+                if (ninds == 0 || nverts == 0)  {
+                    printf("ply parsing failed, could not determine number "
+                           " of vertices or faces\n");
+                    done = 1;
+                    break;
+                }
                 state = PLY_VERTICES;
+            }
             break;
         case PLY_VERTICES:
             res = parse_vertex(&p, vert, norm, color);
@@ -106,13 +136,16 @@ int parse_ply(const char *filename) {
                 done = 1;
                 break;
             }
-            printf("got vert %f %f %f %f %f %f %hhu %hhu %hhu\n",
-                   vert[0], vert[1], vert[2],
-                   norm[0], norm[1], norm[2],
-                   color[0], color[1], color[2]);
+            (*vert_cb)(context, nverts, vert, norm, color);
             break;
         case PLY_INDICES:
-            done = 1;
+            res = parse_indices(&p, inds);
+            if (!res) {
+                done = 1;
+                break;
+            }
+            (*index_cb)(context, ninds, inds);
+
             break;
         }
     }
