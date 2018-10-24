@@ -191,6 +191,8 @@ static void render_geom (struct resources *res,
 
   bind_vbo(&geom->buffer.vertex_buffer, attrs->position);
   bind_vbo(&geom->buffer.normal_buffer, attrs->normal);
+  if (geom->buffer.color_buffer.handle)
+    bind_vbo(&geom->buffer.color_buffer, attrs->color);
   bind_ibo(&geom->buffer.index_buffer);
 
   glDrawElements(type,

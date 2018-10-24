@@ -86,10 +86,10 @@ void game_init(struct game *game) {
     /* camera->mirrored = 1; */
 
     node_translate(&player->node, V3(terrain->size/2.,terrain->size/2.,0));
-    vec3_scale(player->node.scale, 10.0, player->node.scale);
+    /* vec3_scale(player->node.scale, 10.0, player->node.scale); */
 
     node_rotate(camera, V3(100, 0, 0));
-    node_translate(camera, V3(0,-30,20));
+    node_translate(camera, V3(0,-40,20));
     /* node_recalc(camera); */
 
     terrain->entity.node.pos[2] = 20.0;

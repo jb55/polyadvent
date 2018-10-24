@@ -35,18 +35,18 @@ void main()
 	vec4 trans_normal = normal_matrix * v4_normal;
 	vec4 v4_pos = vec4(position, 1.0);
 	gl_Position = mvp * v4_pos;
-	v_light = dot(normal, normalize(light_dir)) ;
+	v_light = dot(trans_normal.xyz, normalize(light_dir)) ;
 
 	v_color = land[0].xyz;
 
-	// for (int i = 0; i < nlands-1; i++) {
-	// 	v_color =
-	// 		mix(v_color,
-	// 		    land[i+1].xyz,
-	// 		    smoothstep(land[i].w, land[i+1].w, position.z));
-	// }
+	for (int i = 0; i < nlands-1; i++) {
+		v_color =
+			mix(v_color,
+			    land[i+1].xyz,
+			    smoothstep(land[i].w, land[i+1].w, position.z));
+	}
 
-	v_color = vec3(0.2 + position.z*0.05, position.z*0.0095, position.z*0.0001) * 0.5;
+	// v_color = vec3(0.2 + position.z*0.05, position.z*0.0095, position.z*0.0001) * 0.5;
 
 	 // v_color = vec3(position.z, position.z, position.z) * 0.005;
 

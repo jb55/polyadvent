@@ -21,14 +21,14 @@ out vec3 v_ray;
 
 void main()
 {
-	vec4 v4_normal = vec4(normal , 1);
+	vec4 v4_normal = vec4(normal, 1);
 	vec4 trans_normal = normal_matrix * v4_normal;
 	vec4 v4_pos = vec4(position, 1.0);
 	gl_Position = mvp * v4_pos;
-	v_light = dot(normal, normalize(light_dir)) ;
+	v_light = dot(trans_normal.xyz, light_dir);
 
 	v_color = color;
 
-	v_normal = trans_normal.xyz;
+	// v_normal = trans_normal.xyz;
 	v_ray = camera_position - (world * v4_pos).xyz;
 }
