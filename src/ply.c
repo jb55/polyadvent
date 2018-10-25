@@ -17,7 +17,7 @@ enum ply_state {
     PLY_INDICES
 };
 
-static void skip_line(const char **cursor) {
+static void next_line(const char **cursor) {
     while (*((*cursor)++) != '\n')
         ;
 }
@@ -46,8 +46,6 @@ static int parse_element(const char **cursor, const char *element, int *nverts) 
 
     *nverts = atoi(*cursor);
 
-    skip_line(cursor);
-
     return *nverts != 0;
 }
 
@@ -58,7 +56,6 @@ static inline int parse_vertex(const char **cursor, float *v, float *n, u8 *c) {
             &v[0], &v[1], &v[2],
             &n[0], &n[1], &n[2],
             &c[0], &c[1], &c[2]);
-    skip_line(cursor);
 
     return matched == 9;
 }
@@ -69,30 +66,30 @@ static int parse_indices(const char **cursor, int *inds) {
     int matched =
         sscanf(*cursor, "3 %d %d %d", &inds[0], &inds[1], &inds[2]);
 
-    skip_line(cursor);
-
     return matched == 3;
 }
 
 static int parse_header(const char **cursor, int *nverts, int *ninds) {
     int ok = 0;
-    ok |= parse_element(cursor, "vertex", nverts);
-    ok |= parse_element(cursor, "face", ninds);
+    ok = parse_element(cursor, "vertex", nverts);
 
+    // only parse one thing at a time
     if (ok)
-        return 0;
+        return 1;
 
-    skip_line(cursor);
-    return 0;
+    ok = parse_element(cursor, "face", ninds);
+
+    return ok;
 }
 
 static int parse_magic(const char **cursor) {
-    return consume_string(cursor, "ply\n");
+    return consume_string(cursor, "ply");
 }
 
 
 int parse_ply(const char *filename, struct geometry *geom) {
     size_t len;
+    int success = 0;
     int nverts = 0;
     int ninds = 0;
     int done = 0;
@@ -121,7 +118,7 @@ int parse_ply(const char *filename, struct geometry *geom) {
             break;
         case PLY_HEADER:
             res = parse_header(&p, &nverts, &ninds);
-            if (consume_string(&p, "end_header\n")) {
+            if (consume_string(&p, "end_header")) {
                 if (ninds == 0 || nverts == 0)  {
                     printf("ply parsing failed, could not determine number "
                            " of vertices or faces\n");
@@ -175,19 +172,33 @@ int parse_ply(const char *filename, struct geometry *geom) {
 
             cind++;
 
-            if (cind == ninds)
+            if (cind == ninds) {
+                success = 1;
                 done = 1;
+            }
 
             break;
         }
+
+        // next line
+        if (p >= data + len) {
+            /* printf("got here, state %d cind %d ninds %d over %ld\n", */
+            /*        state, cind, ninds, p - (data + len)); */
+            done = 1;
+        }
+
+        if (!done)
+            next_line(&p);
     }
 
     free((void*)data);
 
-    geom->num_indices = ninds * 3;
-    geom->num_verts = nverts * 3;
+    if (success) {
+        geom->num_indices = ninds * 3;
+        geom->num_verts = nverts * 3;
 
-    make_buffer_geometry(geom);
+        make_buffer_geometry(geom);
+    }
 
-    return state == PLY_INDICES;
+    return success;
 }
