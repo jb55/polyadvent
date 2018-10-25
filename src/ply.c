@@ -51,13 +51,16 @@ static int parse_element(const char **cursor, const char *element, int *nverts) 
 
 
 static inline int parse_vertex(const char **cursor, float *v, float *n, u8 *c) {
+    static float st[2];
+
     int matched =
-        sscanf(*cursor, "%f %f %f %f %f %f %hhu %hhu %hhu",
+        sscanf(*cursor, "%f %f %f %f %f %f %f %f %hhu %hhu %hhu",
             &v[0], &v[1], &v[2],
             &n[0], &n[1], &n[2],
+            &st[0], &st[1],
             &c[0], &c[1], &c[2]);
 
-    return matched == 9;
+    return matched == 11;
 }
 
 
@@ -72,12 +75,14 @@ static int parse_indices(const char **cursor, int *inds) {
 static int parse_header(const char **cursor, int *nverts, int *ninds) {
     int ok = 0;
     ok = parse_element(cursor, "vertex", nverts);
-
-    // only parse one thing at a time
-    if (ok)
-        return 1;
+    if (ok) return 1;
 
     ok = parse_element(cursor, "face", ninds);
+    if (ok) return 1;
+
+    ok = parse_element(cursor, "face", ninds);
+    if (ok) return 1;
+
 
     return ok;
 }

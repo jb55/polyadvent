@@ -65,7 +65,7 @@ void game_init(struct game *game) {
     node_init(&terrain->entity.node);
 
     // player init
-    ok = load_model(&player->model, "lambo");
+    ok = load_model(&player->model, "palm-tree");
     assert(ok);
     player->model.program = res->program.handle;
     player->node.label = "player";
