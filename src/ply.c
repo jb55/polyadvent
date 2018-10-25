@@ -60,6 +60,8 @@ static inline int parse_vertex(const char **cursor, float *v, float *n, u8 *c) {
             &st[0], &st[1],
             &c[0], &c[1], &c[2]);
 
+
+
     return matched == 11;
 }
 
@@ -142,6 +144,7 @@ int parse_ply(const char *filename, struct geometry *geom) {
         case PLY_VERTICES:
             res = parse_vertex(&p, vert, norm, color);
             if (!res) {
+                printf("failed parsing verts\n");
                 done = 1;
                 break;
             }
@@ -167,6 +170,7 @@ int parse_ply(const char *filename, struct geometry *geom) {
         case PLY_INDICES:
             res = parse_indices(&p, inds);
             if (!res) {
+                printf("failed parsing indices\n");
                 done = 1;
                 break;
             }
