@@ -3,13 +3,13 @@
 precision mediump float;
 
 flat in vec3 v_color;
-flat in vec3 v_normal;
 in vec3 v_ray;
 out vec4 fragmentColor;
 
 uniform vec3 camera_position;
 uniform bool fog_on;
 uniform bool diffuse_on;
+uniform vec3 light_intensity;
 uniform mat4 normal_matrix;
 
 vec3 apply_fog(in vec3 rgb, in float distance, in vec3 ray_orig, in vec3 ray_dir) {
@@ -25,25 +25,12 @@ vec3 apply_fog(in vec3 rgb, in float distance, in vec3 ray_orig, in vec3 ray_dir
 
   float fog_amount = 1.0 - exp(-(pow(distance*b, 2.0))) ;
 
-  vec3  fog_color  = vec3(0.5,0.6,0.7);
+  vec3  fog_color  = vec3(0.5,0.6,0.7) * light_intensity;
   return mix( rgb, fog_color, fog_amount);
-}
-
-vec3 gamma_correct(vec3 color) {
-  return pow(color, vec3(1.0/2.2));
-}
-
-float lambert(vec3 N, vec3 L)
-{
-  vec3 nrmN = normalize(N);
-  vec3 nrmL = normalize(L);
-  float result = dot(nrmN, nrmL);
-  return max(result, 0.0);
 }
 
 
 void main() {
-  float distance = length(v_ray);
   vec3 light_position = vec3(2.0,1.0,5.0);
 
   vec3 color;
@@ -51,7 +38,7 @@ void main() {
   vec3 frag = v_color;
 
   if (fog_on) {
-    vec3 fog = apply_fog(frag, distance, camera_position, v_ray);
+    vec3 fog = apply_fog(frag, length(v_ray), camera_position, v_ray);
     color = fog;
   }
   else
