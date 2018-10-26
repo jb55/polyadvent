@@ -135,8 +135,7 @@ static void player_movement(struct game *game) {
   if (!vec3_eq(res->player.node.pos, last_pos, 0.0001)) {
 
     res->player.node.pos[2] =
-      game->terrain.fn(&game->terrain, res->player.node.pos[0], res->player.node.pos[1]) +
-      PLAYER_HEIGHT;
+      game->terrain.fn(&game->terrain, res->player.node.pos[0], res->player.node.pos[1]) + 0.2;
 
     node_recalc(&res->camera);
 
@@ -173,10 +172,32 @@ static int try_reload_shaders(struct resources *res) {
 }
 #endif
 
+static void day_night_cycle(float n, struct resources *res) {
+    float darkest = 0.25;
+    float val = n;
+    float roots = sin(val);
+    float circle = fmod(val, TAU);
+    float angle = circle/TAU;
+    float hour = 24.0*angle;
+    float intensity = angle <= 0.5
+        ? clamp(roots, darkest, 1.0)
+        : clamp(-roots * 0.4, darkest, 0.5);
+    printf("intensity %f(%f) angle %f hour %f n %f\n", roots, intensity, angle,
+           hour, n);
+
+    res->light_intensity[0] = intensity;
+    res->light_intensity[1] = intensity;
+    res->light_intensity[2] = intensity;
+
+    res->light_dir[0] = -cos(val);
+    res->light_dir[1] = -sin(val);
+    res->light_dir[2] = 0.8;
+}
+
 void update (struct game *game, u32 dt) {
 	static double last_ox, last_oy, last_oz;
-	static int toggle_fog = 0, toggle_diffuse = 0;
-	static float n = 1;
+	static int toggle_fog = 0;
+	static float n = 1.0;
 	static int first = 1;
 	struct resources *res = &game->test_resources;
 	struct perlin_settings *ts = &game->terrain.settings;
@@ -210,17 +231,9 @@ void update (struct game *game, u32 dt) {
 	if (game->input.keystates[SDL_SCANCODE_F])
 		toggle_fog = 1;
 
-	if (game->input.keystates[SDL_SCANCODE_G])
-		toggle_diffuse = 1;
-
 	if (toggle_fog) {
 		res->fog_on = !res->fog_on;
 		toggle_fog = 0;
-	}
-
-	if (toggle_diffuse) {
-		res->diffuse_on = !res->diffuse_on;
-		toggle_diffuse = 0;
 	}
 
 	double ox = tnode->pos[0];
@@ -237,7 +250,9 @@ void update (struct game *game, u32 dt) {
 		n += 0.01f;
 	}
 
-	n += 0.001f;
+    day_night_cycle(n, res);
+
+	n += 0.00001f;
 
 	node_recalc(root);
 }

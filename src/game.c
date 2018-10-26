@@ -29,6 +29,7 @@ void game_init(struct game *game) {
     struct entity *player = &res->player;
     struct terrain *terrain = &game->terrain;
     mat4 *light_dir = res->light_dir;
+    mat4 *light_intensity = res->light_intensity;
     int ok = 0;
 
     const double size = 10000;
@@ -52,6 +53,10 @@ void game_init(struct game *game) {
 
     mat4_id(mvp);
 
+    light_intensity[0] = 0.8;
+    light_intensity[1] = 0.8;
+    light_intensity[2] = 0.8;
+
     light_dir[0] = 0.8;
     light_dir[1] = 0.8;
     light_dir[2] = 0.8;
@@ -65,7 +70,7 @@ void game_init(struct game *game) {
     node_init(&terrain->entity.node);
 
     // player init
-    ok = load_model(&player->model, "ship");
+    ok = load_model(&player->model, "pirate-officer");
     assert(ok);
     player->model.program = res->program.handle;
     player->node.label = "player";
@@ -85,7 +90,7 @@ void game_init(struct game *game) {
     /* vec3_all(camera->scale, -1); */
     /* camera->mirrored = 1; */
 
-    node_translate(&player->node, V3(terrain->size/2.,terrain->size/2.,0));
+    node_translate(&player->node, V3(terrain->size/2.,terrain->size/2.,0.0));
     /* vec3_scale(player->node.scale, 10.0, player->node.scale); */
 
     node_rotate(camera, V3(100, 0, 0));

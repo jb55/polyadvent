@@ -10,7 +10,7 @@
 #include "entity.h"
 #include "terrain.h"
 
-#define PLAYER_HEIGHT 1.7
+#define PLAYER_HEIGHT 1.73
 
 /*
  * Global data used by our render callback:
@@ -26,6 +26,7 @@ struct resources {
 	struct uniforms {
 		GLint camera_position;
 		GLint light_dir;
+		GLint light_intensity;
 		GLint mvp;
 		GLint normal_matrix;
 		GLint view;
@@ -49,6 +50,7 @@ struct resources {
 
 	float test_mvp[MAT4_ELEMS];
 	float light_dir[3];
+	float light_intensity[3];
 	float camera_persp[MAT4_ELEMS];
 };
 

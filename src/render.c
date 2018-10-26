@@ -127,6 +127,9 @@ init_gl(struct resources *resources, int width, int height) {
         resources->uniforms.camera_position =
             glGetUniformLocation(handle, "camera_position");
 
+        resources->uniforms.light_intensity =
+            glGetUniformLocation(handle, "light_intensity");
+
         resources->uniforms.light_dir =
             glGetUniformLocation(handle, "light_dir");
 
@@ -217,7 +220,7 @@ static void render_geom (struct resources *res,
 
 
 void render (struct game *game) {
-    static const float adjust = 1.0f;
+    float adjust = game->test_resources.light_intensity[0];
     glClearColor( 0.5294f * adjust, 0.8078f * adjust, 0.9216f * adjust, 1.0f ); //clear background screen to black
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
     check_gl();
@@ -234,6 +237,7 @@ void render (struct game *game) {
     mat4 *mvp = res->test_mvp;
     mat4 *persp = res->camera_persp;
     mat4 *light = res->light_dir;
+    mat4 *light_intensity = res->light_intensity;
 
     struct node *camera = &res->camera;
 
@@ -258,6 +262,8 @@ void render (struct game *game) {
         glUniform1i(res->uniforms.fog_on, res->fog_on);
         glUniform1i(res->uniforms.diffuse_on, res->diffuse_on);
         glUniform3f(res->uniforms.light_dir, light[0], light[1], light[2]);
+        glUniform3f(res->uniforms.light_intensity,
+                    light_intensity[0], light_intensity[1], light_intensity[2]);
 
         mat4_multiply(view_proj, entity->node.mat, mvp);
         mat4_copy(entity->node.mat, model_view);
@@ -269,8 +275,6 @@ void render (struct game *game) {
         recalc_normals(res->uniforms.normal_matrix, model_view, normal_matrix);
 
         render_geom(res, &entity->model.geom, GL_TRIANGLES);
-
-        printf("i %ld\n", i);
 
         check_gl();
     }

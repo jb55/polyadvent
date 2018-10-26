@@ -10,7 +10,8 @@
 #define SLAB(f) "etc/slab/" f
 #define RESOURCE(f) "etc/shaders/" f
 
-#define PI 3.14159265f;
+#define PI 3.14159265f
+#define TAU 6.2831853f
 
 typedef unsigned char u8;
 typedef signed char s8;
