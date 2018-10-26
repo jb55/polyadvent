@@ -172,18 +172,19 @@ static int try_reload_shaders(struct resources *res) {
 }
 #endif
 
+// TODO: match based on some real concept of time
 static void day_night_cycle(float n, struct resources *res) {
     float darkest = 0.25;
     float val = n;
     float roots = sin(val);
     float circle = fmod(val, TAU);
     float angle = circle/TAU;
-    float hour = 24.0*angle;
     float intensity = angle <= 0.5
         ? clamp(roots, darkest, 1.0)
         : clamp(-roots * 0.4, darkest, 0.5);
-    printf("intensity %f(%f) angle %f hour %f n %f\n", roots, intensity, angle,
-           hour, n);
+
+    /* printf("intensity %f(%f) angle %f hour %f n %f\n", roots, intensity, angle, */
+    /*        hour, n); */
 
     res->light_intensity[0] = intensity;
     res->light_intensity[1] = intensity;
