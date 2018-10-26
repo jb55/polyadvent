@@ -2,8 +2,9 @@
 
 precision mediump float;
 
-flat in vec3 v_color;
-flat in vec3 v_normal;
+in float v_light;
+in vec3 v_color;
+in vec3 v_normal;
 in vec3 v_ray;
 out vec4 fragmentColor;
 
@@ -48,15 +49,15 @@ void main() {
 
   vec3 color;
 
-  vec3 frag = v_color;
+  vec3 frag = v_color * v_light;
 
   if (fog_on) {
     vec3 fog = apply_fog(frag, distance, camera_position, v_ray);
-    color = fog;
+    color = frag + (fog * 0.000001);
   }
   else
-    color = frag;
+      color = frag;
 
   // fragmentColor = vec4(color + diffuse, 1.0);
-  fragmentColor = vec4(color, 1.0);
+  fragmentColor = vec4(gamma_correct(color), 1.0);
 }

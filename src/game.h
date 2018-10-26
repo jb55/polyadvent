@@ -20,6 +20,7 @@ struct resources {
 	struct vbo vertex_buffer, element_buffer, normal_buffer;
 
 	struct gpu_program program;
+	struct gpu_program smooth_program;
 	struct gpu_program terrain_program;
 
 	struct uniforms {

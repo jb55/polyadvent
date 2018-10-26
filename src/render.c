@@ -55,7 +55,7 @@ static const GLushort cube_indices[] = {
 
 void
 init_gl(struct resources *resources, int width, int height) {
-	struct shader vertex, terrain_vertex, fragment;
+	struct shader vertex, terrain_vertex, fragment, fragment_smooth;
 	float tmp_matrix[16];
 	int ok = 0;
 
@@ -79,6 +79,11 @@ init_gl(struct resources *resources, int width, int height) {
 
 	assert(ok);
 
+	ok =
+		make_shader(GL_FRAGMENT_SHADER, SHADER("test-smooth.f.glsl"), &fragment_smooth);
+
+	assert(ok);
+
 	// camera
 	mat4_perspective(90 /* fov */,
 			 (float)width / height,
@@ -97,6 +102,13 @@ init_gl(struct resources *resources, int width, int height) {
 	ok =
 		make_program(&vertex, &fragment, &resources->program);
 
+    assert(ok);
+
+	ok =
+		make_program(&vertex, &fragment_smooth, &resources->smooth_program);
+
+    assert(ok);
+
     check_gl();
 
 	assert(ok);
@@ -104,6 +116,7 @@ init_gl(struct resources *resources, int width, int height) {
     GLuint programs[] =
         { resources->terrain_program.handle
         , resources->program.handle
+        , resources->smooth_program.handle
         };
 
     // uniforms shared between all shaders
@@ -256,6 +269,8 @@ void render (struct game *game) {
         recalc_normals(res->uniforms.normal_matrix, model_view, normal_matrix);
 
         render_geom(res, &entity->model.geom, GL_TRIANGLES);
+
+        printf("i %ld\n", i);
 
         check_gl();
     }
