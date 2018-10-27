@@ -10,6 +10,7 @@
 #include "uniform.h"
 #include "shader.h"
 #include "file.h"
+#include <math.h>
 
 static void movement(struct game *game, struct node *node, float speed_mult) {
   float amt = 0.03;
@@ -61,6 +62,27 @@ static void movement(struct game *game, struct node *node, float speed_mult) {
 }
 
 void update_terrain(struct game *game) {
+static void remap_samples(struct point *points, int n_samples,
+                                    double size)
+{
+    double middle = size / 2.0;
+
+    for (int i = 0; i < n_samples; ++i) {
+        struct point *point = &points[i];
+
+        /* double x = point->x/size; */
+        /* double y = point->y/size; */
+        double dx = point->x - middle;
+        double dy = point->y - middle;
+        double dist = sqrt(dx*dx + dy*dy);
+        double nx = dx / dist;
+        double ny = dy / dist;
+        double factor = -log(dist)*50.0;
+        point->x += nx * factor;
+        point->y += ny * factor;
+    }
+}
+
   static int first = 1;
   static float last_scale = -1.0;
 
