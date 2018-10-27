@@ -216,6 +216,7 @@ void render (struct game *game) {
         check_gl();
     }
 
+    render_ui(&game->ui);
 
     //player
     // y tho

@@ -38,8 +38,7 @@ int main(void)
         SDL_WINDOW_OPENGL|SDL_WINDOW_RESIZABLE);
 
     SDL_GL_CreateContext(window);
-    init_gl(&game.test_resources, width, height);
-    game_init(&game);
+    game_init(&game, width, height);
 
     check_gl();
     u32 last = SDL_GetTicks();

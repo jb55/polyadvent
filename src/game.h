@@ -9,6 +9,7 @@
 #include "shader.h"
 #include "entity.h"
 #include "terrain.h"
+#include "ui.h"
 
 #define PLAYER_HEIGHT 1.73
 
@@ -54,12 +55,13 @@ struct resources {
 struct game {
     int counter;
     int seed;
+    struct ui ui;
     struct resources test_resources;
     struct input input;
     struct terrain terrain;
 };
 
-void game_init(struct game *game);
+void game_init(struct game *game, int width, int height);
 void should_update(struct game *game);
 
 #endif /* PA_GAME_H */

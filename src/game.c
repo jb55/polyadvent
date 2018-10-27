@@ -4,6 +4,8 @@
 #include "ply.h"
 #include "model.h"
 #include "terrain.h"
+#include "render.h"
+#include "util.h"
 #include <assert.h>
 
 mat4 *cam_init = (float[16]){
@@ -21,7 +23,10 @@ static void camera_update(struct node *node) {
   mat4_multiply(persp, mat, mat);
 }
 
-void game_init(struct game *game) {
+void game_init(struct game *game, int width, int height) {
+    init_gl(&game->test_resources, width, height);
+    check_gl();
+
     struct resources *res = &game->test_resources;
     mat4 *mvp = res->test_mvp;
     struct node *root = &res->root;
@@ -45,6 +50,9 @@ void game_init(struct game *game) {
         .exp = 5.3,
         .scale = 1.0
     };
+
+    create_ui(&game->ui, width, height);
+    check_gl();
 
     terrain_init(terrain);
     terrain->entity.model.shading = SHADING_TERRAIN;

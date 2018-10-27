@@ -26,21 +26,32 @@ destroy_buffer_geometry(struct geometry *geom) {
 void render_geometry(struct geometry *geom, struct attributes *attrs)
 {
     bind_vbo(&geom->vbos.vertex, attrs->position);
-    bind_vbo(&geom->vbos.normal, attrs->normal);
-    if (geom->vbos.color.handle)
+    check_gl();
+    if (geom->vbos.normal.handle) {
+        bind_vbo(&geom->vbos.normal, attrs->normal);
+        check_gl();
+    }
+    if (geom->vbos.color.handle) {
         bind_vbo(&geom->vbos.color, attrs->color);
+        check_gl();
+    }
     bind_ibo(&geom->vbos.index);
+    check_gl();
 
     glDrawElements(GL_TRIANGLES,
                    geom->num_indices, /* count */
                    GL_UNSIGNED_INT,    /* type */
                    (void*)0            /* element array buffer offset */
                    );
+    check_gl();
 }
 
 
 void init_geometry(struct geometry *geom) {
     geom->colors = NULL;
+    geom->vbos.color.handle = 0;
+    geom->normals = NULL;
+    geom->vbos.normal.handle = 0;
 }
 
 void
@@ -48,7 +59,7 @@ make_buffer_geometry(struct geometry *geom) {
     // VBOs
 
     assert(geom->vertices);
-    assert(geom->normals);
+    /* assert(geom->normals); */
     assert(geom->indices);
     assert(geom->num_indices >= 1);
 
@@ -62,12 +73,13 @@ make_buffer_geometry(struct geometry *geom) {
 
     /* printf("making normal buffer\n"); */
     // cube normals
-    make_vertex_buffer(
-                        GL_ARRAY_BUFFER,
-                        geom->normals,
-                        geom->num_verts * 3 * (int)sizeof(*geom->normals),
-                        &geom->vbos.normal
-                        );
+    if (geom->normals != NULL)
+        make_vertex_buffer(
+                            GL_ARRAY_BUFFER,
+                            geom->normals,
+                            geom->num_verts * 3 * (int)sizeof(*geom->normals),
+                            &geom->vbos.normal
+                            );
 
     // vertex colors
     if (geom->colors != NULL)
