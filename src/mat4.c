@@ -161,25 +161,25 @@ mat4 *mat4_perspective(float fov, float aspect, float near,
 mat4 *mat4_ortho(float left, float right, float bottom, float top, float near,
             float far, mat4 *dest)
 {
-    float lr = 1.0 / (left - right);
-    float bt = 1.0 / (bottom - top);
-    float nf = 1.0 / (near - far);
-    dest[0] = -2 * lr;
+    float rl = 1.0 / (right - left);
+    float tb = 1.0 / (top - bottom);
+    float fn = 1.0 / (far - near);
+    dest[0] = 2.0 * rl;
     dest[1] = 0;
     dest[2] = 0;
     dest[3] = 0;
     dest[4] = 0;
-    dest[5] = -2 * bt;
+    dest[5] = 2.0 * tb;
     dest[6] = 0;
     dest[7] = 0;
     dest[8] = 0;
     dest[9] = 0;
-    dest[10] = 2 * nf;
+    dest[10] = -2.0 * fn;
     dest[11] = 0;
-    dest[12] = (left + right) * lr;
-    dest[13] = (top + bottom) * bt;
-    dest[14] = (far + near) * nf;
-    dest[15] = 1;
+    dest[12] = (left + right) * rl;
+    dest[13] = (top + bottom) * tb;
+    dest[14] = (far + near) * fn;
+    dest[15] = 1.0;
     return dest;
 }
 

@@ -10,13 +10,15 @@ struct ui {
     struct gpu_program shader;
     struct geometry quad;
     struct attributes attrs;
-    GLint view_uniform;
-    float camera[MAT4_ELEMS];
+    GLint mvp_uniform;
+    GLint uipos_uniform;
+    GLint uisize_uniform;
+    float ortho[MAT4_ELEMS];
 };
 
 void create_ui(struct ui *ui, int width, int height);
 void resize_ui(struct ui *ui, int width, int height);
-void render_ui(struct ui *ui);
+void render_ui(struct ui *ui, float *camera);
 
 
 #endif /* POLYADVENT_UI_H */

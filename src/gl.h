@@ -40,6 +40,7 @@ void glUniformMatrix4fv(GLint location, GLsizei count, GLboolean transpose,
 
 void glUseProgram(GLuint program);
 void glUniform1f(GLint location, GLfloat v0);
+void glUniform2f(GLint location, GLfloat v0, GLfloat v1);
 void glGetProgramiv(GLuint program, GLenum pname, GLint *params);
 void glDeleteProgram(	GLuint program);
 
@@ -85,6 +86,9 @@ void glFramebufferRenderbuffer(	GLenum target,
                                 GLenum attachment,
                                 GLenum renderbuffertarget,
                                 GLuint renderbuffer);
+
+
  
+
 
 #endif /* POLYADVENT_GL_H */

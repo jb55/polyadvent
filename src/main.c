@@ -44,7 +44,7 @@ int main(void)
     u32 last = SDL_GetTicks();
 
     while (1) {
-        process_events(game.test_resources.camera_persp, &game.input);
+        process_events(&game.ui, game.test_resources.camera_persp, &game.input);
         u32 ticks = SDL_GetTicks();
         update(&game, ticks-last);
 

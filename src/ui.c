@@ -37,12 +37,23 @@ static void create_quad(struct geometry *geom)
     check_gl();
 }
 
-void render_ui(struct ui *ui) {
+void render_ui(struct ui *ui, float *view) {
+    static float mvp[MAT4_ELEMS];
+	glDisable(GL_DEPTH_TEST);
     glUseProgram(ui->shader.handle);
     check_gl();
 
+    float uipos[2] = {0.01, 0.01};
+    float uisize[2] = {0.2, 0.2};
+
+    mat4_multiply(ui->ortho, view, mvp);
+
     // setup camera for shader
-    glUniformMatrix4fv(ui->view_uniform, 1, 0, ui->camera);
+    /* glUniform2f(ui->uipos_uniform, uipos[0] * uisize[0], uipos[1] * uisize[1]); */
+    glUniform2f(ui->uipos_uniform, uipos[0], uipos[1]);
+    glUniform2f(ui->uisize_uniform, uisize[0], uisize[1]);
+
+    glUniformMatrix4fv(ui->mvp_uniform, 1, 0, ui->ortho);
     check_gl();
 
     // render quad
@@ -53,13 +64,15 @@ void render_ui(struct ui *ui) {
 
 void resize_ui(struct ui *ui, int width, int height) {
     float left = 0;
-    float right = width;
+    float right = 1.0;
+    float bottom = 1.0;
     float top = 0;
-    float bottom = height;
-    float near = -100;
-    float far = 100;
+    float near = 0.0;
+    float far = 1.0;
 
-    mat4_ortho(left, right, bottom, top, near, far, ui->camera);
+    printf("%d %d\n", width, height);
+
+    mat4_ortho(left, right, bottom, top, near, far, ui->ortho);
 }
 
 
@@ -82,7 +95,9 @@ void create_ui(struct ui *ui, int width, int height) {
 
     GLuint program = ui->shader.handle;
 
-    ui->view_uniform = glGetUniformLocation(program, "view");
+    ui->mvp_uniform   = glGetUniformLocation(program, "mvp");
+    ui->uipos_uniform = glGetUniformLocation(program, "uipos");
+    ui->uisize_uniform = glGetUniformLocation(program, "uisize");
 
     /* ui->attrs.normal   = (gpu_addr)glGetAttribLocation(program, "normal"); */
     ui->attrs.position = (gpu_addr)glGetAttribLocation(program, "position");

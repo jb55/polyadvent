@@ -154,6 +154,7 @@ recalc_normals(GLint nm_uniform, mat4 *model_view, mat4 *normal) {
 
 void render (struct game *game) {
     float adjust = game->test_resources.light_intensity[0];
+	glEnable(GL_DEPTH_TEST);
     glClearColor( 0.5294f * adjust, 0.8078f * adjust, 0.9216f * adjust, 1.0f ); //clear background screen to black
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
     check_gl();
@@ -216,7 +217,7 @@ void render (struct game *game) {
         check_gl();
     }
 
-    render_ui(&game->ui);
+    render_ui(&game->ui, view);
 
     //player
     // y tho
