@@ -151,11 +151,38 @@ mat4 *mat4_translate (mat4 *mat, float *v3, mat4 *dest) {
 }
 
 mat4 *mat4_perspective(float fov, float aspect, float near,
-                       float far, mat4 *dest) {
+                       float far, mat4 *dest)
+{
 	float top = near * tanf(fov*PI / 360.0f);
 	float right = top * aspect;
 	return mat4_frustum(-right, right, -top, top, near, far, dest);
 }
+
+mat4 *mat4_ortho(float left, float right, float bottom, float top, float near,
+            float far, mat4 *dest)
+{
+    float lr = 1.0 / (left - right);
+    float bt = 1.0 / (bottom - top);
+    float nf = 1.0 / (near - far);
+    dest[0] = -2 * lr;
+    dest[1] = 0;
+    dest[2] = 0;
+    dest[3] = 0;
+    dest[4] = 0;
+    dest[5] = -2 * bt;
+    dest[6] = 0;
+    dest[7] = 0;
+    dest[8] = 0;
+    dest[9] = 0;
+    dest[10] = 2 * nf;
+    dest[11] = 0;
+    dest[12] = (left + right) * lr;
+    dest[13] = (top + bottom) * bt;
+    dest[14] = (far + near) * nf;
+    dest[15] = 1;
+    return dest;
+}
+
 
 mat4 *mat4_inverse(mat4 *src, mat4 *dest) {
 	if(dest == NULL) { dest = src; }
