@@ -70,8 +70,6 @@ void resize_ui(struct ui *ui, int width, int height) {
     float near = 0.0;
     float far = 1.0;
 
-    printf("%d %d\n", width, height);
-
     mat4_ortho(left, right, bottom, top, near, far, ui->ortho);
 }
 
