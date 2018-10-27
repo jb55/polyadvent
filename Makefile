@@ -8,7 +8,7 @@ CFLAGS = $(DEFS) -ggdb -Ofast -I src -Wall -Werror -Wextra -std=c99 \
 						-Wno-unused-variable \
 						-Wno-cast-align \
 						-Wno-padded
-LDFLAGS = -lSDL2 -lGL
+LDFLAGS = -lSDL2 -lGL -lm
 SRC=src
 
 OBJS  = $(SRC)/window.o
@@ -17,6 +17,7 @@ OBJS += $(SRC)/camera.o
 OBJS += $(SRC)/debug.o
 OBJS += $(SRC)/delaunay.o
 OBJS += $(SRC)/event.o
+OBJS += $(SRC)/fbo.o
 OBJS += $(SRC)/file.o
 OBJS += $(SRC)/game.o
 OBJS += $(SRC)/geometry.o
@@ -24,8 +25,10 @@ OBJS += $(SRC)/input.o
 OBJS += $(SRC)/main.o
 OBJS += $(SRC)/mat4.o
 OBJS += $(SRC)/mat_util.o
+OBJS += $(SRC)/model.o
 OBJS += $(SRC)/node.o
 OBJS += $(SRC)/perlin.o
+OBJS += $(SRC)/ply.o
 OBJS += $(SRC)/poisson.o
 OBJS += $(SRC)/quat.o
 OBJS += $(SRC)/render.o
@@ -35,8 +38,7 @@ OBJS += $(SRC)/uniform.o
 OBJS += $(SRC)/update.o
 OBJS += $(SRC)/util.o
 OBJS += $(SRC)/vec3.o
-OBJS += $(SRC)/ply.o
-OBJS += $(SRC)/model.o
+OBJS += $(SRC)/ui.o
 
 SRCS=$(OBJS:.o=.c)
 

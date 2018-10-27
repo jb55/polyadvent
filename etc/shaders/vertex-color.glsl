@@ -20,6 +20,8 @@ flat out vec3 v_color;
 flat out vec3 v_normal;
 out vec3 v_ray;
 
+// TODO: includes
+// #include "lighting.glsl"
 
 vec3 standard_light(vec3 color) {
     vec4 v4_normal = vec4(normal, 1);

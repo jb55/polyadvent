@@ -27,6 +27,7 @@ int main(void)
     srand(seed);
 
     struct game game;
+    game.seed = seed;
 
     /* SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES); */
     int width = 640;

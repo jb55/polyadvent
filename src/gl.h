@@ -43,9 +43,48 @@ void glUniform1f(GLint location, GLfloat v0);
 void glGetProgramiv(GLuint program, GLenum pname, GLint *params);
 void glDeleteProgram(	GLuint program);
 
+void glGenFramebuffers(GLsizei handle, GLuint *ids);
+void glBindFramebuffer(	GLenum target, GLuint framebuffer);
+GLenum glCheckFramebufferStatus(GLenum target);
+void glDeleteFramebuffers(GLsizei n, const GLuint * framebuffers);
+
 void glDisableVertexAttribArray(GLuint index);
 void glDeleteVertexArrays(GLsizei n, const GLuint *arrays);
 
 GLboolean glIsBuffer(	GLuint buffer);
+
+
+void glTexImage2D(	GLenum target,
+                    GLint level,
+                    GLint internalformat,
+                    GLsizei width,
+                    GLsizei height,
+                    GLint border,
+                    GLenum format,
+                    GLenum type,
+                    const GLvoid * data);
+
+void glFramebufferTexture2D(	GLenum target,
+                                GLenum attachment,
+                                GLenum textarget,
+                                GLuint texture,
+                                GLint level);
+
+void glGenRenderbuffers(	GLsizei n,
+                            GLuint * renderbuffers);
+
+void glBindRenderbuffer(	GLenum target,
+                            GLuint renderbuffer);
+
+void glRenderbufferStorage(	GLenum target,
+                            GLenum internalformat,
+                            GLsizei width,
+                            GLsizei height);
+
+void glFramebufferRenderbuffer(	GLenum target,
+                                GLenum attachment,
+                                GLenum renderbuffertarget,
+                                GLuint renderbuffer);
+ 
 
 #endif /* POLYADVENT_GL_H */

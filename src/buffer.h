@@ -6,6 +6,12 @@
 
 typedef GLuint gpu_addr;
 
+struct attributes {
+    gpu_addr position;
+    gpu_addr normal;
+    gpu_addr color;
+};
+
 struct vbo {
   u32 type;
   int components;

@@ -8,9 +8,15 @@
 #include "geometry.h"
 #include "common.h"
 
+enum shading {
+    SHADING_TERRAIN,
+    SHADING_VERT_COLOR,
+    SHADING_UI,
+};
+
 struct model {
     struct geometry geom;
-    u32 program;
+    enum shading shading;
 };
 
 

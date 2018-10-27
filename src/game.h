@@ -22,6 +22,7 @@ struct resources {
 	struct gpu_program program;
 	struct gpu_program smooth_program;
 	struct gpu_program terrain_program;
+	struct gpu_program ui_program;
 
 	struct uniforms {
 		GLint camera_position;
@@ -36,11 +37,7 @@ struct resources {
 		GLint world;
 	} uniforms;
 
-	struct attributes {
-		gpu_addr position;
-		gpu_addr normal;
-		gpu_addr color;
-	} attributes;
+	struct attributes attributes;
 
 	struct node root;
 	struct entity player;
@@ -55,10 +52,11 @@ struct resources {
 };
 
 struct game {
-  int counter;
-  struct resources test_resources;
-  struct input input;
-  struct terrain terrain;
+    int counter;
+    int seed;
+    struct resources test_resources;
+    struct input input;
+    struct terrain terrain;
 };
 
 void game_init(struct game *game);

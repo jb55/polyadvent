@@ -20,7 +20,6 @@ make_buffer(GLenum target, const void *buffer_data, GLsizei buffer_size) {
   return buffer;
 }
 
-
 struct vbo*
 make_index_buffer(GLenum target, const void *data, GLsizei buffer_size,
                   struct vbo *vbo) {

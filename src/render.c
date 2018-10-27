@@ -211,7 +211,7 @@ void render (struct game *game) {
 
         recalc_normals(res->uniforms.normal_matrix, model_view, normal_matrix);
 
-        render_geom(res, &entity->model.geom, GL_TRIANGLES);
+        render_geometry(&entity->model.geom, &res->attributes);
 
         check_gl();
     }

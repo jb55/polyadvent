@@ -7,7 +7,7 @@
 
 void
 handle_resize(float *camera, int width, int height) {
-  printf("resizing %d %d\n", width, height);
+  /* printf("resizing %d %d\n", width, height); */
   glViewport( 0, 0, width, height );
   mat4_perspective(75 /* fov */, (float)width / height, 1, 20000, camera);
 

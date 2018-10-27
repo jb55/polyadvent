@@ -33,7 +33,6 @@ void game_init(struct game *game) {
     int ok = 0;
 
     const double size = 10000;
-    const double pdist = 1.7;
 
     terrain->settings = (struct perlin_settings){
         .depth = 1,
@@ -48,7 +47,7 @@ void game_init(struct game *game) {
     };
 
     terrain_init(terrain);
-    terrain->entity.model.program = res->terrain_program.handle;
+    terrain->entity.model.shading = SHADING_TERRAIN;
     terrain->size = size;
 
     mat4_id(mvp);
@@ -72,7 +71,7 @@ void game_init(struct game *game) {
     // player init
     ok = load_model(&player->model, "pirate-officer");
     assert(ok);
-    player->model.program = res->program.handle;
+    player->model.shading = SHADING_VERT_COLOR;
     player->node.label = "player";
 
     root->label = "root";

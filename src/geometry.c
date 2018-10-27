@@ -6,10 +6,10 @@
 void
 destroy_buffer_geometry(struct geometry *geom) {
     gpu_addr buffers[] = {
-        geom->buffer.vertex_buffer.handle,
-        geom->buffer.normal_buffer.handle,
-        geom->buffer.color_buffer.handle,
-        geom->buffer.index_buffer.handle
+        geom->vbos.vertex.handle,
+        geom->vbos.normal.handle,
+        geom->vbos.color.handle,
+        geom->vbos.index.handle
     };
     /* void glDeleteVertexArrays(GLsizei n, const GLuint *arrays); */
     /* glDisableVertexAttribArray(geom->buffer.vertex_buffer.handle); */
@@ -21,6 +21,21 @@ destroy_buffer_geometry(struct geometry *geom) {
     check_gl();
     glDeleteBuffers(ARRAY_SIZE(buffers), buffers);
     check_gl();
+}
+
+void render_geometry(struct geometry *geom, struct attributes *attrs)
+{
+    bind_vbo(&geom->vbos.vertex, attrs->position);
+    bind_vbo(&geom->vbos.normal, attrs->normal);
+    if (geom->vbos.color.handle)
+        bind_vbo(&geom->vbos.color, attrs->color);
+    bind_ibo(&geom->vbos.index);
+
+    glDrawElements(GL_TRIANGLES,
+                   geom->num_indices, /* count */
+                   GL_UNSIGNED_INT,    /* type */
+                   (void*)0            /* element array buffer offset */
+                   );
 }
 
 
@@ -42,7 +57,7 @@ make_buffer_geometry(struct geometry *geom) {
                         GL_ARRAY_BUFFER,
                         geom->vertices,
                         geom->num_verts * 3 * (int)sizeof(*geom->vertices),
-                        &geom->buffer.vertex_buffer
+                        &geom->vbos.vertex
                         );
 
     /* printf("making normal buffer\n"); */
@@ -51,7 +66,7 @@ make_buffer_geometry(struct geometry *geom) {
                         GL_ARRAY_BUFFER,
                         geom->normals,
                         geom->num_verts * 3 * (int)sizeof(*geom->normals),
-                        &geom->buffer.normal_buffer
+                        &geom->vbos.normal
                         );
 
     // vertex colors
@@ -60,7 +75,7 @@ make_buffer_geometry(struct geometry *geom) {
                         GL_ARRAY_BUFFER,
                         geom->colors,
                         geom->num_verts * 3 * (int)sizeof(*geom->colors),
-                        &geom->buffer.color_buffer
+                        &geom->vbos.color
                         );
 
     /* printf("making index buffer\n"); */
@@ -69,6 +84,6 @@ make_buffer_geometry(struct geometry *geom) {
                     GL_ELEMENT_ARRAY_BUFFER,
                     geom->indices,
                     geom->num_indices * (int)sizeof(*geom->indices),
-                    &geom->buffer.index_buffer
+                    &geom->vbos.index
                     );
 }
