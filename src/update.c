@@ -134,7 +134,7 @@ void update_terrain(struct game *game) {
     /* struct point *samples = */
     /*   uniform_samples(n_samples, game->terrain.size); */
 
-    static const double pdist = 42.0;
+    static const double pdist = 32.0;
 
     struct point *samples =
       poisson_disk_samples(pdist, game->terrain.size, 30, &n_samples);
