@@ -25,10 +25,10 @@
 //  v2------v3
 
 static const GLfloat cube_vertices[] = {
-  0.5, 0.5, 0.5,  -0.5, 0.5, 0.5,  -0.5,-0.5, 0.5,   0.5,-0.5, 0.5,    // v0-v0.5-v2-v3 front
+  0.5, 0.5, 0.5,  -0.5, 0.5, 0.5,  -0.5,-0.5, 0.5,   0.5,-0.5, 0.5,    // v0-v1-v2-v3 front
   0.5, 0.5,-0.5,   0.5, 0.5, 0.5,   0.5,-0.5, 0.5,   0.5,-0.5,-0.5,    // v5-v0-v3-v4 right
- -0.5, 0.5, 0.5,   0.5, 0.5, 0.5,   0.5, 0.5,-0.5,  -0.5, 0.5,-0.5,    // v0.5-v0-v5-v6 top
- -0.5, 0.5, 0.5,  -0.5, 0.5,-0.5,  -0.5,-0.5,-0.5,  -0.5,-0.5, 0.5,    // v0.5-v6-v7-v2 left
+  -0.5, 0.5, 0.5,   0.5, 0.5, 0.5,   0.5, 0.5,-0.5,  -0.5, 0.5,-0.5,   // v1-v0-v5-v6 top
+  -0.5, 0.5, 0.5,  -0.5, 0.5,-0.5,  -0.5,-0.5,-0.5,  -0.5,-0.5, 0.5,   // v1-v6-v7-v2 left
   0.5,-0.5, 0.5,  -0.5,-0.5, 0.5,  -0.5,-0.5,-0.5,   0.5,-0.5,-0.5,    // v3-v2-v7-v4 bottom
  -0.5, 0.5,-0.5,   0.5, 0.5,-0.5,   0.5,-0.5,-0.5,  -0.5,-0.5,-0.5     // v4-v7-v6-v5 back
 };
@@ -64,25 +64,14 @@ init_gl(struct resources *resources, int width, int height) {
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
 
 	// Shaders
-	ok =
-		make_shader(GL_VERTEX_SHADER, SHADER("vertex-color.glsl"), &vertex);
+	ok = make_shader(GL_VERTEX_SHADER, SHADER("vertex-color.glsl"), &vertex);
+	assert(ok && "vertex-color shader");
 
-	assert(ok);
+    ok = make_shader(GL_VERTEX_SHADER, SHADER("terrain.glsl"), &terrain_vertex);
+	assert(ok && "terrain vertex shader");
 
-    ok =
-		make_shader(GL_VERTEX_SHADER, SHADER("terrain.glsl"), &terrain_vertex);
-
-	assert(ok);
-
-	ok =
-		make_shader(GL_FRAGMENT_SHADER, SHADER("test.f.glsl"), &fragment);
-
-	assert(ok);
-
-	ok =
-		make_shader(GL_FRAGMENT_SHADER, SHADER("test-smooth.f.glsl"), &fragment_smooth);
-
-	assert(ok);
+	ok = make_shader(GL_FRAGMENT_SHADER, SHADER("test.f.glsl"), &fragment);
+	assert(ok && "default fragment shader");
 
 	// camera
 	mat4_perspective(90 /* fov */,
@@ -92,31 +81,17 @@ init_gl(struct resources *resources, int width, int height) {
 			 resources->camera_persp);
 
 	// Shader program
-	ok =
-		make_program(&terrain_vertex, &fragment, &resources->terrain_program);
-
-	assert(ok);
-
+	ok = make_program(&terrain_vertex, &fragment, &resources->terrain_program);
+	assert(ok && "terrain program");
     check_gl();
 
-	ok =
-		make_program(&vertex, &fragment, &resources->program);
-
-    assert(ok);
-
-	ok =
-		make_program(&vertex, &fragment_smooth, &resources->smooth_program);
-
-    assert(ok);
-
+	ok = make_program(&vertex, &fragment, &resources->program);
+	assert(ok && "vertex-color program");
     check_gl();
-
-	assert(ok);
 
     GLuint programs[] =
         { resources->terrain_program.handle
         , resources->program.handle
-        , resources->smooth_program.handle
         };
 
     // uniforms shared between all shaders
@@ -176,48 +151,6 @@ recalc_normals(GLint nm_uniform, mat4 *model_view, mat4 *normal) {
 }
 
 
-static float tmp_matrix[MAT4_ELEMS] = { 0 };
-
-
-static void
-render_cube (struct resources * resources) {
-  bind_vbo(&resources->vertex_buffer,
-           resources->attributes.position);
-
-  bind_vbo(&resources->normal_buffer,
-           resources->attributes.normal);
-
-  bind_ibo(&resources->element_buffer);
-
-  glDrawElements(
-    GL_TRIANGLES,
-    ARRAY_SIZE(cube_indices), /* count */
-    GL_UNSIGNED_SHORT,  /* type */
-    (void*)0            /* element array buffer offset */
-  );
-
-  //glDisableVertexAttribArray(resources->attributes.position);
-}
-
-
-static void render_geom (struct resources *res,
-                         struct geometry *geom,
-                         GLenum type) {
-  struct attributes *attrs = &res->attributes;
-
-  bind_vbo(&geom->buffer.vertex_buffer, attrs->position);
-  bind_vbo(&geom->buffer.normal_buffer, attrs->normal);
-  if (geom->buffer.color_buffer.handle)
-    bind_vbo(&geom->buffer.color_buffer, attrs->color);
-  bind_ibo(&geom->buffer.index_buffer);
-
-  glDrawElements(type,
-                 geom->num_indices, /* count */
-                 GL_UNSIGNED_INT,    /* type */
-                 (void*)0            /* element array buffer offset */
-                 );
-}
-
 
 void render (struct game *game) {
     float adjust = game->test_resources.light_intensity[0];
@@ -248,7 +181,11 @@ void render (struct game *game) {
 
     for (size_t i = 0; i < ARRAY_SIZE(entities); ++i) {
         struct entity *entity = entities[i];
-        glUseProgram(entity->model.program);
+        // TODO this is a bit wonky, refactor this
+        if (i == 0)
+            glUseProgram(game->test_resources.terrain_program.handle);
+        else if (i == 1)
+            glUseProgram(game->test_resources.program.handle);
         check_gl();
 
         mat4_inverse(camera->mat, view);
