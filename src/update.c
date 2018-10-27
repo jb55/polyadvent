@@ -61,7 +61,6 @@ static void movement(struct game *game, struct node *node, float speed_mult) {
   }
 }
 
-void update_terrain(struct game *game) {
 static void remap_samples(struct point *points, int n_samples,
                                     double size)
 {
@@ -83,6 +82,7 @@ static void remap_samples(struct point *points, int n_samples,
     }
 }
 
+void update_terrain(struct game *game) {
   static int first = 1;
   static float last_scale = -1.0;
 
@@ -134,8 +134,14 @@ static void remap_samples(struct point *points, int n_samples,
     /* struct point *samples = */
     /*   uniform_samples(n_samples, game->terrain.size); */
 
+    static const double pdist = 42.0;
+
     struct point *samples =
-      poisson_disk_samples(42.0, game->terrain.size, 30, &n_samples);
+      poisson_disk_samples(pdist, game->terrain.size, 30, &n_samples);
+
+    /* remap_samples(samples, n_samples, game->terrain.size); */
+
+    /* draw_samples(samples, pdist, n_samples, game->terrain.size); */
 
     terrain->samples = samples;
     terrain->n_samples = n_samples;
