@@ -88,7 +88,7 @@ void glFramebufferRenderbuffer(	GLenum target,
                                 GLuint renderbuffer);
 
 
- 
-
+void glDeleteRenderbuffers(	GLsizei n,
+                            GLuint *renderbuffers);
 
 #endif /* POLYADVENT_GL_H */

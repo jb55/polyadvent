@@ -13,6 +13,7 @@ struct fbo {
     int width, height;
 };
 
+void init_fbo(struct fbo *fbo);
 void bind_fbo(struct fbo *fbo);
 void create_fbo(struct fbo *fbo, int width, int height);
 int fbo_attach_texture(struct fbo *, GLenum attachment);

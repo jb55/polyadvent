@@ -10,6 +10,7 @@
 #include "entity.h"
 #include "terrain.h"
 #include "ui.h"
+#include "fbo.h"
 
 #define PLAYER_HEIGHT 1.73
 
@@ -19,6 +20,7 @@
  */
 struct resources {
 	struct vbo vertex_buffer, element_buffer, normal_buffer;
+    struct fbo shadow_buffer;
 
 	struct gpu_program program;
 	struct gpu_program smooth_program;
@@ -43,13 +45,15 @@ struct resources {
 	struct node root;
 	struct entity player;
 	struct node camera;
+	struct node alt_camera;
 
 	bool fog_on, diffuse_on;
 
 	float test_mvp[MAT4_ELEMS];
 	float light_dir[3];
 	float light_intensity[3];
-	float camera_persp[MAT4_ELEMS];
+	float proj_persp[MAT4_ELEMS];
+	float proj_ortho[MAT4_ELEMS];
 };
 
 struct game {

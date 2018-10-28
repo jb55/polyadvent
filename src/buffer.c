@@ -43,14 +43,22 @@ void bind_ibo(struct vbo *vbo) {
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbo->handle);
 }
 
-void bind_vbo(struct vbo *vbo, gpu_addr slot) {
+static void bind_vbo_internal(struct vbo *vbo, gpu_addr slot, int size) {
   glEnableVertexAttribArray(slot);
   glBindBuffer(vbo->type, vbo->handle);
   glVertexAttribPointer(slot,              // attribute
-                        3,                 // size
+                        size,                 // size
                         GL_FLOAT,          // type
                         GL_FALSE,          // normalized?
                         0,   // stride
                         (void*)0           // array buffer offset
                         );
+}
+
+void bind_uv_vbo(struct vbo *vbo, gpu_addr slot) {
+    bind_vbo_internal(vbo, slot, 2);
+}
+
+void bind_vbo(struct vbo *vbo, gpu_addr slot) {
+    bind_vbo_internal(vbo, slot, 3);
 }

@@ -200,6 +200,22 @@ static int try_reload_shaders(struct resources *res) {
 }
 #endif
 
+void resize_fbos(struct game *game, int width, int height) {
+    struct resources *res = &game->test_resources;
+
+    if (res->shadow_buffer.handle) {
+        // TODO: remove once delete_fbo deletes attachments
+        glDeleteTextures(1, &res->shadow_buffer.attachments[1]);
+        glDeleteRenderbuffers(1, &res->shadow_buffer.attachments[0]);
+        delete_fbo(&res->shadow_buffer);
+    }
+
+    create_fbo(&res->shadow_buffer, width, height);
+    fbo_attach_renderbuffer(&res->shadow_buffer, GL_DEPTH24_STENCIL8,
+                            GL_DEPTH_STENCIL_ATTACHMENT);
+    fbo_attach_texture(&res->shadow_buffer, GL_COLOR_ATTACHMENT0);
+}
+
 // TODO: match based on some real concept of time
 static void day_night_cycle(float n, struct resources *res) {
     float darkest = 0.25;

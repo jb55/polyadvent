@@ -8,6 +8,8 @@ int load_model(struct model *model, const char *name) {
 
     int ok = 0;
 
+    init_geometry(&model->geom);
+
     // Load mesh
     snprintf(path, 128, "data/models/%s.ply", name);
     ok = parse_ply(path, &model->geom);

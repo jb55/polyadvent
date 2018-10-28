@@ -10,6 +10,7 @@ struct buffer_geometry {
     struct vbo index;
     struct vbo normal;
     struct vbo color;
+    struct vbo tex_coord;
 };
 
 struct geometry {
@@ -20,6 +21,7 @@ struct geometry {
     float *normals;
     u32 *indices;
     float *colors;
+    float *tex_coords;
 };
 
 void render_geometry(struct geometry *geom, struct attributes *);

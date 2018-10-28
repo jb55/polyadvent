@@ -5,8 +5,14 @@
 
 struct game;
 
+struct render_config {
+    int draw_ui;
+    float *camera;
+    float *projection;
+};
+
 void init_gl(struct resources *resources, int width, int height);
-void render (struct game *game);
+void render (struct game *game, struct render_config *config);
 
 void wireframe_mode_on();
 void wireframe_mode_off();

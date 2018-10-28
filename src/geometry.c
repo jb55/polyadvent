@@ -9,7 +9,8 @@ destroy_buffer_geometry(struct geometry *geom) {
         geom->vbos.vertex.handle,
         geom->vbos.normal.handle,
         geom->vbos.color.handle,
-        geom->vbos.index.handle
+        geom->vbos.index.handle,
+        geom->vbos.tex_coord.handle
     };
     /* void glDeleteVertexArrays(GLsizei n, const GLuint *arrays); */
     /* glDisableVertexAttribArray(geom->buffer.vertex_buffer.handle); */
@@ -35,6 +36,10 @@ void render_geometry(struct geometry *geom, struct attributes *attrs)
         bind_vbo(&geom->vbos.color, attrs->color);
         check_gl();
     }
+    if (geom->vbos.tex_coord.handle) {
+        bind_uv_vbo(&geom->vbos.tex_coord, attrs->tex_coord);
+        check_gl();
+    }
     bind_ibo(&geom->vbos.index);
     check_gl();
 
@@ -51,7 +56,9 @@ void init_geometry(struct geometry *geom) {
     geom->colors = NULL;
     geom->vbos.color.handle = 0;
     geom->normals = NULL;
+    geom->tex_coords = NULL;
     geom->vbos.normal.handle = 0;
+    geom->vbos.tex_coord.handle = 0;
 }
 
 void
@@ -89,6 +96,20 @@ make_buffer_geometry(struct geometry *geom) {
                         geom->num_verts * 3 * (int)sizeof(*geom->colors),
                         &geom->vbos.color
                         );
+
+    if (geom->tex_coords != NULL) {
+        printf("%f %f %f %f\n",
+               geom->tex_coords[0],
+               geom->tex_coords[1],
+               geom->tex_coords[2],
+               geom->tex_coords[3]
+               );
+
+        make_vertex_buffer(GL_ARRAY_BUFFER,
+                           geom->tex_coords,
+                           geom->num_verts * 2 * (int)sizeof(*geom->tex_coords),
+                           &geom->vbos.tex_coord);
+    }
 
     /* printf("making index buffer\n"); */
     // cube indices

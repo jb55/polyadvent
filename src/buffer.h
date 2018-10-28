@@ -10,6 +10,7 @@ struct attributes {
     gpu_addr position;
     gpu_addr normal;
     gpu_addr color;
+    gpu_addr tex_coord;
 };
 
 struct vbo {
@@ -31,6 +32,7 @@ struct vbo *
 make_index_buffer(GLenum target, const void *buffer_data,
                   GLsizei buffer_size, struct vbo *vbo);
 
+void bind_uv_vbo(struct vbo *vbo, gpu_addr slot);
 void bind_vbo(struct vbo *vbo, gpu_addr slot);
 void bind_ibo(struct vbo *vbo);
 

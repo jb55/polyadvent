@@ -17,6 +17,7 @@
 #include "poisson.h"
 #include "uniform.h"
 #include "ply.h"
+#include "fbo.h"
 
 
 int main(void)
@@ -43,13 +44,34 @@ int main(void)
     check_gl();
     u32 last = SDL_GetTicks();
 
+    struct render_config fbo_render_config = {
+      .draw_ui = 0,
+      .camera = game.test_resources.camera.mat,
+      .projection = game.test_resources.proj_persp
+    };
+
+    struct render_config default_config = {
+      .draw_ui = 1,
+      .camera = game.test_resources.camera.mat,
+      .projection = game.test_resources.proj_persp
+    };
+
     while (1) {
-        process_events(&game.ui, game.test_resources.camera_persp, &game.input);
+        process_events(&game, game.test_resources.proj_persp);
         u32 ticks = SDL_GetTicks();
         update(&game, ticks-last);
 
         last = ticks;
-        render(&game);
+
+        GLuint texture = game.test_resources.shadow_buffer.attachments[0];
+        struct fbo *fbo = &game.test_resources.shadow_buffer;
+        bind_fbo(fbo);
+
+        /* glViewport( 0, 0, width, height ); */
+
+        render(&game, &fbo_render_config);
+        unbind_fbo(&game.test_resources.shadow_buffer);
+        render(&game, &default_config);
 
         /* Swap front and back buffers */
         SDL_GL_SwapWindow(window);

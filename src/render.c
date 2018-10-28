@@ -78,7 +78,7 @@ init_gl(struct resources *resources, int width, int height) {
 			 (float)width / height,
 			 1,
 			 5000,
-			 resources->camera_persp);
+			 resources->proj_persp);
 
 	// Shader program
 	ok = make_program(&terrain_vertex, &fragment, &resources->terrain_program);
@@ -152,7 +152,7 @@ recalc_normals(GLint nm_uniform, mat4 *model_view, mat4 *normal) {
 
 
 
-void render (struct game *game) {
+void render (struct game *game, struct render_config *config) {
     float adjust = game->test_resources.light_intensity[0];
 	glEnable(GL_DEPTH_TEST);
     glClearColor( 0.5294f * adjust, 0.8078f * adjust, 0.9216f * adjust, 1.0f ); //clear background screen to black
@@ -169,11 +169,11 @@ void render (struct game *game) {
     struct resources *res = &game->test_resources;
 
     mat4 *mvp = res->test_mvp;
-    mat4 *persp = res->camera_persp;
+    mat4 *projection = config->projection;
     mat4 *light = res->light_dir;
     mat4 *light_intensity = res->light_intensity;
 
-    struct node *camera = &res->camera;
+    float *camera = config->camera;
 
     struct entity *entities[] =
         { &game->terrain.entity
@@ -189,13 +189,13 @@ void render (struct game *game) {
             glUseProgram(game->test_resources.program.handle);
         check_gl();
 
-        mat4_inverse(camera->mat, view);
-        mat4_multiply(persp, view, view_proj);
+        mat4_inverse(camera, view);
+        mat4_multiply(projection, view, view_proj);
 
         glUniform3f(res->uniforms.camera_position,
-                    camera->mat[M_X],
-                    camera->mat[M_Y],
-                    camera->mat[M_Z]);
+                    camera[M_X],
+                    camera[M_Y],
+                    camera[M_Z]);
 
         glUniform1i(res->uniforms.fog_on, res->fog_on);
         glUniform1i(res->uniforms.diffuse_on, res->diffuse_on);
@@ -217,7 +217,8 @@ void render (struct game *game) {
         check_gl();
     }
 
-    render_ui(&game->ui, view);
+    if (config->draw_ui)
+        render_ui(&game->ui, view);
 
     //player
     // y tho

@@ -4,8 +4,8 @@
 
 #include "gl.h"
 #include "input.h"
-#include "ui.h"
+#include "game.h"
 
-void process_events(struct ui *ui, float *camera, struct input *input);
+void process_events(struct game *game, float *camera);
 
 #endif /* PA_EVENT_H */

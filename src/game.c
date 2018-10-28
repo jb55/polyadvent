@@ -6,6 +6,7 @@
 #include "terrain.h"
 #include "render.h"
 #include "util.h"
+#include "update.h"
 #include <assert.h>
 
 mat4 *cam_init = (float[16]){
@@ -31,6 +32,7 @@ void game_init(struct game *game, int width, int height) {
     mat4 *mvp = res->test_mvp;
     struct node *root = &res->root;
     struct node *camera = &res->camera;
+    struct node *alt_camera = &res->alt_camera;
     struct entity *player = &res->player;
     struct terrain *terrain = &game->terrain;
     mat4 *light_dir = res->light_dir;
@@ -51,6 +53,16 @@ void game_init(struct game *game, int width, int height) {
         .scale = 1.0
     };
 
+    // default ortho screenspace projection
+    mat4_ortho(0.0, // left
+               width, // right
+               0.0, // bottom
+               height, // top
+               0.0, // near
+               100000.0,  // far
+               res->proj_ortho
+               );
+
     create_ui(&game->ui, width, height);
     check_gl();
 
@@ -68,12 +80,21 @@ void game_init(struct game *game, int width, int height) {
     light_dir[1] = 0.8;
     light_dir[2] = 0.8;
 
+    // BRB: shadow mapping next!
+
+    // FBO STUFF
+    init_fbo(&res->shadow_buffer);
+    resize_fbos(game, width, height);
+
+    // FBO STUFF END
+
     game->test_resources.fog_on = 1;
     game->test_resources.diffuse_on = 0;
 
     node_init(root);
     node_init(&player->node);
     node_init(camera);
+    node_init(alt_camera);
     node_init(&terrain->entity.node);
 
     // player init
@@ -88,17 +109,16 @@ void game_init(struct game *game, int width, int height) {
 
     node_attach(&player->node, root);
     node_attach(camera, &player->node);
+    node_attach(alt_camera, camera);
 
     quat_axis_angle(V3(1,0,0), -45, camera->orientation);
-
-    /* camera->custom_update = camera_update; */
-    /* camera->custom_update_data = (void*)game->test_resources.camera_persp; */
-
-    /* vec3_all(camera->scale, -1); */
-    /* camera->mirrored = 1; */
+    /* quat_axis_angle(V3(1,0,0), -45, alt_camera->orientation); */
 
     node_translate(&player->node, V3(terrain->size/2.,terrain->size/2.,0.0));
     /* vec3_scale(player->node.scale, 10.0, player->node.scale); */
+
+    node_rotate(alt_camera, V3(0, 0, 0));
+    /* node_translate(alt_camera, V3(0,60,-100)); */
 
     node_rotate(camera, V3(100, 0, 0));
     node_translate(camera, V3(0,-40,20));

@@ -8,6 +8,7 @@ void create_fbo(struct fbo *fbo, int width, int height) {
     glBindFramebuffer(GL_FRAMEBUFFER, fbo->handle);
     check_gl();
 
+    fbo->n_attachments = 0;
     fbo->width = width;
     fbo->height = height;
 }
@@ -33,6 +34,13 @@ int fbo_attach_renderbuffer(struct fbo *fbo,
     check_gl();
 
     return *rbo;
+}
+
+void init_fbo(struct fbo *fbo) {
+    fbo->n_attachments = 0;
+    fbo->handle = 0;
+    fbo->width = 0;
+    fbo->height = 0;
 }
 
 int fbo_attach_texture(struct fbo *fbo, GLenum attachment) {
@@ -71,6 +79,8 @@ void fbo_check(struct fbo *fbo) {
 }
 
 void delete_fbo(struct fbo *fbo) {
+    // TODO: delete attachments
+
     glDeleteFramebuffers(1, &fbo->handle);
     check_gl();
 }

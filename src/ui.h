@@ -10,9 +10,14 @@ struct ui {
     struct gpu_program shader;
     struct geometry quad;
     struct attributes attrs;
-    GLint mvp_uniform;
-    GLint uipos_uniform;
-    GLint uisize_uniform;
+
+    struct ui_uniforms {
+        GLint mvp;
+        GLint uipos;
+        GLint uisize;
+        GLint texture;
+    } uniforms;
+
     float ortho[MAT4_ELEMS];
 };
 
