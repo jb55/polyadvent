@@ -91,4 +91,10 @@ void glFramebufferRenderbuffer(	GLenum target,
 void glDeleteRenderbuffers(	GLsizei n,
                             GLuint *renderbuffers);
 
+
+void glFramebufferTexture(	GLenum target,
+                            GLenum attachment,
+                            GLuint texture,
+                            GLint level);
+
 #endif /* POLYADVENT_GL_H */

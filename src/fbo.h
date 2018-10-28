@@ -16,9 +16,19 @@ struct fbo {
 void init_fbo(struct fbo *fbo);
 void bind_fbo(struct fbo *fbo);
 void create_fbo(struct fbo *fbo, int width, int height);
-int fbo_attach_texture(struct fbo *, GLenum attachment);
-void fbo_check(struct fbo *fbo);
-int fbo_attach_renderbuffer(struct fbo *fbo, GLenum internalformat, GLenum attachment);
+
+int fbo_attach_color_texture(struct fbo *fbo);
+int fbo_attach_depth_texture(struct fbo *fbo);
+
+int fbo_attach_texture(struct fbo *fbo, GLint internalformat, GLint format,
+                       GLenum attachment, GLenum type);
+
+int fbo_attach_renderbuffer(struct fbo *fbo, GLenum internalformat,
+                            GLenum attachment);
+
+
+
+void check_fbo(struct fbo *fbo);
 void delete_fbo(struct fbo *);
 void unbind_fbo(struct fbo *fbo);
 

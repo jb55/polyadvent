@@ -43,7 +43,8 @@ void init_fbo(struct fbo *fbo) {
     fbo->height = 0;
 }
 
-int fbo_attach_texture(struct fbo *fbo, GLenum attachment) {
+int fbo_attach_texture(struct fbo *fbo, GLint internalformat, GLint format,
+                       GLenum attachment, GLenum type) {
     assert(fbo->n_attachments < MAX_FBO_ATTACHMENTS);
     GLuint *texture = &fbo->attachments[fbo->n_attachments++];
 
@@ -53,8 +54,8 @@ int fbo_attach_texture(struct fbo *fbo, GLenum attachment) {
     check_gl();
     glBindTexture(GL_TEXTURE_2D, *texture);
     check_gl();
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, fbo->width, fbo->height, 0, GL_RGB,
-                  GL_UNSIGNED_BYTE, NULL);
+    glTexImage2D(GL_TEXTURE_2D, 0, internalformat, fbo->width, fbo->height, 0,
+                 format, type, NULL);
     check_gl();
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     check_gl();
@@ -63,6 +64,7 @@ int fbo_attach_texture(struct fbo *fbo, GLenum attachment) {
 
     glFramebufferTexture2D(GL_FRAMEBUFFER, attachment, GL_TEXTURE_2D, *texture,
                            0);
+
     check_gl();
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     check_gl();
@@ -70,7 +72,7 @@ int fbo_attach_texture(struct fbo *fbo, GLenum attachment) {
     return *texture;
 }
 
-void fbo_check(struct fbo *fbo) {
+void check_fbo(struct fbo *fbo) {
     glBindFramebuffer(GL_FRAMEBUFFER, fbo->handle);
     check_gl();
     assert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
@@ -94,4 +96,14 @@ void bind_fbo(struct fbo *fbo) {
 void unbind_fbo(struct fbo *fbo) {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     check_gl();
+}
+
+int fbo_attach_depth_texture(struct fbo *fbo) {
+    return fbo_attach_texture(fbo, GL_DEPTH_COMPONENT16, GL_DEPTH_COMPONENT,
+                              GL_DEPTH_ATTACHMENT, GL_FLOAT);
+}
+
+int fbo_attach_color_texture(struct fbo *fbo) {
+    return fbo_attach_texture(fbo, GL_RGB, GL_RGB, GL_COLOR_ATTACHMENT0,
+                              GL_UNSIGNED_BYTE);
 }

@@ -211,9 +211,17 @@ void resize_fbos(struct game *game, int width, int height) {
     }
 
     create_fbo(&res->shadow_buffer, width, height);
-    fbo_attach_renderbuffer(&res->shadow_buffer, GL_DEPTH24_STENCIL8,
-                            GL_DEPTH_STENCIL_ATTACHMENT);
-    fbo_attach_texture(&res->shadow_buffer, GL_COLOR_ATTACHMENT0);
+    /* fbo_attach_renderbuffer(&res->shadow_buffer, GL_DEPTH24_STENCIL8, */
+    /*                         GL_DEPTH_STENCIL_ATTACHMENT); */
+
+    /* fbo_attach_color_texture(&res->shadow_buffer); */
+    fbo_attach_depth_texture(&res->shadow_buffer);
+
+    check_fbo(&res->shadow_buffer);
+
+    /* fbo_attach_texture(&res->shadow_buffer, GL_DEPTH_COMPONENT16, */
+    /*                    GL_DEPTH_COMPONENT, GL_DEPTH_ATTACHMENT); */
+
 }
 
 // TODO: match based on some real concept of time

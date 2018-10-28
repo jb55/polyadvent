@@ -46,8 +46,8 @@ int main(void)
 
     struct render_config fbo_render_config = {
       .draw_ui = 0,
-      .camera = game.test_resources.camera.mat,
-      .projection = game.test_resources.proj_persp
+      .camera = game.test_resources.sun_camera.mat,
+      .projection = game.test_resources.proj_ortho
     };
 
     struct render_config default_config = {
@@ -65,10 +65,13 @@ int main(void)
 
         GLuint texture = game.test_resources.shadow_buffer.attachments[0];
         struct fbo *fbo = &game.test_resources.shadow_buffer;
+        check_fbo(fbo);
         bind_fbo(fbo);
 
         /* glViewport( 0, 0, width, height ); */
 
+        /* glDrawBuffer(GL_NONE);  */
+        check_gl();
         render(&game, &fbo_render_config);
         unbind_fbo(&game.test_resources.shadow_buffer);
         render(&game, &default_config);

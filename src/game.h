@@ -45,7 +45,7 @@ struct resources {
 	struct node root;
 	struct entity player;
 	struct node camera;
-	struct node alt_camera;
+	struct node sun_camera;
 
 	bool fog_on, diffuse_on;
 

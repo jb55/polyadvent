@@ -32,7 +32,7 @@ void game_init(struct game *game, int width, int height) {
     mat4 *mvp = res->test_mvp;
     struct node *root = &res->root;
     struct node *camera = &res->camera;
-    struct node *alt_camera = &res->alt_camera;
+    struct node *sun_camera = &res->sun_camera;
     struct entity *player = &res->player;
     struct terrain *terrain = &game->terrain;
     mat4 *light_dir = res->light_dir;
@@ -58,8 +58,8 @@ void game_init(struct game *game, int width, int height) {
                width, // right
                0.0, // bottom
                height, // top
-               0.0, // near
-               100000.0,  // far
+               -10000.0, // near
+               10000.0,  // far
                res->proj_ortho
                );
 
@@ -94,7 +94,7 @@ void game_init(struct game *game, int width, int height) {
     node_init(root);
     node_init(&player->node);
     node_init(camera);
-    node_init(alt_camera);
+    node_init(sun_camera);
     node_init(&terrain->entity.node);
 
     // player init
@@ -109,16 +109,19 @@ void game_init(struct game *game, int width, int height) {
 
     node_attach(&player->node, root);
     node_attach(camera, &player->node);
-    node_attach(alt_camera, camera);
+    node_attach(sun_camera, &player->node);
 
     quat_axis_angle(V3(1,0,0), -45, camera->orientation);
+    quat_axis_angle(V3(1,0,0), 5, sun_camera->orientation);
+    /* quat_axis_angle(V3(1,0,0), 0, sun_camera->orientation); */
     /* quat_axis_angle(V3(1,0,0), -45, alt_camera->orientation); */
 
     node_translate(&player->node, V3(terrain->size/2.,terrain->size/2.,0.0));
     /* vec3_scale(player->node.scale, 10.0, player->node.scale); */
 
-    node_rotate(alt_camera, V3(0, 0, 0));
     /* node_translate(alt_camera, V3(0,60,-100)); */
+
+    node_translate(sun_camera, V3(width/2.0, height/2.0, 50));
 
     node_rotate(camera, V3(100, 0, 0));
     node_translate(camera, V3(0,-40,20));
