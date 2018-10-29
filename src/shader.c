@@ -7,25 +7,74 @@
 #include "gl.h"
 #include "debug.h"
 #include "shader.h"
+#include "common.h"
 
+#define MAX_LINES 4096
 
+static int file_buf_count = 0;
+static char *file_buffers[12];
+static char *line_buff[MAX_LINES];
+static u32 line_lens[MAX_LINES];
+
+static char *strsep(char **stringp, const char *delim) {
+    if (*stringp == NULL) { return NULL; }
+    char *token_start = *stringp;
+    *stringp = strpbrk(token_start, delim);
+    if (*stringp)
+        (*stringp)++;
+    return token_start;
+}
+
+static char **resolve_imports(char *contents, int *nlines) {
+    char *line;
+    size_t file_len;
+    char *resolved_contents;
+    static char fname_buf[32];
+
+    while ((line = strsep(&contents, "\n"))) {
+        int line_len = contents - line;
+        int size = sizeof("#include");
+        if (memcmp(line, "#include ", size) == 0) {
+            char *filename = line + size;
+            snprintf(fname_buf, 32, SHADER("%.*s"), line_len-size-1, filename);
+            /* printf("got include %s\n", fname_buf); */
+            resolved_contents = file_contents(fname_buf, &file_len);
+            file_buffers[file_buf_count++] = resolved_contents;
+            resolve_imports(resolved_contents, nlines);
+        }
+        else {
+            line_buff[*nlines] = line;
+            line_lens[*nlines] = line_len;
+            (*nlines)++;
+        }
+    }
+
+    return line_buff;
+}
 
 int make_shader(GLenum type, const char *filename, struct shader *shader) {
   size_t length;
+  int nlines = 0;
   GLchar *source = (GLchar *)file_contents(filename, &length);
-  GLint shader_ok;
-
   if (!source)
-    return 0;
+      return 0;
 
-  source[length] = '\0';
+  char **lines = resolve_imports(source, &nlines);
+
+  GLint shader_ok;
 
   shader->filename = filename;
   shader->type = type;
   shader->handle = glCreateShader(type);
 
-  glShaderSource(shader->handle, 1, (const GLchar**)&source, (GLint*)&length);
+  glShaderSource(shader->handle, nlines, (const char**)lines,
+                 (const int*)line_lens);
+
   free(source);
+  for (int i = 0; i < file_buf_count; ++i)
+      free(file_buffers[i]);
+  file_buf_count = 0;
+
   glCompileShader(shader->handle);
 
   glGetShaderiv(shader->handle, GL_COMPILE_STATUS, &shader_ok);

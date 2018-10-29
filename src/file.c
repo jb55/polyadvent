@@ -15,7 +15,7 @@ time_t file_mtime(const char *filename) {
 
 void *file_contents(const char *filename, size_t *length) {
   FILE *f = fopen(filename, "r");
-  void *buffer;
+  char *buffer;
 
   if (!f) {
       fprintf(stderr, "Unable to open %s for reading\n", filename);
@@ -29,6 +29,8 @@ void *file_contents(const char *filename, size_t *length) {
   buffer = malloc(*length+1);
   *length = fread(buffer, 1, *length, f);
   fclose(f);
+
+  buffer[*length] = 0;
 
   return buffer;
 }
