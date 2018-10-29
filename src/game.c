@@ -105,7 +105,7 @@ void game_init(struct game *game, int width, int height) {
     terrain->entity.casts_shadows = 0;
 
     // player init
-    ok = load_model(&player->model, "ship");
+    ok = load_model(&player->model, "tower");
     assert(ok);
     player->model.shading = SHADING_VERT_COLOR;
     player->node.label = "player";

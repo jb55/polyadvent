@@ -226,7 +226,7 @@ void resize_fbos(struct game *game, int width, int height) {
 
 // TODO: match based on some real concept of time
 static void day_night_cycle(float n, struct resources *res) {
-    float darkest = 0.2;
+    float darkest = 0.3;
     float val = n*200.0;
     float roots = vec3_dot(res->light_dir, V3(0.0, 0.0, 1.0));
     float intensity = clamp(roots, darkest, 1.0);
