@@ -32,6 +32,7 @@ struct resources {
 		GLint light_dir;
 		GLint light_intensity;
 		GLint mvp;
+		GLint depth_mvp;
 		GLint normal_matrix;
 		GLint view;
 		GLint fog_on;

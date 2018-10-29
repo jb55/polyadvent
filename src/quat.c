@@ -26,6 +26,11 @@ void quat_multiply(quat *a, quat *b, quat *dest) {
   dest[3] = aw * bw - ax * bx - ay * by - az * bz;
 }
 
+/* void quat_from_vec3(float *vec3, quat *dest) { */
+/*     float angle = atan2(vec3[0], vec3[2]); */
+/*     dest[0] = 0; */
+/*     dest[1] = 1 * sin(angle/2); */
+/* } */
 
 void quat_axis_angle(float *axis, float angle, quat *dest) {
   float half_angle = angle / 2.0;

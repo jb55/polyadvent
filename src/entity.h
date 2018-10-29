@@ -8,7 +8,10 @@
 struct entity {
     struct node node;
     struct model model;
+    int casts_shadows;
 };
+
+void init_entity(struct entity *);
 
 
 #endif /* ENTITY_H */

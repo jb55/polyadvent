@@ -43,17 +43,21 @@ int main(void)
 
     check_gl();
     u32 last = SDL_GetTicks();
+    static float depth_mvp[MAT4_ELEMS];
+    mat4_id(depth_mvp);
 
     struct render_config fbo_render_config = {
       .draw_ui = 0,
       .camera = game.test_resources.sun_camera.mat,
-      .projection = game.test_resources.proj_ortho
+      .projection = game.test_resources.proj_ortho,
+      .depth_mvp = depth_mvp
     };
 
     struct render_config default_config = {
       .draw_ui = 1,
       .camera = game.test_resources.camera.mat,
-      .projection = game.test_resources.proj_persp
+      .projection = game.test_resources.proj_persp,
+      .depth_mvp = depth_mvp
     };
 
     while (1) {
@@ -67,11 +71,7 @@ int main(void)
         struct fbo *fbo = &game.test_resources.shadow_buffer;
         check_fbo(fbo);
         bind_fbo(fbo);
-
-        /* glViewport( 0, 0, width, height ); */
-
-        /* glDrawBuffer(GL_NONE);  */
-        check_gl();
+        /* glDrawBuffer(GL_NONE); */
         render(&game, &fbo_render_config);
         unbind_fbo(&game.test_resources.shadow_buffer);
         render(&game, &default_config);

@@ -19,6 +19,7 @@ struct node {
   struct node* children[MAX_NODE_CHILDREN];
 };
 
+float *node_pos(struct node *node);
 int node_recalc(struct node *root);
 void node_attach(struct node *node, struct node *to);
 void node_mark_for_recalc(struct node *node);

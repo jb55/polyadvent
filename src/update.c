@@ -228,23 +228,28 @@ void resize_fbos(struct game *game, int width, int height) {
 static void day_night_cycle(float n, struct resources *res) {
     float darkest = 0.25;
     float val = n;
-    float roots = sin(val);
-    float circle = fmod(val, TAU);
-    float angle = circle/TAU;
-    float intensity = angle <= 0.5
-        ? clamp(roots, darkest, 1.0)
-        : clamp(-roots * 0.4, darkest, 0.5);
+    float roots = vec3_dot(res->light_dir, V3(0.0, 0.0, 1.0));
+    float intensity = 1.0;//clamp(roots, darkest, 1.0);
+    float light_pos[3];
 
-    /* printf("intensity %f(%f) angle %f hour %f n %f\n", roots, intensity, angle, */
-    /*        hour, n); */
+    /* float intensity = angle <= 0.5 */
+    /*     ? clamp(roots, darkest, 1.0) */
+    /*     : clamp(-roots * 0.4, darkest, 0.5); */
 
     res->light_intensity[0] = intensity;
     res->light_intensity[1] = intensity;
     res->light_intensity[2] = intensity;
 
-    res->light_dir[0] = -cos(val);
-    res->light_dir[1] = -sin(val);
-    res->light_dir[2] = 0.8;
+    res->light_dir[0] = 0.0;
+    res->light_dir[1] = sin(val);
+    res->light_dir[2] = cos(val);
+
+    /* printf("intensity %f(%f) n %f light_dir %f %f\n", roots, intensity, */
+    /*        n, res->light_dir[0], res->light_dir[1]); */
+
+    vec3_add(&res->player.node.mat[M_X], res->light_dir, light_pos);
+
+    look_at(light_pos, node_pos(&res->player.node), V3(0, 0, 1.0), res->sun_camera.mat);
 }
 
 void update (struct game *game, u32 dt) {
@@ -308,4 +313,12 @@ void update (struct game *game, u32 dt) {
 	n += 0.00001f;
 
 	node_recalc(root);
+
+    /* look_at(&res->sun_camera.mat[M_X], */
+    /*         &res->player.node.mat[M_X], */
+    /*         V3(0,0,-1.0), */
+    /*         res->sun_camera.mat */
+    /*         ); */
+
+
 }

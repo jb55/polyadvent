@@ -67,17 +67,21 @@ void look_at(vec3 *eye, vec3 *target, vec3 *up, mat4 *dest) {
   dest[0] = x[0];
   dest[1] = x[1];
   dest[2] = x[2];
-  /* dest[3] = -vec3_dot(x, eye); */
+  /* dest[3] = vec3_dot(x, eye); */
 
   dest[4] = y[0];
   dest[5] = y[1];
   dest[6] = y[2];
-  /* dest[7] = -vec3_dot(y, eye); */
+  /* dest[7] = vec3_dot(y, eye); */
 
   dest[8]  = z[0];
   dest[9]  = z[1];
   dest[10] = z[2];
-  /* dest[11] = -vec3_dot(z, eye); */
+  /* dest[11] = vec3_dot(z, eye); */
+
+  dest[12] = eye[0];
+  dest[13] = eye[1];
+  dest[14] = eye[2];
 }
 
 

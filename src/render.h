@@ -9,6 +9,7 @@ struct render_config {
     int draw_ui;
     float *camera;
     float *projection;
+    float *depth_mvp;
 };
 
 void init_gl(struct resources *resources, int width, int height);

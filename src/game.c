@@ -7,6 +7,7 @@
 #include "render.h"
 #include "util.h"
 #include "update.h"
+#include "entity.h"
 #include <assert.h>
 
 mat4 *cam_init = (float[16]){
@@ -35,6 +36,7 @@ void game_init(struct game *game, int width, int height) {
     struct node *sun_camera = &res->sun_camera;
     struct entity *player = &res->player;
     struct terrain *terrain = &game->terrain;
+
     mat4 *light_dir = res->light_dir;
     mat4 *light_intensity = res->light_intensity;
     int ok = 0;
@@ -53,11 +55,13 @@ void game_init(struct game *game, int width, int height) {
         .scale = 1.0
     };
 
+    int shadowmap_scale = 1.0;
+
     // default ortho screenspace projection
-    mat4_ortho(0.0, // left
-               width, // right
-               0.0, // bottom
-               height, // top
+    mat4_ortho(-width/2.0 * shadowmap_scale, // left
+               width/2.0 * shadowmap_scale, // right
+               -height/2.0 * shadowmap_scale, // bottom
+               height/2.0 * shadowmap_scale, // top
                -10000.0, // near
                10000.0,  // far
                res->proj_ortho
@@ -84,7 +88,7 @@ void game_init(struct game *game, int width, int height) {
 
     // FBO STUFF
     init_fbo(&res->shadow_buffer);
-    resize_fbos(game, width, height);
+    resize_fbos(game, width * shadowmap_scale, height * shadowmap_scale);
 
     // FBO STUFF END
 
@@ -92,13 +96,16 @@ void game_init(struct game *game, int width, int height) {
     game->test_resources.diffuse_on = 0;
 
     node_init(root);
-    node_init(&player->node);
     node_init(camera);
     node_init(sun_camera);
-    node_init(&terrain->entity.node);
+
+    init_entity(&terrain->entity);
+    init_entity(player);
+    player->casts_shadows = 1;
+    terrain->entity.casts_shadows = 0;
 
     // player init
-    ok = load_model(&player->model, "pirate-officer");
+    ok = load_model(&player->model, "ship");
     assert(ok);
     player->model.shading = SHADING_VERT_COLOR;
     player->node.label = "player";
@@ -109,19 +116,15 @@ void game_init(struct game *game, int width, int height) {
 
     node_attach(&player->node, root);
     node_attach(camera, &player->node);
-    node_attach(sun_camera, &player->node);
+    /* node_attach(sun_camera, root); */
 
     quat_axis_angle(V3(1,0,0), -45, camera->orientation);
-    quat_axis_angle(V3(1,0,0), 5, sun_camera->orientation);
-    /* quat_axis_angle(V3(1,0,0), 0, sun_camera->orientation); */
-    /* quat_axis_angle(V3(1,0,0), -45, alt_camera->orientation); */
+    /* quat_axis_angle(V3(1,0,0), -90, camera->orientation); */
+    /* node_rotate(sun_camera, V3(-7.5, 0, 0)); */
+    /* node_translate(sun_camera, V3(width/shadowmap_scale, 2000, 0)); */
 
     node_translate(&player->node, V3(terrain->size/2.,terrain->size/2.,0.0));
     /* vec3_scale(player->node.scale, 10.0, player->node.scale); */
-
-    /* node_translate(alt_camera, V3(0,60,-100)); */
-
-    node_translate(sun_camera, V3(width/2.0, height/2.0, 50));
 
     node_rotate(camera, V3(100, 0, 0));
     node_translate(camera, V3(0,-40,20));

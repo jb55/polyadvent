@@ -18,6 +18,7 @@
 
 #define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
 
+void look_at(vec3 *eye, vec3 *target, vec3 *up, mat4 *dest);
 int clampi(int a, int mina, int maxa);
 double clamp(double a, double mina, double maxa);
 double max(double a, double b);

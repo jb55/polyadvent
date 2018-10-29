@@ -102,6 +102,9 @@ init_gl(struct resources *resources, int width, int height) {
         resources->uniforms.camera_position =
             glGetUniformLocation(handle, "camera_position");
 
+        resources->uniforms.depth_mvp =
+            glGetUniformLocation(handle, "depth_mvp");
+
         resources->uniforms.light_intensity =
             glGetUniformLocation(handle, "light_intensity");
 
@@ -164,6 +167,7 @@ void render (struct game *game, struct render_config *config) {
     static float view_proj[MAT4_ELEMS] = { 0 };
     static float normal_matrix[MAT4_ELEMS] = { 0 };
     static float model_view[MAT4_ELEMS] = { 0 };
+    static float depth_bias[MAT4_ELEMS] = { 0 };
     mat4_id(id);
     mat4_id(model_view);
     struct resources *res = &game->test_resources;
@@ -180,8 +184,12 @@ void render (struct game *game, struct render_config *config) {
         , &game->test_resources.player
         };
 
+    int is_shadow = config->draw_ui == 0;
+
     for (size_t i = 0; i < ARRAY_SIZE(entities); ++i) {
         struct entity *entity = entities[i];
+        if (is_shadow && !entity->casts_shadows)
+            continue;
         // TODO this is a bit wonky, refactor this
         if (i == 0)
             glUseProgram(game->test_resources.terrain_program.handle);
@@ -191,6 +199,22 @@ void render (struct game *game, struct render_config *config) {
 
         mat4_inverse(camera, view);
         mat4_multiply(projection, view, view_proj);
+
+        // TODO: use something other than draw_ui to detect shadow map fbo phase 
+        if (is_shadow) {
+            static const float bias_matrix[] = {
+              0.5, 0.0, 0.0, 0.0,
+              0.0, 0.5, 0.0, 0.0,
+              0.0, 0.0, 0.5, 0.0,
+              0.5, 0.5, 0.5, 1.0
+            };
+
+            mat4_multiply(bias_matrix, view_proj, config->depth_mvp);
+            /* mat4_copy(view_proj, config->depth_mvp); */
+        }
+        else {
+            glUniformMatrix4fv(res->uniforms.depth_mvp, 1, 0, config->depth_mvp);
+        }
 
         glUniform3f(res->uniforms.camera_position,
                     camera[M_X],
@@ -207,6 +231,7 @@ void render (struct game *game, struct render_config *config) {
         mat4_copy(entity->node.mat, model_view);
 
         glUniformMatrix4fv(res->uniforms.mvp, 1, 0, mvp);
+        glUniformMatrix4fv(res->uniforms.depth_mvp, 1, 0, config->depth_mvp);
         glUniformMatrix4fv(res->uniforms.model_view, 1, 0, model_view);
         glUniformMatrix4fv(res->uniforms.world, 1, 0, entity->node.mat);
 

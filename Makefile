@@ -16,6 +16,7 @@ OBJS += $(SRC)/buffer.o
 OBJS += $(SRC)/camera.o
 OBJS += $(SRC)/debug.o
 OBJS += $(SRC)/delaunay.o
+OBJS += $(SRC)/entity.o
 OBJS += $(SRC)/event.o
 OBJS += $(SRC)/fbo.o
 OBJS += $(SRC)/file.o
@@ -34,11 +35,11 @@ OBJS += $(SRC)/quat.o
 OBJS += $(SRC)/render.o
 OBJS += $(SRC)/shader.o
 OBJS += $(SRC)/terrain.o
+OBJS += $(SRC)/ui.o
 OBJS += $(SRC)/uniform.o
 OBJS += $(SRC)/update.o
 OBJS += $(SRC)/util.o
 OBJS += $(SRC)/vec3.o
-OBJS += $(SRC)/ui.o
 
 SRCS=$(OBJS:.o=.c)
 

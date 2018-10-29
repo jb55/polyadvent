@@ -19,19 +19,12 @@ int fbo_attach_renderbuffer(struct fbo *fbo,
     GLuint *rbo = &fbo->attachments[fbo->n_attachments++];
 
     glBindFramebuffer(GL_FRAMEBUFFER, fbo->handle);
-    check_gl();
     glGenRenderbuffers(1, rbo);
-    check_gl();
     glBindRenderbuffer(GL_RENDERBUFFER, *rbo);
-    check_gl();
     glRenderbufferStorage(GL_RENDERBUFFER, internalformat, fbo->width, fbo->height);
-    check_gl();
     glBindRenderbuffer(GL_RENDERBUFFER, 0);
-    check_gl();
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, attachment, GL_RENDERBUFFER, *rbo);
-    check_gl();
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    check_gl();
 
     return *rbo;
 }
@@ -49,18 +42,16 @@ int fbo_attach_texture(struct fbo *fbo, GLint internalformat, GLint format,
     GLuint *texture = &fbo->attachments[fbo->n_attachments++];
 
     glBindFramebuffer(GL_FRAMEBUFFER, fbo->handle);
-    check_gl();
     glGenTextures(1, texture);
-    check_gl();
     glBindTexture(GL_TEXTURE_2D, *texture);
-    check_gl();
     glTexImage2D(GL_TEXTURE_2D, 0, internalformat, fbo->width, fbo->height, 0,
                  format, type, NULL);
-    check_gl();
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    check_gl();
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    check_gl();
+    if (attachment == GL_DEPTH_ATTACHMENT) {
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    }
 
     glFramebufferTexture2D(GL_FRAMEBUFFER, attachment, GL_TEXTURE_2D, *texture,
                            0);
