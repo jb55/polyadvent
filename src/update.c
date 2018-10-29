@@ -226,11 +226,13 @@ void resize_fbos(struct game *game, int width, int height) {
 
 // TODO: match based on some real concept of time
 static void day_night_cycle(float n, struct resources *res) {
-    float darkest = 0.25;
-    float val = n;
+    float darkest = 0.2;
+    float val = n*200.0;
     float roots = vec3_dot(res->light_dir, V3(0.0, 0.0, 1.0));
-    float intensity = 1.0;//clamp(roots, darkest, 1.0);
+    float intensity = clamp(roots, darkest, 1.0);
     float light_pos[3];
+    float tmp[3]
+;
 
     /* float intensity = angle <= 0.5 */
     /*     ? clamp(roots, darkest, 1.0) */
@@ -241,11 +243,13 @@ static void day_night_cycle(float n, struct resources *res) {
     res->light_intensity[2] = intensity;
 
     res->light_dir[0] = 0.0;
-    res->light_dir[1] = sin(val);
-    res->light_dir[2] = cos(val);
+    res->light_dir[1] = -sin(val);
+    res->light_dir[2] = -cos(val);
 
-    /* printf("intensity %f(%f) n %f light_dir %f %f\n", roots, intensity, */
-    /*        n, res->light_dir[0], res->light_dir[1]); */
+    vec3_normalize(res->light_dir, res->light_dir);
+
+    printf("intensity %f(%f) n %f light_dir %f %f\n", roots, intensity,
+           n, res->light_dir[1], res->light_dir[2]);
 
     vec3_add(&res->player.node.mat[M_X], res->light_dir, light_pos);
 

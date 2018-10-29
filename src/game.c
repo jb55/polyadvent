@@ -55,13 +55,13 @@ void game_init(struct game *game, int width, int height) {
         .scale = 1.0
     };
 
-    int shadowmap_scale = 1.0;
+    static const int shadowmap_scale = 1.0;
 
     // default ortho screenspace projection
-    mat4_ortho(-width/2.0 * shadowmap_scale, // left
-               width/2.0 * shadowmap_scale, // right
-               -height/2.0 * shadowmap_scale, // bottom
-               height/2.0 * shadowmap_scale, // top
+    mat4_ortho(-100.0, // left
+               100.0, // right
+               -100.0, // bottom
+               100.0, // top
                -10000.0, // near
                10000.0,  // far
                res->proj_ortho

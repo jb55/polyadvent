@@ -242,8 +242,8 @@ void render (struct game *game, struct render_config *config) {
         check_gl();
     }
 
-    if (config->draw_ui)
-        render_ui(&game->ui, view);
+    /* if (config->draw_ui) */
+    /*     render_ui(&game->ui, view); */
 
     //player
     // y tho

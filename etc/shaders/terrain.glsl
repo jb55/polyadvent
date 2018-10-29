@@ -25,22 +25,12 @@ vec3 standard_light(vec3 color) {
 	vec4 v4_normal = vec4(normal , 1);
 	vec4 trans_normal = normal_matrix * v4_normal;
 
-	float light = dot(trans_normal.xyz, normalize(light_dir)) ;
-    return color * light;
-}
-
-vec3 hemispherical(vec3 color) {
-	vec4 v4_normal = vec4(normal , 1);
-	vec4 trans_normal = normal_matrix * v4_normal;
-
     vec3 L = light_dir;
     vec3 N = normalize(trans_normal.xyz);
 
-    float costheta = dot(L,N);
+    float costheta = clamp(dot(L,N), 0.1, 1.0);
 
-    float a = 0.5 + (0.5 * costheta);
-    return a * light_intensity * color
-   + (1.0-a) * vec3(0.0, 0.0, 0.0) * color;
+    return color * costheta;
 }
 
 vec3 gamma_correct(vec3 color) {
@@ -71,10 +61,9 @@ void main()
 			    smoothstep(land[i].w, land[i+1].w, position.z));
 	}
 
-	// v_color = vec3(0.2 + position.z*0.05, position.z*0.0095, position.z*0.0001) * 0.5;
+	// vec3 color = vec3(position.z*0.05, position.z*0.0095, position.z*0.0001) * 0.5;
 	 // v_color = vec3(position.z, position.z, position.z) * 0.005;
 
-
-    v_color = hemispherical(color);
+    v_color = standard_light(color);
 	v_ray = camera_position - (world * v4_pos).xyz;
 }

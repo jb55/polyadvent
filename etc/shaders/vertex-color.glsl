@@ -25,26 +25,18 @@ out vec4 shadow_coord;
 // TODO: includes
 // #include "lighting.glsl"
 
+
+
 vec3 standard_light(vec3 color) {
-    vec4 v4_normal = vec4(normal, 1);
-    vec4 trans_normal = normal_matrix * v4_normal;
+	vec4 v4_normal = vec4(normal , 1);
+	vec4 trans_normal = normal_matrix * v4_normal;
 
-	float light = dot(trans_normal.xyz, normalize(light_dir));
-    return color * light;
-}
-
-vec3 hemispherical(vec3 color) {
-    vec4 v4_normal = vec4(normal, 1);
-    vec4 trans_normal = normal_matrix * v4_normal;
-
-    vec3 L = normalize(light_dir);
+    vec3 L = light_dir;
     vec3 N = normalize(trans_normal.xyz);
 
-    float costheta = dot(L,N);
+    float costheta = clamp(dot(L,N), 0.1, 1.0);
 
-    float a = 0.5 + (0.5 * costheta);
-    return a * light_intensity * color
-        + (1.0-a) * vec3(0.0, 0.0, 0.0) * color;
+    return color * costheta;
 }
 
 vec3 gamma_correct(vec3 color) {
@@ -58,7 +50,7 @@ void main()
     gl_Position = mvp * v4_pos;
     shadow_coord = depth_mvp * v4_pos;
 
-    v_color = hemispherical(color);
+    v_color = standard_light(color);
     // v_normal = trans_normal.xyz;
     v_ray = camera_position - (world * v4_pos).xyz;
 }
