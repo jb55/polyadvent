@@ -5,17 +5,11 @@ precision mediump float;
 in vec3 position;
 in vec3 normal;
 
-uniform mat4 world;
-uniform mat4 mvp;
-uniform mat4 depth_mvp;
-uniform mat4 model_view;
-uniform mat4 normal_matrix;
-uniform vec3 camera_position;
-uniform vec3 light_dir;
-uniform vec3 light_intensity;
+#include uniforms.glsl
 
 flat out float v_light;
 flat out vec3 v_color;
+
 out vec3 v_ray;
 out vec4 shadow_coord;
 
