@@ -60,9 +60,19 @@ static inline int parse_vertex(const char **cursor, float *v, float *n, u8 *c) {
             &st[0], &st[1],
             &c[0], &c[1], &c[2]);
 
+    if (matched == 11)
+        return 1;
 
+    matched =
+        sscanf(*cursor, "%f %f %f %f %f %f %hhu %hhu %hhu",
+               &v[0], &v[1], &v[2],
+               &n[0], &n[1], &n[2],
+               &c[0], &c[1], &c[2]);
 
-    return matched == 11;
+    if (matched == 9)
+        return 1;
+
+    return 0;
 }
 
 

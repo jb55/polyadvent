@@ -39,9 +39,11 @@ static void movement(struct game *game, struct node *node, float speed_mult) {
   if (game->input.keystates[SDL_SCANCODE_S])
     node_forward(node, V3(0,-amt,0));
 
-  // TODO: mark as update
-  /* if (game->input.keystates[SDL_SCANCODE_UP]) */
-  /*   node_rotate(node, V3(amt * 0.01,0,0)); */
+  if (game->input.keystates[SDL_SCANCODE_R])
+    node_translate(node, V3(0, 0,amt));
+
+  if (game->input.keystates[SDL_SCANCODE_F])
+    node_translate(node, V3(0, 0,-amt));
 
   if (game->input.keystates[SDL_SCANCODE_E])
     node_rotate(node, V3(0, 0, turn));
@@ -50,7 +52,7 @@ static void movement(struct game *game, struct node *node, float speed_mult) {
     node_rotate(node, V3(0, 0, -turn));
 
   /* if (game->input.keystates[SDL_SCANCODE_DOWN]) */
-  /*   node_rotate(node, V3(-amt * 0.01, 0, 0)); */
+  /*   node_translate(node, V3(0, 0, -amt)); */
 
   if (game->input.keystates[SDL_SCANCODE_P]) {
     printf("%f %f %f\n",
@@ -134,7 +136,7 @@ void update_terrain(struct game *game) {
     /* struct point *samples = */
     /*   uniform_samples(n_samples, game->terrain.size); */
 
-    static const double pdist = 32.0;
+    static const double pdist = 42.0;
 
     struct point *samples =
       poisson_disk_samples(pdist, game->terrain.size, 30, &n_samples);
@@ -151,24 +153,29 @@ void update_terrain(struct game *game) {
   terrain_create(&game->terrain);
 }
 
+static void player_terrain_collision(struct game *game) {
+    struct node *player = &game->test_resources.player.node;
+    // player movement
+    static vec3 last_pos[3] = {0};
+
+    if (!vec3_eq(player->pos, last_pos, 0.0001)) {
+        float player_z = player->pos[2];
+
+        float terrain_z = 
+            game->terrain.fn(&game->terrain, player->pos[0], player->pos[1]) + 5.0;
+
+        float inset =
+            min(0.0, player_z - terrain_z);
+
+        if (inset <= 0)
+            node_translate(player, V3(0.0, 0.0, -inset));
+    }
+
+}
 
 static void player_movement(struct game *game) {
   struct resources *res = &game->test_resources;
-
-  // player movement
-  static vec3 last_pos[3] = {0};
-
-  movement(game, &res->player.node, 1.0);
-
-  if (!vec3_eq(res->player.node.pos, last_pos, 0.0001)) {
-
-    res->player.node.pos[2] =
-      game->terrain.fn(&game->terrain, res->player.node.pos[0], res->player.node.pos[1]) + 0.2;
-
-    node_recalc(&res->camera);
-
-    vec3_copy(res->player.node.pos, last_pos);
-  }
+  movement(game, &res->player.node, 2.0);
 
   node_recalc(&res->camera);
   vec3 *camera_world = node_world(&res->camera);
@@ -233,13 +240,16 @@ void resize_fbos(struct game *game, int width, int height) {
 }
 
 // TODO: match based on some real concept of time
-static void day_night_cycle(float n, struct resources *res) {
-    /* float val = 9950.0; */
-    float val = n * 800.0;
+static void day_night_cycle(float time, struct resources *res) {
+    float val = 51.0;
     float intensity = vec3_dot(res->light_dir, V3(0.0, 0.0, 1.0));
     intensity = clamp(intensity, 0.4, 1.0);
     float light_pos[3];
-;
+
+    res->sun_color[0] = 1.0;
+    res->sun_color[1] = 0.9;
+    res->sun_color[2] = 0.8;
+
 
     /* float intensity = angle <= 0.5 */
     /*     ? clamp(roots, darkest, 1.0) */
@@ -250,17 +260,23 @@ static void day_night_cycle(float n, struct resources *res) {
     /* vec3_normalize(res->light_intensity, res->light_intensity); */
 
     res->light_dir[0] = 0.0;
-    res->light_dir[1] = -sin(val);
-    res->light_dir[2] = -cos(val);
+    res->light_dir[1] = -fabs(sin(val));
+    res->light_dir[2] = fabs(cos(val));
 
     vec3_normalize(res->light_dir, res->light_dir);
 
     /* printf("intensity %f(%f) n %f light_dir %f %f\n", roots, intensity, */
     /*        n, res->light_dir[1], res->light_dir[2]); */
 
-    vec3_add(&res->player.node.mat[M_X], res->light_dir, light_pos);
+    vec3_add(res->player.node.pos, res->light_dir, light_pos);
 
-    look_at(light_pos, node_pos(&res->player.node), V3(0, 0, 1.0), res->sun_camera.mat);
+    look_at(light_pos, res->player.node.pos, V3(0, 0, 1.0), res->sun_camera.mat);
+}
+
+void gravity(struct game *game) {
+    struct entity *player = &game->test_resources.player;
+
+    node_translate(&player->node, V3(0.0, 0.0, -1.0));
 }
 
 void update (struct game *game, u32 dt) {
@@ -272,7 +288,10 @@ void update (struct game *game, u32 dt) {
 	struct perlin_settings *ts = &game->terrain.settings;
 	struct node *tnode = &game->terrain.entity.node;
 	struct node *root = &game->test_resources.root;
+    float *time = &res->time;
 	float *light = res->light_dir;
+
+    gravity(game);
 
 	if (first) {
 		update_terrain(game);
@@ -288,6 +307,8 @@ void update (struct game *game, u32 dt) {
 	else {
 		player_movement(game);
 	}
+
+    player_terrain_collision(game);
 
 #ifdef DEBUG
 	if (game->input.keystates[SDL_SCANCODE_R])
@@ -305,31 +326,10 @@ void update (struct game *game, u32 dt) {
 		toggle_fog = 0;
 	}
 
-	double ox = tnode->pos[0];
-	double oy = tnode->pos[1];
+    day_night_cycle(*time, res);
 
-	bool changed = last_ox != ox || last_oy != oy || last_oz != tnode->pos[2];
-
-	if (changed) {
-		update_terrain(game);
-		last_ox = ts->ox = ox;
-		last_oy = ts->oy = oy;
-		last_oz = tnode->pos[2] = max(tnode->pos[2], 5.0);
-
-		n += 0.01f;
-	}
-
-    day_night_cycle(n, res);
-
-	n += 0.00001f;
+	*time += dt * 0.00001f;
 
 	node_recalc(root);
-
-    /* look_at(&res->sun_camera.mat[M_X], */
-    /*         &res->player.node.mat[M_X], */
-    /*         V3(0,0,-1.0), */
-    /*         res->sun_camera.mat */
-    /*         ); */
-
 
 }

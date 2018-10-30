@@ -37,10 +37,12 @@ struct resources {
 		GLint camera_position;
 		GLint light_dir;
 		GLint light_intensity;
+		GLint sun_color;
 		GLint mvp;
 		GLint depth_mvp;
 		GLint normal_matrix;
 		GLint view;
+		GLint time;
 		GLint fog_on;
 		GLint diffuse_on;
 		GLint model_view;
@@ -54,8 +56,10 @@ struct resources {
 	struct node camera;
 	struct node sun_camera;
 
+    float time;
 	bool fog_on, diffuse_on;
 
+	float sun_color[3];
 	float test_mvp[MAT4_ELEMS];
 	float light_dir[3];
 	float light_intensity;

@@ -14,6 +14,7 @@ out vec3 v_color_smooth;
 out vec3 v_normal;
 out vec3 v_ray;
 out vec3 v_position;
+out vec3 v_frag_pos;
 out vec4 shadow_coord;
 
 const int nlands = 6;
@@ -41,7 +42,9 @@ void main()
 	}
 
 	// vec3 color = vec3(position.z*0.05, position.z*0.0095, position.z*0.0001) * 0.5;
-	 // v_color = vec3(position.z, position.z, position.z) * 0.005;
+
+
+     // v_color = vec3(position.z, position.z, position.z) * 0.005;
 
 #include standard_vtxos.glsl
 }

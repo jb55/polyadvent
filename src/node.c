@@ -115,10 +115,6 @@ void node_attach(struct node *node, struct node *to) {
   to->children[to->n_children++] = node;
 }
 
-float *node_pos(struct node *node) {
-    return &node->mat[M_X];
-}
-
 void node_forward(struct node *node, float *dir) {
   float movement[3] = {0};
   float q[4] = {0};

@@ -54,13 +54,13 @@ void game_init(struct game *game, int width, int height) {
         .scale = 1.0
     };
 
-    static const int shadowmap_scale = 1.0;
+    static const int shadowmap_scale = 10.0;
 
     // default ortho screenspace projection
-    mat4_ortho(-100.0, // left
-               100.0, // right
-               -100.0, // bottom
-               100.0, // top
+    mat4_ortho(-shadowmap_scale, // left
+               shadowmap_scale, // right
+               -shadowmap_scale, // bottom
+               shadowmap_scale, // top
                -10000.0, // near
                10000.0,  // far
                res->proj_ortho
@@ -76,11 +76,16 @@ void game_init(struct game *game, int width, int height) {
 
     mat4_id(mvp);
 
+    res->time = 0;
     res->light_intensity = 0.8;
 
     light_dir[0] = 0.8;
     light_dir[1] = 0.8;
     light_dir[2] = 0.8;
+
+    res->sun_color[0] = 1.0;
+    res->sun_color[1] = 0.9;
+    res->sun_color[2] = 0.8;
 
     // BRB: shadow mapping next!
 
@@ -103,7 +108,7 @@ void game_init(struct game *game, int width, int height) {
     terrain->entity.casts_shadows = 0;
 
     // player init
-    ok = load_model(&player->model, "tower");
+    ok = load_model(&player->model, "ico-sphere");
     assert(ok);
     player->model.shading = SHADING_VERT_COLOR;
     player->node.label = "player";

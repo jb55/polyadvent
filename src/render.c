@@ -117,8 +117,14 @@ init_gl(struct resources *resources, int width, int height) {
         resources->uniforms.light_intensity =
             glGetUniformLocation(handle, "light_intensity");
 
+        resources->uniforms.time =
+            glGetUniformLocation(handle, "time");
+
         resources->uniforms.light_dir =
             glGetUniformLocation(handle, "light_dir");
+
+        resources->uniforms.sun_color =
+            glGetUniformLocation(handle, "sun_color");
 
         resources->uniforms.world =
             glGetUniformLocation(handle, "world");
@@ -167,8 +173,11 @@ recalc_normals(GLint nm_uniform, mat4 *model_view, mat4 *normal) {
 
 void render (struct game *game, struct render_config *config) {
     float adjust = game->test_resources.light_intensity;
+    struct resources *res = &game->test_resources;
+
 	glEnable(GL_DEPTH_TEST);
-    glClearColor( 0.5294f * adjust, 0.8078f * adjust, 0.9216f * adjust, 1.0f ); //clear background screen to black
+    glClearColor( res->sun_color[0], res->sun_color[1], res->sun_color[2], 1.0 ); //clear background screen to black
+    /* glClearColor( 0.5294f * adjust, 0.8078f * adjust, 0.9216f * adjust, 1.0f ); //clear background screen to black */
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
     check_gl();
 
@@ -178,9 +187,9 @@ void render (struct game *game, struct render_config *config) {
     static float normal_matrix[MAT4_ELEMS] = { 0 };
     static float model_view[MAT4_ELEMS] = { 0 };
     static float depth_bias[MAT4_ELEMS] = { 0 };
+    static float tmp[MAT4_ELEMS] = { 0 };
     mat4_id(id);
     mat4_id(model_view);
-    struct resources *res = &game->test_resources;
 
     mat4 *mvp = res->test_mvp;
     mat4 *projection = config->projection;
@@ -226,6 +235,12 @@ void render (struct game *game, struct render_config *config) {
         glUniform1i(res->uniforms.diffuse_on, res->diffuse_on);
         glUniform3f(res->uniforms.light_dir, light[0], light[1], light[2]);
         glUniform1f(res->uniforms.light_intensity, res->light_intensity);
+        glUniform1f(res->uniforms.time, res->time);
+        glUniform3f(res->uniforms.sun_color,
+                    res->sun_color[0],
+                    res->sun_color[1],
+                    res->sun_color[2]);
+        
 
         mat4_multiply(view_proj, entity->node.mat, mvp);
         mat4_copy(entity->node.mat, model_view);

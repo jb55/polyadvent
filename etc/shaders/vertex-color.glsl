@@ -15,6 +15,7 @@ out vec3 v_color_smooth;
 out vec3 v_normal;
 out vec3 v_position;
 out vec3 v_ray;
+out vec3 v_frag_pos;
 out vec4 shadow_coord;
 
 #include lighting.glsl
