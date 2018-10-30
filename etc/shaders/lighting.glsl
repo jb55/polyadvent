@@ -1,12 +1,12 @@
 
 vec3 standard_light(vec3 color) {
-	vec4 v4_normal = vec4(normal , 1);
+	vec4 v4_normal = vec4(v_normal , 1);
 	vec4 trans_normal = normal_matrix * v4_normal;
 
-    vec3 L = light_dir;
+    vec3 L = light_dir * light_intensity;
     vec3 N = normalize(trans_normal.xyz);
 
-    float costheta = clamp(dot(L,N), 0.3, 1.0) * light_intensity;
+    float costheta = max(0.0, dot(L,N));
 
     return color * costheta;
 }
@@ -19,6 +19,7 @@ const vec3 spherical_harmonics[4] = vec3[](
   vec3( -0.188884931542396, -0.277402551592231, -0.377844212327557 )
 );
 
+
 vec3 irradiance_spherical_harmonics(const vec3 n) {
     return max(
                spherical_harmonics[0]
@@ -26,8 +27,4 @@ vec3 irradiance_spherical_harmonics(const vec3 n) {
                + spherical_harmonics[2] * n.z
                + spherical_harmonics[3] * n.x
                , 0.0);
-}
-
-vec3 gamma_correct(vec3 color) {
-    return pow(color, vec3(1.0/2.2));
 }

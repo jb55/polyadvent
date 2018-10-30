@@ -9,8 +9,11 @@ in vec3 normal;
 
 flat out float v_light;
 flat out vec3 v_color;
+out vec3 v_color_smooth;
 
+out vec3 v_normal;
 out vec3 v_ray;
+out vec3 v_position;
 out vec4 shadow_coord;
 
 const int nlands = 6;
@@ -29,10 +32,6 @@ const vec4 land[nlands] = vec4[](
 
 void main()
 {
-	vec4 v4_pos = vec4(position, 1.0);
-	gl_Position = mvp * v4_pos;
-    shadow_coord = depth_mvp * v4_pos;
-
     vec3 color = land[0].xyz;
     for (int i = 0; i < nlands-1; i++) {
 		color =
@@ -44,6 +43,5 @@ void main()
 	// vec3 color = vec3(position.z*0.05, position.z*0.0095, position.z*0.0001) * 0.5;
 	 // v_color = vec3(position.z, position.z, position.z) * 0.005;
 
-    v_color = standard_light(color);
-	v_ray = camera_position - (world * v4_pos).xyz;
+#include standard_vtxos.glsl
 }

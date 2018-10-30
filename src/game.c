@@ -38,7 +38,6 @@ void game_init(struct game *game, int width, int height) {
     struct terrain *terrain = &game->terrain;
 
     mat4 *light_dir = res->light_dir;
-    mat4 *light_intensity = res->light_intensity;
     int ok = 0;
 
     const double size = 10000;
@@ -77,9 +76,7 @@ void game_init(struct game *game, int width, int height) {
 
     mat4_id(mvp);
 
-    light_intensity[0] = 0.8;
-    light_intensity[1] = 0.8;
-    light_intensity[2] = 0.8;
+    res->light_intensity = 0.8;
 
     light_dir[0] = 0.8;
     light_dir[1] = 0.8;

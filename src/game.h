@@ -58,7 +58,7 @@ struct resources {
 
 	float test_mvp[MAT4_ELEMS];
 	float light_dir[3];
-	float light_intensity[3];
+	float light_intensity;
 	float proj_persp[MAT4_ELEMS];
 	float proj_ortho[MAT4_ELEMS];
 };

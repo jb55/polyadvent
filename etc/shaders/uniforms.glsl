@@ -6,4 +6,4 @@ uniform mat4 model_view;
 uniform mat4 normal_matrix;
 uniform vec3 camera_position;
 uniform vec3 light_dir;
-uniform vec3 light_intensity;
+uniform float light_intensity;

@@ -166,7 +166,7 @@ recalc_normals(GLint nm_uniform, mat4 *model_view, mat4 *normal) {
 
 
 void render (struct game *game, struct render_config *config) {
-    float adjust = game->test_resources.light_intensity[0];
+    float adjust = game->test_resources.light_intensity;
 	glEnable(GL_DEPTH_TEST);
     glClearColor( 0.5294f * adjust, 0.8078f * adjust, 0.9216f * adjust, 1.0f ); //clear background screen to black
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
@@ -185,7 +185,6 @@ void render (struct game *game, struct render_config *config) {
     mat4 *mvp = res->test_mvp;
     mat4 *projection = config->projection;
     mat4 *light = res->light_dir;
-    mat4 *light_intensity = res->light_intensity;
 
     float *camera = config->camera;
 
@@ -226,8 +225,7 @@ void render (struct game *game, struct render_config *config) {
         glUniform1i(res->uniforms.fog_on, res->fog_on);
         glUniform1i(res->uniforms.diffuse_on, res->diffuse_on);
         glUniform3f(res->uniforms.light_dir, light[0], light[1], light[2]);
-        glUniform3f(res->uniforms.light_intensity,
-                    light_intensity[0], light_intensity[1], light_intensity[2]);
+        glUniform1f(res->uniforms.light_intensity, res->light_intensity);
 
         mat4_multiply(view_proj, entity->node.mat, mvp);
         mat4_copy(entity->node.mat, model_view);
