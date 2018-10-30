@@ -49,6 +49,7 @@ void main() {
     color = frag;
 
   float shadow_map_z = texture(shadow_map, shadow_coord.xy).z;
+
   if (light_dir.z > 0.0 && shadow_map_z < shadow_coord.z ) {
     float factor = 1.0/dot(light_dir, vec3(0.0, 0.0, 1.0));
     visibility = clamp(0.2 * factor, 0.5, 1.0);

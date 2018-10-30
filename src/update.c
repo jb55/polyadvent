@@ -183,16 +183,24 @@ static void player_movement(struct game *game) {
 #ifdef DEBUG
 static int try_reload_shaders(struct resources *res) {
 	int ret;
-	printf("reloading shaders... ");
+    for (int i = 0; i < NUM_PROGRAMS; ++i) {
+        struct gpu_program *program = &res->programs[i];
+        ret = reload_program(program);
 
-	ret = reload_program(&res->program);
+        if (ret == 2) {}
+        else if (ret == 1)
+            printf("reload %s + %s success.\n",
+                   program->vertex.filename,
+                   program->fragment.filename);
+        else
+            printf("reload %s + %s failed.\n",
+                   program->vertex.filename,
+                   program->fragment.filename);
 
-	if (ret == 2)
-		printf("nothing to reload\n");
-	else if (ret == 1)
-		printf("success.\n");
-	else
-		printf("failed.\n");
+        // failure ok, clear any errors
+        glGetError();
+    }
+
 
 
 
@@ -227,7 +235,7 @@ void resize_fbos(struct game *game, int width, int height) {
 // TODO: match based on some real concept of time
 static void day_night_cycle(float n, struct resources *res) {
     float darkest = 0.3;
-    float val = n*100.0;
+    float val = 9950.0;
     float roots = vec3_dot(res->light_dir, V3(0.0, 0.0, 1.0));
     float intensity = clamp(roots, darkest, 1.0);
     float light_pos[3];

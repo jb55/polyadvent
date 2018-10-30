@@ -6,13 +6,17 @@
 
 #define SHADER(f) "etc/shaders/" f
 
+#define MAX_SHADER_INCLUDES 8
+#define MAX_INCLUDE_FNAME_LEN 32
+
 struct shader {
 	GLenum type;
 	GLuint handle;
+    int n_includes;
 	const char *filename;
-#ifdef DEBUG
+    char includes[MAX_SHADER_INCLUDES][MAX_INCLUDE_FNAME_LEN];
+    time_t include_mtimes[MAX_SHADER_INCLUDES];
 	time_t load_mtime;
-#endif
 };
 
 struct gpu_program {
@@ -22,9 +26,7 @@ struct gpu_program {
 };
 
 
-#ifdef DEBUG
 int reload_program(struct gpu_program *program);
-#endif
 
 int make_shader(GLenum type, const char *filename, struct shader *shader);
 

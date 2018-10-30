@@ -7,7 +7,7 @@
 #include "geometry.h"
 
 struct ui {
-    struct gpu_program shader;
+    struct gpu_program *shader;
     struct geometry quad;
     struct attributes attrs;
 
@@ -21,7 +21,9 @@ struct ui {
     float ortho[MAT4_ELEMS];
 };
 
-void create_ui(struct ui *ui, int width, int height);
+void create_ui(struct ui *ui, int width, int height,
+               struct gpu_program *);
+
 void resize_ui(struct ui *ui, int width, int height);
 void render_ui(struct ui *ui, float *camera);
 

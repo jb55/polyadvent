@@ -14,6 +14,15 @@
 
 #define PLAYER_HEIGHT 1.73
 
+#define MAX_PROGRAMS 12
+
+enum program_type {
+  DEFAULT_PROGRAM,
+  TERRAIN_PROGRAM,
+  UI_PROGRAM,
+  NUM_PROGRAMS,
+};
+
 /*
  * Global data used by our render callback:
  * NOTE: just for testing right now
@@ -22,10 +31,7 @@ struct resources {
 	struct vbo vertex_buffer, element_buffer, normal_buffer;
     struct fbo shadow_buffer;
 
-	struct gpu_program program;
-	struct gpu_program smooth_program;
-	struct gpu_program terrain_program;
-	struct gpu_program ui_program;
+    struct gpu_program programs[NUM_PROGRAMS];
 
 	struct uniforms {
 		GLint camera_position;

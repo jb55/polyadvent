@@ -67,7 +67,8 @@ void game_init(struct game *game, int width, int height) {
                res->proj_ortho
                );
 
-    create_ui(&game->ui, width, height);
+    create_ui(&game->ui, width, height, &res->programs[UI_PROGRAM]);
+
     check_gl();
 
     terrain_init(terrain);

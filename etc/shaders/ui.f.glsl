@@ -11,5 +11,5 @@ uniform sampler2D screen_texture;
 
 void main() {
     // fragmentColor = vec4(color + diffuse, 1.0);
-    fragmentColor = texture(screen_texture, v_tex_coords) + vec4(v_color, 1.0) * 0.000001;
+    fragmentColor = texture(screen_texture, v_tex_coords) + vec4(v_color, 0.0) * 0.0001;
 }

@@ -50,7 +50,7 @@ static void create_quad(struct geometry *geom)
 void render_ui(struct ui *ui, float *view) {
     static float mvp[MAT4_ELEMS];
 	glDisable(GL_DEPTH_TEST);
-    glUseProgram(ui->shader.handle);
+    glUseProgram(ui->shader->handle);
     check_gl();
 
     float uipos[2] = {0.01, 0.01};
@@ -85,11 +85,12 @@ void resize_ui(struct ui *ui, int width, int height) {
 }
 
 
-void create_ui(struct ui *ui, int width, int height) {
+void create_ui(struct ui *ui, int width, int height, struct gpu_program *shader) {
     struct shader vertex;
     struct shader fragment;
     int ok = 0;
 
+    ui->shader = shader;
     create_quad(&ui->quad);
     check_gl();
 
@@ -99,10 +100,10 @@ void create_ui(struct ui *ui, int width, int height) {
     ok = make_shader(GL_FRAGMENT_SHADER, SHADER("ui.f.glsl"), &fragment);
     assert(ok && "ui fragment shader");
 
-    ok = make_program(&vertex, &fragment, &ui->shader);
+    ok = make_program(&vertex, &fragment, ui->shader);
     assert(ok && "ui program");
 
-    GLuint program = ui->shader.handle;
+    GLuint program = ui->shader->handle;
 
     ui->uniforms.mvp            = glGetUniformLocation(program, "mvp");
     ui->uniforms.uipos          = glGetUniformLocation(program, "uipos");

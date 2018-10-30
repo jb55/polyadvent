@@ -81,17 +81,19 @@ init_gl(struct resources *resources, int width, int height) {
 			 resources->proj_persp);
 
 	// Shader program
-	ok = make_program(&terrain_vertex, &fragment, &resources->terrain_program);
+	ok = make_program(&terrain_vertex, &fragment,
+                      &resources->programs[TERRAIN_PROGRAM]);
+
 	assert(ok && "terrain program");
     check_gl();
 
-	ok = make_program(&vertex, &fragment, &resources->program);
+	ok = make_program(&vertex, &fragment, &resources->programs[DEFAULT_PROGRAM]);
 	assert(ok && "vertex-color program");
     check_gl();
 
     GLuint programs[] =
-        { resources->terrain_program.handle
-        , resources->program.handle
+        { resources->programs[TERRAIN_PROGRAM].handle
+        , resources->programs[DEFAULT_PROGRAM].handle
         };
 
     // uniforms shared between all shaders
@@ -139,7 +141,8 @@ init_gl(struct resources *resources, int width, int height) {
 
     // TODO: auto-generate these somehow?
 	resources->attributes.color =
-		(gpu_addr)glGetAttribLocation(resources->program.handle, "color");
+        (gpu_addr)glGetAttribLocation(resources->programs[DEFAULT_PROGRAM]
+                                        .handle, "color");
 
     check_gl();
 }
@@ -185,6 +188,8 @@ void render (struct game *game, struct render_config *config) {
         };
 
     int is_shadow = config->draw_ui == 0;
+    int terrain_program = game->test_resources.programs[TERRAIN_PROGRAM].handle;
+    int default_program = game->test_resources.programs[DEFAULT_PROGRAM].handle;
 
     for (size_t i = 0; i < ARRAY_SIZE(entities); ++i) {
         struct entity *entity = entities[i];
@@ -192,9 +197,9 @@ void render (struct game *game, struct render_config *config) {
             continue;
         // TODO this is a bit wonky, refactor this
         if (i == 0)
-            glUseProgram(game->test_resources.terrain_program.handle);
+            glUseProgram(terrain_program);
         else if (i == 1)
-            glUseProgram(game->test_resources.program.handle);
+            glUseProgram(default_program);
         check_gl();
 
         mat4_inverse(camera, view);
@@ -242,8 +247,8 @@ void render (struct game *game, struct render_config *config) {
         check_gl();
     }
 
-    /* if (config->draw_ui) */
-    /*     render_ui(&game->ui, view); */
+    if (config->draw_ui)
+        render_ui(&game->ui, view);
 
     //player
     // y tho

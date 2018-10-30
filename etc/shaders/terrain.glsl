@@ -17,6 +17,7 @@ const int nlands = 6;
 
 #include lighting.glsl
 
+
 const vec4 land[nlands] = vec4[](
   vec4(0.0, 0.5, 0.79, 0.0),          // 0 - water
   vec4(0.9176, 0.8156, 0.6588, 1.0),  // 1 - sand
@@ -33,8 +34,7 @@ void main()
     shadow_coord = depth_mvp * v4_pos;
 
     vec3 color = land[0].xyz;
-
-	for (int i = 0; i < nlands-1; i++) {
+    for (int i = 0; i < nlands-1; i++) {
 		color =
 			mix(color,
 			    land[i+1].xyz,
