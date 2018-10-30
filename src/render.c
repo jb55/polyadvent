@@ -53,6 +53,13 @@ static const GLushort cube_indices[] = {
   20,21,22,  20,22,23
 };
 
+static const float bias_matrix[] = {
+  0.5, 0.0, 0.0, 0.0,
+  0.0, 0.5, 0.0, 0.0,
+  0.0, 0.0, 0.5, 0.0,
+  0.5, 0.5, 0.5, 1.0
+};
+
 void
 init_gl(struct resources *resources, int width, int height) {
 	struct shader vertex, terrain_vertex, fragment, fragment_smooth;
@@ -187,13 +194,12 @@ void render (struct game *game, struct render_config *config) {
         , &game->test_resources.player
         };
 
-    int is_shadow = config->draw_ui == 0;
     int terrain_program = game->test_resources.programs[TERRAIN_PROGRAM].handle;
     int default_program = game->test_resources.programs[DEFAULT_PROGRAM].handle;
 
     for (size_t i = 0; i < ARRAY_SIZE(entities); ++i) {
         struct entity *entity = entities[i];
-        if (is_shadow && !entity->casts_shadows)
+        if (config->is_depth_pass && !entity->casts_shadows)
             continue;
         // TODO this is a bit wonky, refactor this
         if (i == 0)
@@ -205,17 +211,8 @@ void render (struct game *game, struct render_config *config) {
         mat4_inverse(camera, view);
         mat4_multiply(projection, view, view_proj);
 
-        // TODO: use something other than draw_ui to detect shadow map fbo phase 
-        if (is_shadow) {
-            static const float bias_matrix[] = {
-              0.5, 0.0, 0.0, 0.0,
-              0.0, 0.5, 0.0, 0.0,
-              0.0, 0.0, 0.5, 0.0,
-              0.5, 0.5, 0.5, 1.0
-            };
-
+        if (config->is_depth_pass) {
             mat4_multiply(bias_matrix, view_proj, config->depth_mvp);
-            /* mat4_copy(view_proj, config->depth_mvp); */
         }
         else {
             glUniformMatrix4fv(res->uniforms.depth_mvp, 1, 0, config->depth_mvp);
