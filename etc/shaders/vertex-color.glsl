@@ -18,8 +18,6 @@ out vec3 v_ray;
 out vec3 v_frag_pos;
 out vec4 shadow_coord;
 
-#include lighting.glsl
-
 void main()
 {
 #include standard_vtxos.glsl
