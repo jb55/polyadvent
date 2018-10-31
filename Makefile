@@ -28,6 +28,7 @@ OBJS += $(SRC)/mat4.o
 OBJS += $(SRC)/mat_util.o
 OBJS += $(SRC)/model.o
 OBJS += $(SRC)/node.o
+OBJS += $(SRC)/orbit.o
 OBJS += $(SRC)/perlin.o
 OBJS += $(SRC)/ply.o
 OBJS += $(SRC)/poisson.o
@@ -40,6 +41,7 @@ OBJS += $(SRC)/uniform.o
 OBJS += $(SRC)/update.o
 OBJS += $(SRC)/util.o
 OBJS += $(SRC)/vec3.o
+OBJS += $(SRC)/hires.o
 
 SRCS=$(OBJS:.o=.c)
 

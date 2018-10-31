@@ -31,6 +31,7 @@ const vec4 land[nlands] = vec4[](
   vec4(1.0, 1.0, 1.0, 380.0)          // 5 - snow
 );
 
+
 void main()
 {
     vec3 color = land[0].xyz;

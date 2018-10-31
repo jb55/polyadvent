@@ -12,13 +12,21 @@
 /*   KEY_UP */
 /* }; */
 
+#define MOUSE_BUTTONS 5
+
 struct input {
   /* enum key_state keys[0x7F-0x1F]; */
-  u8 const *keystates;
-  SDL_Keymod modifiers;
+    u8 const *keystates;
+    SDL_Keymod modifiers;
+    int mdx, mdy;
+    int mx, my;
+    int is_dragging;
+    int mbuttons[MOUSE_BUTTONS];
 };
 
 void input_init(struct input *input);
+
+void input_reset(struct input *input);
 
 void handle_key(struct input *input, SDL_KeyboardEvent ke);
 

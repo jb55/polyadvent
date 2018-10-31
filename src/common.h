@@ -10,9 +10,6 @@
 #define SLAB(f) "etc/slab/" f
 #define RESOURCE(f) "etc/shaders/" f
 
-#define PI 3.14159265f
-#define TAU 6.2831853f
-
 typedef unsigned char u8;
 typedef signed char s8;
 
@@ -21,6 +18,9 @@ typedef signed short s16;
 
 typedef unsigned int u32;
 typedef signed int s32;
+
+typedef unsigned long long u64;
+typedef signed long long s64;
 
 struct point {
   double x, y;

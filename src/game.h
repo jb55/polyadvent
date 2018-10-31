@@ -11,6 +11,7 @@
 #include "terrain.h"
 #include "ui.h"
 #include "fbo.h"
+#include "orbit.h"
 
 #define PLAYER_HEIGHT 1.73
 
@@ -55,6 +56,7 @@ struct resources {
 
 	struct node root;
 	struct entity player;
+	struct orbit orbit_camera;
 	struct node camera;
 	struct node sun_camera;
 
@@ -72,6 +74,7 @@ struct resources {
 struct game {
     int counter;
     int seed;
+    float dt;
     struct ui ui;
     struct resources test_resources;
     struct input input;

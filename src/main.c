@@ -18,6 +18,7 @@
 #include "uniform.h"
 #include "ply.h"
 #include "fbo.h"
+#include "hires.h"
 
 
 int main(void)
@@ -42,7 +43,7 @@ int main(void)
     game_init(&game, width, height);
 
     check_gl();
-    u32 last = SDL_GetTicks();
+    double last = hires_time_in_seconds();
     static float depth_mvp[MAT4_ELEMS];
     mat4_id(depth_mvp);
 
@@ -64,10 +65,17 @@ int main(void)
 
     while (1) {
         process_events(&game, game.test_resources.proj_persp);
-        u32 ticks = SDL_GetTicks();
-        update(&game, ticks-last);
+        double new_time = hires_time_in_seconds();
+        double frame_time = new_time - last;
+        game.dt = frame_time;
+        update(&game);
 
-        last = ticks;
+        /* while (accumulator >= dt) { */
+        /*     t += dt; */
+        /*     accumulator -= dt; */
+        /* } */
+
+        last = new_time;
 
         GLuint texture = game.test_resources.shadow_buffer.attachments[0];
         struct fbo *fbo = &game.test_resources.shadow_buffer;

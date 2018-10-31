@@ -16,6 +16,11 @@
         }                                               \
     }
 
+#define PI 3.14159265
+#define TAU 6.2831853
+
+#define RAD(x) ((x)*TAU/360.0)
+
 #define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
 
 void look_at(vec3 *eye, vec3 *target, vec3 *up, mat4 *dest);

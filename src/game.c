@@ -104,6 +104,10 @@ void game_init(struct game *game, int width, int height) {
     game->test_resources.fog_on = 1;
     game->test_resources.diffuse_on = 0;
 
+    res->orbit_camera.azimuth = RAD(90.0);
+    res->orbit_camera.inclination = RAD(180.0);
+    res->orbit_camera.radius = RAD(180.0);
+
     node_init(root);
     node_init(camera);
     node_init(sun_camera);
@@ -125,19 +129,13 @@ void game_init(struct game *game, int width, int height) {
 
     node_attach(&player->node, root);
     node_attach(camera, &player->node);
-    /* node_attach(sun_camera, root); */
 
     quat_axis_angle(V3(1,0,0), -45, camera->orientation);
-    /* quat_axis_angle(V3(1,0,0), -90, camera->orientation); */
-    /* node_rotate(sun_camera, V3(-7.5, 0, 0)); */
-    /* node_translate(sun_camera, V3(width/shadowmap_scale, 2000, 0)); */
 
     node_translate(&player->node, V3(terrain->size/2.,terrain->size/2.,0.0));
-    /* vec3_scale(player->node.scale, 10.0, player->node.scale); */
 
     node_rotate(camera, V3(100, 0, 0));
     node_translate(camera, V3(0,-40,20));
-    /* node_recalc(camera); */
 
     terrain->entity.node.pos[2] = 20.0;
 
