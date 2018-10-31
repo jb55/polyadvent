@@ -21,8 +21,8 @@ vec3 standard_light(vec3 color, vec3 position) {
 	vec4 trans_normal = normal_matrix * v4_normal;
 
     const float pi = 3.14159265;
-    const float shiny = 16.0;
-    float ambient_str = 0.1 + light_intensity * 0.1;
+    const float shiny = 8.0;
+    float ambient_str = 0.2;
     float spec_str = 0.5 * light_intensity;
 
     vec3 ray = camera_position - position;
@@ -48,6 +48,7 @@ vec3 standard_light(vec3 color, vec3 position) {
         vec3 halfway_dir = normalize(light_dir + view_dir);   // blinn-phong
         spec = energy_conservation * pow(max(dot(v_normal, halfway_dir), 0.0), shiny);
     }
+
     else {
         const float energy_conservation = ( 2.0 + shiny ) / ( 2.0 * pi );
         vec3 reflect_dir = reflect(-light_dir, v_normal); // phong

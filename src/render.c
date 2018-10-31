@@ -189,9 +189,8 @@ void render (struct game *game, struct render_config *config) {
 
 	glEnable(GL_DEPTH_TEST);
 
-    gamma_correct(res->sun_color, gtmp);
     float sky_intensity = clamp(res->light_intensity, 0.2, 1.0);
-    vec3_scale(gtmp, sky_intensity, gtmp);
+    vec3_scale(res->sun_color, sky_intensity, gtmp);
 
     glClearColor( gtmp[0], gtmp[1], gtmp[2], 1.0 ); //clear background screen to black
     /* glClearColor( 0.5294f * adjust, 0.8078f * adjust, 0.9216f * adjust, 1.0f ); //clear background screen to black */
