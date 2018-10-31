@@ -2,7 +2,8 @@
 vec3 apply_fog(in vec3 rgb, in float distance, in vec3 ray_orig, in vec3 ray_dir) {
     const float b = 0.00035;
 
-    float fog_amount = 1.0-exp(-pow(distance * (1.0/1.2) * b, 6.0));
+    float draw_dist = 1.4;
+    float fog_amount = 1.0-exp(-pow(distance * (1.0/draw_dist) * b, 6.0));
     float sun_amount = max( dot( ray_dir, -light_dir ), 0.0 ) * b;
     sun_amount = pow(sun_amount, 2.0);
 
