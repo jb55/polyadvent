@@ -243,13 +243,18 @@ void resize_fbos(struct game *game, int width, int height) {
 static void day_night_cycle(float time, struct resources *res) {
     float val = time * 50.0;
     float intensity = vec3_dot(res->light_dir, V3(0.0, 0.0, 1.0));
-    intensity = clamp(intensity, 0.0, 0.9);
+    intensity = clamp(intensity, 0.0, 0.8);
     float light_pos[3];
 
     res->sun_color[0] = 1.0;
     res->sun_color[1] = 0.9;
     res->sun_color[2] = 0.8;
 
+    /* res->sun_color[0] = 1.0; */
+    /* res->sun_color[1] = 1.0; */
+    /* res->sun_color[2] = 1.0; */
+
+    /* vec3_scale(res->sun_color, res->light_intensity, gtmp); */
 
     /* float intensity = angle <= 0.5 */
     /*     ? clamp(roots, darkest, 1.0) */

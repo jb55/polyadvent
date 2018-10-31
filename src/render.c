@@ -111,11 +111,17 @@ init_gl(struct resources *resources, int width, int height) {
         resources->uniforms.camera_position =
             glGetUniformLocation(handle, "camera_position");
 
+        resources->uniforms.ambient_str =
+            glGetUniformLocation(handle, "ambient_str");
+
         resources->uniforms.depth_mvp =
             glGetUniformLocation(handle, "depth_mvp");
 
         resources->uniforms.light_intensity =
             glGetUniformLocation(handle, "light_intensity");
+
+        resources->uniforms.sky_intensity =
+            glGetUniformLocation(handle, "sky_intensity");
 
         resources->uniforms.time =
             glGetUniformLocation(handle, "time");
@@ -169,14 +175,25 @@ recalc_normals(GLint nm_uniform, mat4 *model_view, mat4 *normal) {
   glUniformMatrix4fv(nm_uniform, 1, 0, normal);
 }
 
-
+static void gamma_correct(float *c, float *d) {
+    float gamma = 1.0/2.2;
+    d[0] = powf(c[0], gamma);
+    d[1] = powf(c[1], gamma);
+    d[2] = powf(c[2], gamma);
+}
 
 void render (struct game *game, struct render_config *config) {
     float adjust = game->test_resources.light_intensity;
+    float gtmp[3];
     struct resources *res = &game->test_resources;
 
 	glEnable(GL_DEPTH_TEST);
-    glClearColor( res->sun_color[0], res->sun_color[1], res->sun_color[2], 1.0 ); //clear background screen to black
+
+    gamma_correct(res->sun_color, gtmp);
+    float sky_intensity = clamp(res->light_intensity, 0.2, 1.0);
+    vec3_scale(gtmp, sky_intensity, gtmp);
+
+    glClearColor( gtmp[0], gtmp[1], gtmp[2], 1.0 ); //clear background screen to black
     /* glClearColor( 0.5294f * adjust, 0.8078f * adjust, 0.9216f * adjust, 1.0f ); //clear background screen to black */
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
     check_gl();
@@ -236,6 +253,7 @@ void render (struct game *game, struct render_config *config) {
         glUniform3f(res->uniforms.light_dir, light[0], light[1], light[2]);
         glUniform1f(res->uniforms.light_intensity, res->light_intensity);
         glUniform1f(res->uniforms.time, res->time);
+        glUniform1f(res->uniforms.sky_intensity, sky_intensity);
         glUniform3f(res->uniforms.sun_color,
                     res->sun_color[0],
                     res->sun_color[1],

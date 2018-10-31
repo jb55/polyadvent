@@ -87,6 +87,12 @@ void game_init(struct game *game, int width, int height) {
     res->sun_color[1] = 0.9;
     res->sun_color[2] = 0.8;
 
+    res->sun_color[0] = 0.5;
+    res->sun_color[1] = 0.6;
+    res->sun_color[2] = 0.7;
+
+    /* vec3(0.5,0.6,0.7); */
+
     // BRB: shadow mapping next!
 
     // FBO STUFF

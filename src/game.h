@@ -37,6 +37,8 @@ struct resources {
 		GLint camera_position;
 		GLint light_dir;
 		GLint light_intensity;
+		GLint sky_intensity;
+		GLint ambient_str;
 		GLint sun_color;
 		GLint mvp;
 		GLint depth_mvp;
