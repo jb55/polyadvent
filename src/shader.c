@@ -52,6 +52,7 @@ static char **resolve_imports(char *contents, int *nlines) {
             line_buff[*nlines] = line;
             line_lens[*nlines] = line_len;
             (*nlines)++;
+            /* printf("%d %.*s", *nlines, line_len, line); */
         }
     }
 
