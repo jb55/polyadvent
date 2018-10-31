@@ -3,17 +3,17 @@
 #include noise.glsl
 
 
-float clouds(vec3 position) {
-    float cloud_speed = 20000.0;
-    float cloud_pos = time * cloud_speed;
-    float cloud_trans = vec3(cloud_pos, cloud_pos, 0.0);
+// float clouds(vec3 position) {
+//     float cloud_speed = 20000.0;
+//     float cloud_pos = time * cloud_speed;
+//     float cloud_trans = vec3(cloud_pos, cloud_pos, 0.0);
 
-    float clouds = snoise((position + cloud_trans)/800.0);
-    clouds *= max(0.0, dot(light_dir, vec3(0.0,0.0,1.0)));
-    clouds *= 0.35 * exp(clouds * -0.3);
+//     float clouds = snoise((position + cloud_trans)/800.0);
+//     clouds *= max(0.0, dot(light_dir, vec3(0.0,0.0,1.0)));
+//     clouds *= 0.35 * exp(clouds * -0.3);
 
-    return clouds;
-}
+//     return clouds;
+// }
 
 
 vec3 standard_light(vec3 color, vec3 position) {
