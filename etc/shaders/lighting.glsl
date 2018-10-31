@@ -31,8 +31,9 @@ vec3 standard_light(vec3 color, vec3 position) {
     vec3 ambient = ambient_str * sun_color;
 
     vec3 view_dir = normalize(camera_position - v_frag_pos);
-    vec3 reflect_dir = reflect(-light_dir, v_normal);
-    float spec = pow(max(dot(view_dir, reflect_dir), 0.0), 32.0);
+    vec3 reflect_dir = normalize(light_dir + view_dir);   // blin-phong
+    // vec3 reflect_dir = reflect(-light_dir, v_normal); // phong
+    float spec = pow(max(dot(view_dir, reflect_dir), 0.0), 16.0);
 
     vec3 specular = spec_str * spec * sun_color;
 
