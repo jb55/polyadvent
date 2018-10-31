@@ -23,7 +23,7 @@ vec3 standard_light(vec3 color, vec3 position) {
     const float pi = 3.14159265;
     const float shiny = 6.0;
     float ambient_str = 0.2;
-    float spec_str = 1.0 * light_intensity;
+    float spec_str = 0.8 * light_intensity;
 
     vec3 ray = camera_position - position;
     vec3 view_dir = normalize(ray);
