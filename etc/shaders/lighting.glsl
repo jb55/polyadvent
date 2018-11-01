@@ -21,12 +21,12 @@ vec3 standard_light(vec3 color, vec3 position) {
 	vec4 trans_normal = normal_matrix * v4_normal;
 
     const float pi = 3.14159265;
-    const float shiny = 6.0;
+    const float shiny = 12.0;
     float ambient_str = 0.2;
-    float spec_str = 0.6 * light_intensity;
+    float spec_str = 0.2 * light_intensity;
 
     // too much ambient during daytime is making things look weird
-    ambient_str =- light_intensity * ambient_str;
+    // ambient_str =- light_intensity * ambient_str;
 
     vec3 ray = camera_position - position;
     vec3 view_dir = normalize(ray);
@@ -60,8 +60,9 @@ vec3 standard_light(vec3 color, vec3 position) {
     // spec += pow(max(dot(view_dir, reflect_dir), 0.0), 16.0) * 0.5;
 
     vec3 specular = spec_str * spec * sun_color;
+    vec3 final = (ambient + diffuse + specular) * color;
 
-    return (ambient + diffuse + specular) * color;
+    return final / (final + vec3(1.0));
 }
 
 
