@@ -15,6 +15,9 @@
 //     return clouds;
 // }
 
+vec3 gamma_correct(vec3 color) {
+    return pow(color, vec3(1.0/2.2));
+}
 
 vec3 standard_light(vec3 color, vec3 position) {
 	vec4 v4_normal = vec4(v_normal , 1);
@@ -22,8 +25,10 @@ vec3 standard_light(vec3 color, vec3 position) {
 
     const float pi = 3.14159265;
     const float shiny = 12.0;
-    float ambient_str = 0.2;
-    float spec_str = 0.2 * light_intensity;
+    const float exposure = 10.0;
+
+    float ambient_str = 0.3;
+    float spec_str = 0.8 * light_intensity;
 
     // too much ambient during daytime is making things look weird
     // ambient_str =- light_intensity * ambient_str;
@@ -45,7 +50,7 @@ vec3 standard_light(vec3 color, vec3 position) {
     vec3 ambient = ambient_str * sun_color;
 
     float spec;
-    bool blinn = false;
+    bool blinn = true;
     if (blinn) {
         const float energy_conservation = ( 8.0 + shiny ) / ( 8.0 * pi );
         vec3 halfway_dir = normalize(light_dir + view_dir);   // blinn-phong
@@ -62,10 +67,10 @@ vec3 standard_light(vec3 color, vec3 position) {
     vec3 specular = spec_str * spec * sun_color;
     vec3 final = (ambient + diffuse + specular) * color;
 
-    return final / (final + vec3(1.0));
+    // tone mappink
+    final = final / (vec3(1.0) - exp(-final * exposure));
+
+    return final;
 }
 
 
-vec3 gamma_correct(vec3 color) {
-    return pow(color, vec3(1.0/2.2));
-}
