@@ -239,8 +239,8 @@ void resize_fbos(struct game *game, int width, int height) {
 
 // TODO: match based on some real concept of time
 static void day_night_cycle(float time, struct resources *res) {
-    float val = time * 10000.0;
-    float intensity = vec3_dot(res->light_dir, V3(0.0, 0.0, 0.8));
+    float val = time * 0.0005;
+    float intensity = max(0.0, vec3_dot(res->light_dir, V3(0.0, 0.0, 0.8)));
 
     float light_pos[3];
 
@@ -263,8 +263,8 @@ static void day_night_cycle(float time, struct resources *res) {
     /* vec3_normalize(res->light_intensity, res->light_intensity); */
 
     res->light_dir[0] = 0.0;
-    res->light_dir[1] = sin(val);
-    res->light_dir[2] = cos(val) + 1.0;
+    res->light_dir[1] = -sin(val);
+    res->light_dir[2] = -cos(val);
 
     vec3_normalize(res->light_dir, res->light_dir);
 
@@ -337,9 +337,9 @@ void update (struct game *game) {
 		toggle_fog = 0;
 	}
 
-    day_night_cycle(*time, res);
+	*time = SDL_GetTicks();
 
-	*time += game->dt * 0.00001f;
+    day_night_cycle(*time, res);
 
 	node_recalc(root);
 
