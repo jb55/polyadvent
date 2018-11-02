@@ -102,12 +102,12 @@ init_gl(struct resources *resources, int width, int height) {
 			 resources->proj_persp);
 
 	/* Shader program */
-    /* struct shader *terrain_shaders[] = */
-    /*     { &terrain_vertex, &fragment, &terrain_tc, &terrain_teval, */
-    /*       &terrain_geom }; */
-
     struct shader *terrain_shaders[] =
-        { &terrain_vertex, &fragment, &terrain_geom };
+        { &terrain_vertex, &fragment, &terrain_tc, &terrain_teval,
+          &terrain_geom };
+
+    /* struct shader *terrain_shaders[] = */
+    /*     { &terrain_vertex, &fragment, &terrain_geom }; */
 
     /* struct shader *terrain_shaders[] = */
     /*     { &terrain_vertex, &fragment }; */
@@ -324,11 +324,11 @@ void render (struct game *game, struct render_config *config) {
             check_gl();
         }
         else {
-            /* glPatchParameteri(GL_PATCH_VERTICES, 3); */
+            glPatchParameteri(GL_PATCH_VERTICES, 3);
             check_gl();
             bind_geometry(&entity->model.geom, &res->attributes);
             check_gl();
-            glDrawElements(GL_TRIANGLES,
+            glDrawElements(GL_PATCHES,
                            entity->model.geom.num_indices,
                            GL_UNSIGNED_INT, 0);
             check_gl();

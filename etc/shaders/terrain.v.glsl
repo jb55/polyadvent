@@ -7,9 +7,9 @@ in vec3 normal;
 
 #include uniforms.glsl
 
-layout(location = 10) out v_data {
+out shader_data {
 #include shadervars.glsl
-} vertices;
+} vertex;
 
 
 void main()
@@ -39,14 +39,8 @@ void main()
 
      // v_color = vec3(position.z, position.z, position.z) * 0.005;
 
-// #include standard_vtxos.glsl
-    vec4 v4_pos = vec4(position, 1.0);
-    vertices.normal = normal;
-    vertices.color_smooth = vertices.color = color;
-    vertices.shadow_coord = depth_mvp * v4_pos;
-    vertices.position = v4_pos.xyz;
-    vertices.frag_pos = (world * v4_pos).xyz;
+#include standard_vtxos.glsl
 
-    gl_Position = mvp * v4_pos;
-    vertices.position = gl_Position.xyz;
+    gl_Position = v4_pos;
+    vertex.position = gl_Position.xyz;
 }

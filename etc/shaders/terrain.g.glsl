@@ -3,7 +3,7 @@
 layout (triangles) in;
 layout (triangle_strip, max_vertices = 3) out;
 
-layout(location = 10) in v_data {
+in shader_data {
 #include shadervars.glsl
 } vertices[];
 
@@ -23,12 +23,13 @@ void main() {
         vertex.color = vertices[i].color;
         vertex.color_smooth = vertices[i].color_smooth;
         vertex.normal = vertices[i].normal;
-        // vertex.shadow_coord = depth_mvp * v4_pos;
-        // vertex.frag_pos = (world * v4_pos).xyz;
-        vertex.shadow_coord = vertices[i].shadow_coord;
-        vertex.frag_pos = vertices[i].frag_pos;
+        vertex.shadow_coord = depth_mvp * v4_pos;
+        vertex.frag_pos = (world * v4_pos).xyz;
+        // vertex.shadow_coord = vertices[i].shadow_coord;
+        // vertex.frag_pos = vertices[i].frag_pos;
 
-        gl_Position = gl_in[i].gl_Position;
+        gl_Position = mvp * gl_in[i].gl_Position;
+        vertex.position = gl_Position.xyz;
         // gl_Position = vec4(vertices[i].position, 1.0);
 
         EmitVertex();

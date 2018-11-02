@@ -27,6 +27,6 @@ void main()
     vec4 p2 = gl_TessCoord.z * gl_in[2].gl_Position;
     // tePatchDistance = gl_TessCoord;
     vec4 te_position = normalize(p0 + p1 + p2);
-    vertex.position = te_position.xyz;
     gl_Position = te_position;
+    vertex.position = gl_Position.xyz;
 }
