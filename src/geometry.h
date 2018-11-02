@@ -25,6 +25,7 @@ struct geometry {
 };
 
 void render_geometry(struct geometry *geom, struct attributes *);
+void bind_geometry(struct geometry *geom, struct attributes *);
 void init_geometry(struct geometry *geom);
 void make_buffer_geometry(struct geometry *geom);
 void destroy_buffer_geometry(struct geometry *geom);

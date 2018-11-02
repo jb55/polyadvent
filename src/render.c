@@ -63,6 +63,7 @@ static const float bias_matrix[] = {
 void
 init_gl(struct resources *resources, int width, int height) {
 	struct shader vertex, terrain_vertex, terrain_geom, fragment, fragment_smooth;
+	struct shader terrain_teval, terrain_tc;
 	float tmp_matrix[16];
 	int ok = 0;
 
@@ -82,6 +83,14 @@ init_gl(struct resources *resources, int width, int height) {
                      &terrain_geom);
 	assert(ok && "terrain geometry shader");
 
+    ok = make_shader(GL_TESS_CONTROL_SHADER, SHADER("terrain.tc.glsl"),
+                     &terrain_tc);
+	assert(ok && "terrain tessellation control shader");
+
+    ok = make_shader(GL_TESS_EVALUATION_SHADER, SHADER("terrain.te.glsl"),
+                     &terrain_teval);
+	assert(ok && "terrain tessellation eval shader");
+
 	ok = make_shader(GL_FRAGMENT_SHADER, SHADER("test.f.glsl"), &fragment);
 	assert(ok && "default fragment shader");
 
@@ -92,9 +101,18 @@ init_gl(struct resources *resources, int width, int height) {
 			 5000,
 			 resources->proj_persp);
 
-	// Shader program
-    struct shader *shaders[] = { &terrain_vertex, &fragment, &terrain_geom };
-    ok = make_program_from_shaders(shaders, 3, &resources->programs[TERRAIN_PROGRAM]);
+	/* Shader program */
+    /* struct shader *terrain_shaders[] = */
+    /*     { &terrain_vertex, &fragment, &terrain_tc, &terrain_teval, */
+    /*       &terrain_geom }; */
+
+    struct shader *terrain_shaders[] =
+        { &terrain_vertex, &fragment, &terrain_geom };
+
+    /* struct shader *terrain_shaders[] = */
+    /*     { &terrain_vertex, &fragment }; */
+    ok = make_program_from_shaders(terrain_shaders, ARRAY_SIZE(terrain_shaders),
+                                   &resources->programs[TERRAIN_PROGRAM]);
 
 	assert(ok && "terrain program");
     check_gl();
@@ -115,51 +133,62 @@ init_gl(struct resources *resources, int width, int height) {
         // Program variables
         resources->uniforms.camera_position =
             glGetUniformLocation(handle, "camera_position");
-
-        resources->uniforms.ambient_str =
-            glGetUniformLocation(handle, "ambient_str");
+        check_gl();
 
         resources->uniforms.depth_mvp =
             glGetUniformLocation(handle, "depth_mvp");
+        check_gl();
 
         resources->uniforms.light_intensity =
             glGetUniformLocation(handle, "light_intensity");
+        check_gl();
 
         resources->uniforms.sky_intensity =
             glGetUniformLocation(handle, "sky_intensity");
+        check_gl();
 
         resources->uniforms.time =
             glGetUniformLocation(handle, "time");
+        check_gl();
 
         resources->uniforms.light_dir =
             glGetUniformLocation(handle, "light_dir");
+        check_gl();
 
         resources->uniforms.sun_color =
             glGetUniformLocation(handle, "sun_color");
+        check_gl();
 
         resources->uniforms.world =
             glGetUniformLocation(handle, "world");
+        check_gl();
 
         resources->uniforms.fog_on =
             glGetUniformLocation(handle, "fog_on");
+        check_gl();
 
         resources->uniforms.diffuse_on =
             glGetUniformLocation(handle, "diffuse_on");
+        check_gl();
 
         resources->uniforms.mvp =
             glGetUniformLocation(handle, "mvp");
+        check_gl();
 
-        resources->uniforms.model_view =
-            glGetUniformLocation(handle, "model_view");
+        /* resources->uniforms.model_view = */
+        /*     glGetUniformLocation(handle, "model_view"); */
 
         resources->uniforms.normal_matrix =
             glGetUniformLocation(handle, "normal_matrix");
+        check_gl();
 
         resources->attributes.normal =
             (gpu_addr)glGetAttribLocation(handle, "normal");
+        check_gl();
 
         resources->attributes.position =
             (gpu_addr)glGetAttribLocation(handle, "position");
+        check_gl();
 
     }
 
@@ -167,7 +196,6 @@ init_gl(struct resources *resources, int width, int height) {
 	resources->attributes.color =
         (gpu_addr)glGetAttribLocation(resources->programs[DEFAULT_PROGRAM]
                                         .handle, "color");
-
     check_gl();
 }
 
@@ -200,7 +228,7 @@ void render (struct game *game, struct render_config *config) {
     glClearColor( gtmp[0], gtmp[1], gtmp[2], 1.0 ); //clear background screen to black
     /* glClearColor( 0.5294f * adjust, 0.8078f * adjust, 0.9216f * adjust, 1.0f ); //clear background screen to black */
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-    /* glEnable(GL_CULL_FACE); */
+    glDisable(GL_CULL_FACE);
 
     check_gl();
 
@@ -233,6 +261,7 @@ void render (struct game *game, struct render_config *config) {
         if (config->is_depth_pass && !entity->casts_shadows)
             continue;
         // TODO this is a bit wonky, refactor this
+
         if (i == 0)
             glUseProgram(terrain_program);
         else if (i == 1)
@@ -244,43 +273,67 @@ void render (struct game *game, struct render_config *config) {
 
         if (config->is_depth_pass) {
             mat4_multiply(bias_matrix, view_proj, config->depth_mvp);
-            glCullFace(GL_FRONT);
+            /* glCullFace(GL_FRONT); */
         }
         else {
             glUniformMatrix4fv(res->uniforms.depth_mvp, 1, 0, config->depth_mvp);
-            glCullFace(GL_BACK);
+            /* glCullFace(GL_BACK); */
         }
+        check_gl();
 
         glUniform3f(res->uniforms.camera_position,
                     camera[M_X],
                     camera[M_Y],
                     camera[M_Z]);
+        printf("%d depth ? %d\n", (int)i, config->is_depth_pass);
 
         glUniform1i(res->uniforms.fog_on, res->fog_on);
         glUniform1i(res->uniforms.diffuse_on, res->diffuse_on);
         glUniform3f(res->uniforms.light_dir, light[0], light[1], light[2]);
         glUniform1f(res->uniforms.light_intensity, res->light_intensity);
-        glUniform1f(res->uniforms.time, res->time);
+        check_gl();
+        printf("light_intensity uniform %d\n", res->uniforms.light_intensity);
+        /* glUniform1f(res->uniforms.time, res->time); */
+        check_gl();
+        printf("sky_intensity uniform %d\n", res->uniforms.sky_intensity);
         glUniform1f(res->uniforms.sky_intensity, sky_intensity);
+        check_gl();
         glUniform3f(res->uniforms.sun_color,
                     res->sun_color[0],
                     res->sun_color[1],
                     res->sun_color[2]);
-
+        check_gl();
 
         mat4_multiply(view_proj, entity->node.mat, mvp);
         mat4_copy(entity->node.mat, model_view);
 
         glUniformMatrix4fv(res->uniforms.mvp, 1, 0, mvp);
+        check_gl();
         glUniformMatrix4fv(res->uniforms.depth_mvp, 1, 0, config->depth_mvp);
-        glUniformMatrix4fv(res->uniforms.model_view, 1, 0, model_view);
+        check_gl();
+        /* glUniformMatrix4fv(res->uniforms.model_view, 1, 0, model_view); */
+        check_gl();
         glUniformMatrix4fv(res->uniforms.world, 1, 0, entity->node.mat);
+        check_gl();
 
         recalc_normals(res->uniforms.normal_matrix, model_view, normal_matrix);
-
-        render_geometry(&entity->model.geom, &res->attributes);
-
         check_gl();
+
+        if (i != 0) {
+            render_geometry(&entity->model.geom, &res->attributes);
+            check_gl();
+        }
+        else {
+            /* glPatchParameteri(GL_PATCH_VERTICES, 3); */
+            check_gl();
+            bind_geometry(&entity->model.geom, &res->attributes);
+            check_gl();
+            glDrawElements(GL_TRIANGLES,
+                           entity->model.geom.num_indices,
+                           GL_UNSIGNED_INT, 0);
+            check_gl();
+        }
+
     }
 
     if (config->draw_ui)

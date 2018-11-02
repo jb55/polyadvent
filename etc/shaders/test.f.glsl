@@ -1,22 +1,12 @@
 #include profile
 
-precision mediump float;
-
 out vec4 frag_color;
 
 #include uniforms.glsl
 
-in f_data {
+in shader_data {
 #include shadervars.glsl
 } vertex;
-
-// in flat vec3 v_color;
-// in vec3 v_color_smooth;
-// in vec3 v_ray;
-// in vec3 v_normal;
-// in vec3 v_position;
-// in vec4 v_shadow_coord;
-// in vec3 v_frag_pos;
 
 uniform sampler2D shadow_map;
 

@@ -8,6 +8,7 @@ vec3 apply_fog(in vec3 rgb, in float distance, in vec3 ray_orig, in vec3 ray_dir
     // sun_amount = pow(sun_amount, 0.0);
 
     vec3 fog_color = sun_color * sky_intensity;
+    // vec3 fog_color = sun_color;
 
     // vec3  fog_color  = mix(vec3(0.5,0.6,0.7),
     //                        vec3(1.0,0.9,0.8),

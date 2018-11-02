@@ -97,4 +97,7 @@ void glFramebufferTexture(	GLenum target,
                             GLuint texture,
                             GLint level);
 
+void glPatchParameteri(	GLenum pname,
+                        GLint value);
+
 #endif /* POLYADVENT_GL_H */

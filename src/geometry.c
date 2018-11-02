@@ -24,8 +24,7 @@ destroy_buffer_geometry(struct geometry *geom) {
     check_gl();
 }
 
-void render_geometry(struct geometry *geom, struct attributes *attrs)
-{
+void bind_geometry(struct geometry *geom, struct attributes *attrs) {
     bind_vbo(&geom->vbos.vertex, attrs->position);
     check_gl();
     if (geom->vbos.normal.handle) {
@@ -42,7 +41,11 @@ void render_geometry(struct geometry *geom, struct attributes *attrs)
     }
     bind_ibo(&geom->vbos.index);
     check_gl();
+}
 
+void render_geometry(struct geometry *geom, struct attributes *attrs)
+{
+    bind_geometry(geom, attrs);
     glDrawElements(GL_TRIANGLES,
                    geom->num_indices, /* count */
                    GL_UNSIGNED_INT,    /* type */

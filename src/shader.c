@@ -52,7 +52,7 @@ static char **resolve_imports(char *contents, int *nlines) {
             line_buff[*nlines] = line;
             line_lens[*nlines] = line_len;
             (*nlines)++;
-            /* printf("%d %.*s", *nlines, line_len, line); */
+            printf("%d %.*s", *nlines, line_len, line);
         }
     }
 
@@ -199,8 +199,7 @@ make_program_from_shaders(struct shader **shaders, int n_shaders, struct gpu_pro
     for (int i = 0; i < n_shaders; i++) {
         program->shaders[i] = *shaders[i];
         struct shader *shader = &program->shaders[i];
-
-        glAttachShader(program->handle, shader->handle);
+        glAttachShader(program->handle, shaders[i]->handle);
     }
 
 	glLinkProgram(program->handle);

@@ -20,8 +20,7 @@ vec3 gamma_correct(vec3 color) {
 }
 
 vec3 standard_light(vec3 color, vec3 position, vec3 normal) {
-	vec4 v4_normal = vec4(normal, 1);
-	vec4 trans_normal = normal_matrix * v4_normal;
+	vec4 trans_normal = vec4(normal, 1);
 
     // vec3 light_dir = vec3()
     const float pi = 3.14159265;

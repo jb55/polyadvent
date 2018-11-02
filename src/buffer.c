@@ -45,7 +45,9 @@ void bind_ibo(struct vbo *vbo) {
 
 static void bind_vbo_internal(struct vbo *vbo, gpu_addr slot, int size) {
   glEnableVertexAttribArray(slot);
+  check_gl();
   glBindBuffer(vbo->type, vbo->handle);
+  check_gl();
   glVertexAttribPointer(slot,              // attribute
                         size,                 // size
                         GL_FLOAT,          // type
