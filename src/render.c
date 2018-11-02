@@ -102,9 +102,12 @@ init_gl(struct resources *resources, int width, int height) {
 			 resources->proj_persp);
 
 	/* Shader program */
+    /* struct shader *terrain_shaders[] = */
+    /*     { &terrain_vertex, &fragment, &terrain_tc, &terrain_teval, */
+    /*       &terrain_geom }; */
+
     struct shader *terrain_shaders[] =
-        { &terrain_vertex, &fragment, &terrain_tc, &terrain_teval,
-          &terrain_geom };
+        { &terrain_vertex, &fragment, &terrain_tc, &terrain_teval };
 
     /* struct shader *terrain_shaders[] = */
     /*     { &terrain_vertex, &fragment, &terrain_geom }; */

@@ -36,7 +36,7 @@ int main(void)
     int height = 480;
 
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 4);
 
     SDL_Window *window = SDL_CreateWindow(
         "SDL2/OpenGL Demo", 0, 0, width, height,

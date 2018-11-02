@@ -7,10 +7,9 @@ in vec3 normal;
 
 #include uniforms.glsl
 
-out shader_data {
+out shader_datab {
 #include shadervars.glsl
 } vertex;
-
 
 void main()
 {
