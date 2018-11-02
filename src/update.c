@@ -244,9 +244,11 @@ static void day_night_cycle(float time, struct resources *res) {
 
     float light_pos[3];
 
+    float g = 0.6;
+    float b = 0.4;
     res->sun_color[0] = 1.0;
-    res->sun_color[1] = 0.9;
-    res->sun_color[2] = 0.8;
+    res->sun_color[1] = g+intensity*(1.0-g);
+    res->sun_color[2] = b+intensity*(1.0-b);
 
     /* res->sun_color[0] = 1.0; */
     /* res->sun_color[1] = 1.0; */
@@ -288,6 +290,7 @@ static void player_update(struct game *game, struct entity *player) {
     /* orbit_camera->inclination += game->dt * 2.0; */
     /* orbit_camera->azimuth += game->dt * 2.0; */
     /* orbit_to_node(orbit_camera, &game->test_resources.camera); */
+
 
     player_terrain_collision(&game->terrain, player);
 }

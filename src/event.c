@@ -17,16 +17,23 @@ void process_events(struct game *game, float *camera) {
     case SDL_KEYUP:
       handle_key(&game->input, event.key);
       break;
+    case SDL_MOUSEBUTTONDOWN:
+        if (event.button.button <= MOUSE_BUTTONS)
+            game->input.mbuttons[event.button.button-1] = 1;
+
+        break;
+    case SDL_MOUSEBUTTONUP:
+        if (event.button.button <= MOUSE_BUTTONS)
+            game->input.mbuttons[event.button.button-1] = 0;
+        break;
     case SDL_MOUSEMOTION:
         if (event.button.button) {
-            if (event.button.button <= MOUSE_BUTTONS)
-                game->input.mbuttons[event.button.button-1] = 1;
-            game->input.is_dragging = 1;
-            mdx += event.motion.xrel;
-            mdy += event.motion.yrel;
             /* printf("drag... %d %d\n", event.motion.xrel, event.motion.yrel); */
+            game->input.last_mx = game->input.mx;
+            game->input.last_my = game->input.mx;
             game->input.mx = event.motion.x;
             game->input.my = event.motion.y;
+
         }
         break;
     case SDL_WINDOWEVENT:
@@ -43,6 +50,4 @@ void process_events(struct game *game, float *camera) {
 
   }
 
-  game->input.mdx = mdx;
-  game->input.mdy = mdy;
 }

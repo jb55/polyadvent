@@ -54,7 +54,7 @@ void game_init(struct game *game, int width, int height) {
         .scale = 1.0
     };
 
-    static const int shadowmap_scale = 10.0;
+    static const int shadowmap_scale = 100.0;
 
     // default ortho screenspace projection
     mat4_ortho(-shadowmap_scale, // left
@@ -97,7 +97,7 @@ void game_init(struct game *game, int width, int height) {
 
     // FBO STUFF
     init_fbo(&res->shadow_buffer);
-    resize_fbos(game, width * shadowmap_scale, height * shadowmap_scale);
+    resize_fbos(game, width, height);
 
     // FBO STUFF END
 

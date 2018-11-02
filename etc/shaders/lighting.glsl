@@ -23,12 +23,14 @@ vec3 standard_light(vec3 color, vec3 position) {
 	vec4 v4_normal = vec4(v_normal , 1);
 	vec4 trans_normal = normal_matrix * v4_normal;
 
+    vec3 light_dir = vec3()
     const float pi = 3.14159265;
     const float shiny = 12.0;
-    const float exposure = 10.0;
+    const float exposure = 0.2;
+    const float ambient_str = 0.2;
+    float spec_str = 0.4 * light_intensity;
 
-    float ambient_str = 0.3;
-    float spec_str = 0.8 * light_intensity;
+    // float light_intensity = light_intensity * 0.01;
 
     // too much ambient during daytime is making things look weird
     // ambient_str =- light_intensity * ambient_str;
@@ -67,8 +69,9 @@ vec3 standard_light(vec3 color, vec3 position) {
     vec3 specular = spec_str * spec * sun_color;
     vec3 final = (ambient + diffuse + specular) * color;
 
-    // tone mappink
-    final = final / (vec3(1.0) - exp(-final * exposure));
+    // tone mapping
+    // final = final / (vec3(1.0) - final * exposure);
+    // final = final / (vec3(1.0) + color);
 
     return final;
 }

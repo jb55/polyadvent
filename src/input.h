@@ -18,16 +18,17 @@ struct input {
   /* enum key_state keys[0x7F-0x1F]; */
     u8 const *keystates;
     SDL_Keymod modifiers;
-    int mdx, mdy;
-    int mx, my;
+    int mx, my, last_mx, last_my;
     int is_dragging;
     int mbuttons[MOUSE_BUTTONS];
 };
+
+int input_is_dragging(struct input *input, int mouse_button);
 
 void input_init(struct input *input);
 
 void input_reset(struct input *input);
 
-void handle_key(struct input *input, SDL_KeyboardEvent ke);
+void handle_key(struct input *input, SDL_KeyboardEvent);
 
 #endif /* POLYADVENT_INPUT_H */
