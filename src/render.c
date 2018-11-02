@@ -62,7 +62,7 @@ static const float bias_matrix[] = {
 
 void
 init_gl(struct resources *resources, int width, int height) {
-	struct shader vertex, terrain_vertex, fragment, fragment_smooth;
+	struct shader vertex, terrain_vertex, terrain_geom, fragment, fragment_smooth;
 	float tmp_matrix[16];
 	int ok = 0;
 
@@ -74,8 +74,13 @@ init_gl(struct resources *resources, int width, int height) {
 	ok = make_shader(GL_VERTEX_SHADER, SHADER("vertex-color.glsl"), &vertex);
 	assert(ok && "vertex-color shader");
 
-    ok = make_shader(GL_VERTEX_SHADER, SHADER("terrain.glsl"), &terrain_vertex);
+    ok = make_shader(GL_VERTEX_SHADER, SHADER("terrain.v.glsl"),
+                     &terrain_vertex);
 	assert(ok && "terrain vertex shader");
+
+    ok = make_shader(GL_GEOMETRY_SHADER, SHADER("terrain.g.glsl"),
+                     &terrain_geom);
+	assert(ok && "terrain geometry shader");
 
 	ok = make_shader(GL_FRAGMENT_SHADER, SHADER("test.f.glsl"), &fragment);
 	assert(ok && "default fragment shader");
@@ -88,8 +93,8 @@ init_gl(struct resources *resources, int width, int height) {
 			 resources->proj_persp);
 
 	// Shader program
-	ok = make_program(&terrain_vertex, &fragment,
-                      &resources->programs[TERRAIN_PROGRAM]);
+    struct shader *shaders[] = { &terrain_vertex, &fragment, &terrain_geom };
+    ok = make_program_from_shaders(shaders, 3, &resources->programs[TERRAIN_PROGRAM]);
 
 	assert(ok && "terrain program");
     check_gl();
@@ -195,7 +200,7 @@ void render (struct game *game, struct render_config *config) {
     glClearColor( gtmp[0], gtmp[1], gtmp[2], 1.0 ); //clear background screen to black
     /* glClearColor( 0.5294f * adjust, 0.8078f * adjust, 0.9216f * adjust, 1.0f ); //clear background screen to black */
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-    glEnable(GL_CULL_FACE);
+    /* glEnable(GL_CULL_FACE); */
 
     check_gl();
 
@@ -239,11 +244,11 @@ void render (struct game *game, struct render_config *config) {
 
         if (config->is_depth_pass) {
             mat4_multiply(bias_matrix, view_proj, config->depth_mvp);
-            glCullFace(GL_FRONT);  
+            glCullFace(GL_FRONT);
         }
         else {
             glUniformMatrix4fv(res->uniforms.depth_mvp, 1, 0, config->depth_mvp);
-            glCullFace(GL_BACK);  
+            glCullFace(GL_BACK);
         }
 
         glUniform3f(res->uniforms.camera_position,
@@ -261,7 +266,7 @@ void render (struct game *game, struct render_config *config) {
                     res->sun_color[0],
                     res->sun_color[1],
                     res->sun_color[2]);
-        
+
 
         mat4_multiply(view_proj, entity->node.mat, mvp);
         mat4_copy(entity->node.mat, model_view);

@@ -143,8 +143,10 @@ terrain_create(struct terrain *terrain) {
     /* vec3_subtract(v[1], c, tmp1); */
     /* vec3_subtract(v[2], c, tmp2); */
 
+    // standard normals
     vec3_subtract(v[1], v[0], tmp1);
     vec3_subtract(v[2], v[0], tmp2);
+
     vec3_cross(tmp1, tmp2, tmp2);
     vec3_normalize(tmp2, tmp2);
 

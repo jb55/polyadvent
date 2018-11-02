@@ -1,4 +1,4 @@
-#version 300 es
+#include profile
 
 in vec3 position;
 in vec3 color;

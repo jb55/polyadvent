@@ -1,6 +1,6 @@
 
 
-#include noise.glsl
+//#include noise.glsl
 
 
 // float clouds(vec3 position) {
@@ -19,16 +19,16 @@ vec3 gamma_correct(vec3 color) {
     return pow(color, vec3(1.0/2.2));
 }
 
-vec3 standard_light(vec3 color, vec3 position) {
-	vec4 v4_normal = vec4(v_normal , 1);
+vec3 standard_light(vec3 color, vec3 position, vec3 normal) {
+	vec4 v4_normal = vec4(normal, 1);
 	vec4 trans_normal = normal_matrix * v4_normal;
 
-    vec3 light_dir = vec3()
+    // vec3 light_dir = vec3()
     const float pi = 3.14159265;
     const float shiny = 12.0;
     const float exposure = 0.2;
     const float ambient_str = 0.2;
-    float spec_str = 0.4 * light_intensity;
+    float spec_str = 0.8 * light_intensity;
 
     // float light_intensity = light_intensity * 0.01;
 
@@ -56,12 +56,12 @@ vec3 standard_light(vec3 color, vec3 position) {
     if (blinn) {
         const float energy_conservation = ( 8.0 + shiny ) / ( 8.0 * pi );
         vec3 halfway_dir = normalize(light_dir + view_dir);   // blinn-phong
-        spec = energy_conservation * pow(max(dot(v_normal, halfway_dir), 0.0), shiny);
+        spec = energy_conservation * pow(max(dot(normal, halfway_dir), 0.0), shiny);
     }
 
     else {
         const float energy_conservation = ( 2.0 + shiny ) / ( 2.0 * pi );
-        vec3 reflect_dir = reflect(-light_dir, v_normal); // phong
+        vec3 reflect_dir = reflect(-light_dir, normal); // phong
         spec = energy_conservation * pow(max(dot(view_dir, reflect_dir), 0.0), shiny);
     }
     // spec += pow(max(dot(view_dir, reflect_dir), 0.0), 16.0) * 0.5;

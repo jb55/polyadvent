@@ -1,22 +1,16 @@
-
-#version 300 es
-
+#include profile
 precision mediump float;
-
 in vec3 position;
 in vec3 normal;
 in vec3 color;
 
 #include uniforms.glsl
 
-flat out float v_light;
+out f_data {
+#include shadervars.glsl
+} vertex;
+
 flat out vec3 v_color;
-out vec3 v_color_smooth;
-out vec3 v_normal;
-out vec3 v_position;
-out vec3 v_ray;
-out vec3 v_frag_pos;
-out vec4 shadow_coord;
 
 void main()
 {

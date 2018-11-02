@@ -194,13 +194,9 @@ static int try_reload_shaders(struct resources *res) {
 
         if (ret == 2) {}
         else if (ret == 1)
-            printf("reload %s + %s success.\n",
-                   program->vertex.filename,
-                   program->fragment.filename);
+            printf("reload %s success.\n", program->shaders[0].filename);
         else
-            printf("reload %s + %s failed.\n",
-                   program->vertex.filename,
-                   program->fragment.filename);
+            printf("reload %s failed.\n", program->shaders[0].filename);
 
         // failure ok, clear any errors
         glGetError();

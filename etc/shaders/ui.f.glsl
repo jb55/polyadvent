@@ -1,4 +1,4 @@
-#version 300 es
+#include profile
 
 precision mediump float;
 

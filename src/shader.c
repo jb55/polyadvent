@@ -112,6 +112,7 @@ int make_shader(GLenum type, const char *filename, struct shader *shader) {
   return 1;
 }
 
+#define N_SHADERS 3
 
 #ifdef DEBUG
 int reload_program(struct gpu_program *program) {
@@ -120,96 +121,87 @@ int reload_program(struct gpu_program *program) {
 	time_t frag_mtime, vert_mtime;
 	int ok;
 
-	vert_mtime = file_mtime(program->vertex.filename);
-	frag_mtime = file_mtime(program->fragment.filename);
+    int n_shaders = program->n_shaders;
+    struct shader new_shaders[n_shaders];
+    struct shader *new_shaders_p[n_shaders];
 
-	int vert_changed =
-		vert_mtime != program->vertex.load_mtime;
+    int changes[n_shaders];
 
-	int frag_changed =
-		frag_mtime != program->fragment.load_mtime;
+    for (int i = 0; i < n_shaders; i++) {
+        new_shaders_p[i] = &new_shaders[i];
+        changes[i] = 0;
+        struct shader *shader = &program->shaders[i];
 
-    for (int i = 0; i < program->vertex.n_includes; ++i) {
-        time_t include_mtime = program->vertex.include_mtimes[i];
-        time_t new_mtime = file_mtime(program->vertex.includes[i]);
-        vert_changed |= include_mtime != new_mtime;
-    }
+        if (!shader)
+            continue;
+
+        time_t mtime = file_mtime(shader->filename);
+        int changed = mtime != shader->load_mtime;
+
+        for (int j = 0; i < shader->n_includes; ++j) {
+            time_t include_mtime = shader->include_mtimes[j];
+            time_t new_mtime = file_mtime(shader->includes[j]);
+            changed |= mtime != new_mtime;
+        }
  
-    for (int i = 0; i < program->fragment.n_includes; ++i) {
-        time_t include_mtime = program->fragment.include_mtimes[i];
-        frag_changed |= include_mtime != file_mtime(program->fragment.includes[i]);
+        changes[i] = changed;
+
+        if (changed) {
+            GLuint old_handle = shader->handle;
+
+            ok = make_shader(shader->type, shader->filename, &new_shaders[i]);
+            if (!ok) {
+                // clean up all the new shaders we've created so far
+                for (int k = 0; k < i; k++)
+                    glDeleteShader(new_shaders[k].handle);
+                return 0;
+            }
+        }
     }
 
-	if (!vert_changed && !frag_changed)
-		return 2;
+    int any_changes = 0;
+    for (int i = 0; i < n_shaders; i++)
+        any_changes |= changes[i];
 
-	// recompile vertex shader
-	if (vert_changed) {
-		glDeleteShader(program->vertex.handle);
+    if (!any_changes)
+        return 2;
 
-		ok =
-			make_shader(GL_VERTEX_SHADER,
-				    program->vertex.filename,
-				    &vert);
-
-		if (!ok)
-			return 0;
-	}
-
-	// recompile fragment shader
-	if (frag_changed) {
-		glDeleteShader(program->fragment.handle);
-
-		ok =
-			make_shader(GL_FRAGMENT_SHADER,
-				    program->fragment.filename,
-				    &frag);
-
-		if (!ok)
-			return 0;
-	}
-
-	if (vert_changed) {
-		glDeleteShader(program->vertex.handle);
-		pvert = &vert;
-		vert.load_mtime = vert_mtime;
-	}
-	else
-		pvert = &program->vertex;
-
-	if (frag_changed) {
-		glDeleteShader(program->fragment.handle);
-		pfrag = &frag;
-		frag.load_mtime = frag_mtime;
-	}
-	else
-		pfrag = &program->fragment;
+    // delete old shaders
+    for (int i = 0; i < n_shaders; i++) {
+        glDeleteShader(program->shaders[i].handle);
+    }
 
 	glDeleteProgram(program->handle);
 
-	make_program(pvert, pfrag, program);
-
-	return 1;
+    // TODO: cleanup failed make_program?
+	return make_program_from_shaders(new_shaders_p, n_shaders, program);
 }
 #endif
 
 int
-make_program(struct shader *vertex, struct shader *fragment,
-	     struct gpu_program *program)
+make_program(struct shader *vertex,
+             struct shader *fragment,
+	         struct gpu_program *program)
+{
+    struct shader *shaders[] = { vertex, fragment };
+    return make_program_from_shaders(shaders, 2, program);
+}
+
+int
+make_program_from_shaders(struct shader **shaders, int n_shaders, struct gpu_program *program)
 {
 	GLint program_ok;
 
 	// TODO: relax these constraints
-	assert(vertex);
-	assert(fragment);
-
 	program->handle = glCreateProgram();
 
-	program->fragment = *fragment;
-	program->vertex = *vertex;
+    assert(n_shaders <= MAX_SHADERS);
+    for (int i = 0; i < n_shaders; i++) {
+        program->shaders[i] = *shaders[i];
+        struct shader *shader = &program->shaders[i];
 
-	glAttachShader(program->handle, vertex->handle);
-	glAttachShader(program->handle, fragment->handle);
+        glAttachShader(program->handle, shader->handle);
+    }
 
 	glLinkProgram(program->handle);
 
