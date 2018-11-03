@@ -6,8 +6,8 @@
 
 #define SHADER(f) "etc/shaders/" f
 
-#define MAX_SHADER_INCLUDES 8
-#define MAX_INCLUDE_FNAME_LEN 48
+#define MAX_SHADER_INCLUDES 16
+#define MAX_INCLUDE_FNAME_LEN 64
 #define MAX_SHADERS 5
 
 struct shader {
@@ -35,6 +35,8 @@ int make_shader(GLenum type, const char *filename, struct shader *shader);
 int make_program_from_shaders(struct shader **shaders,
                               int n_shaders,
                               struct gpu_program *program);
+
+struct shader *get_program_shader(struct gpu_program *program, GLenum type);
 
 int make_program(struct shader *vertex,
 		 struct shader *fragment,

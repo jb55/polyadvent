@@ -18,6 +18,17 @@ static int file_name_lens[MAX_SHADER_INCLUDES];
 static char *line_buff[MAX_LINES];
 static u32 line_lens[MAX_LINES];
 
+static char *cached_file_contents(const char *filename) {
+    size_t len;
+    for (int i = 0; i < file_buf_count; i++) {
+        if (memcmp(file_names[i], filename, file_name_lens[i]) == 0) {
+            return file_buffers[i];
+        }
+    }
+
+    return file_contents(filename, &len);
+}
+
 static char *strsep(char **stringp, const char *delim) {
     if (*stringp == NULL) { return NULL; }
     char *token_start = *stringp;
@@ -27,13 +38,14 @@ static char *strsep(char **stringp, const char *delim) {
     return token_start;
 }
 
-static char **resolve_imports(char *contents, int *nlines) {
+static char **resolve_imports(char *contents, int *nlines, int level) {
     char *line;
-    size_t file_len;
+    int nline = 0;
     char *resolved_contents;
-    static char fname_buf[32];
+    char fname_buf[32] = {0};
 
     while ((line = strsep(&contents, "\n"))) {
+        nline++;
         int line_len = contents - line;
         int size = sizeof("#include");
         if (memcmp(line, "#include ", size) == 0) {
@@ -42,11 +54,15 @@ static char **resolve_imports(char *contents, int *nlines) {
             snprintf(fname_buf, 32, SHADER("%.*s"), file_name_len, filename);
             file_name_lens[file_buf_count] = file_name_len;
             file_names[file_buf_count] = filename;
-            /* printf("got include %s\n", fname_buf); */
+
+            /* printf("got include %.*s at line %d level %d ind %d\n", */
+            /*         file_name_len, filename, nline, level, file_buf_count); */
+
             // TODO (perf): cache file contents based on filename
-            resolved_contents = file_contents(fname_buf, &file_len);
-            file_buffers[file_buf_count++] = resolved_contents;
-            resolve_imports(resolved_contents, nlines);
+            resolved_contents = cached_file_contents(fname_buf);
+            file_buffers[file_buf_count] = resolved_contents;
+            file_buf_count++;
+            resolve_imports(resolved_contents, nlines, level + 1);
         }
         else {
             line_buff[*nlines] = line;
@@ -59,15 +75,28 @@ static char **resolve_imports(char *contents, int *nlines) {
     return line_buff;
 }
 
+
+struct shader *get_program_shader(struct gpu_program *program, GLenum type) {
+    struct shader *shader;
+    for (int i = 0; i < program->n_shaders; i++) {
+        shader = &program->shaders[i];
+        if (shader->type == type)
+            return shader;
+    }
+
+    return NULL;
+}
+
+
 int make_shader(GLenum type, const char *filename, struct shader *shader) {
   size_t length;
   int nlines = 0;
-  static char fname_buf[32];
   GLchar *source = (GLchar *)file_contents(filename, &length);
   if (!source)
       return 0;
 
-  char **lines = resolve_imports(source, &nlines);
+  assert(file_buf_count == 0);
+  char **lines = resolve_imports(source, &nlines, 0);
 
   GLint shader_ok;
 
@@ -79,20 +108,21 @@ int make_shader(GLenum type, const char *filename, struct shader *shader) {
   glShaderSource(shader->handle, nlines, (const char**)lines,
                  (const int*)line_lens);
 
-  free(source);
-
   // shader dependency stuff
   for (int i = 0; i < file_buf_count; ++i) {
       assert(i < MAX_SHADER_INCLUDES);
       char *p = shader->includes[shader->n_includes];
       int name_len = file_name_lens[i];
-      assert(name_len < MAX_INCLUDE_FNAME_LEN);
+      /* printf("%.*s name len %d\n", name_len, file_names[i], name_len); */
       snprintf(p, MAX_INCLUDE_FNAME_LEN, SHADER("%.*s"), name_len, file_names[i]);
+      assert(name_len < MAX_INCLUDE_FNAME_LEN);
       shader->include_mtimes[shader->n_includes] = file_mtime(p);
-      /* printf("including %s as dep of %s\n", p, name_len, shader->filename); */
+      /* printf("'%s' included in '%s'\n", p, shader->filename); */
       shader->n_includes++;
       free(file_buffers[i]);
   }
+  free(source);
+
   file_buf_count = 0;
 
   glCompileShader(shader->handle);
@@ -116,39 +146,33 @@ int make_shader(GLenum type, const char *filename, struct shader *shader) {
 
 #ifdef DEBUG
 int reload_program(struct gpu_program *program) {
-	struct shader vert, frag;
-	struct shader *pvert, *pfrag;
-	time_t frag_mtime, vert_mtime;
 	int ok;
 
     int n_shaders = program->n_shaders;
+    struct gpu_program new_program;
     struct shader new_shaders[n_shaders];
     struct shader *new_shaders_p[n_shaders];
 
     int changes[n_shaders];
 
     for (int i = 0; i < n_shaders; i++) {
-        new_shaders_p[i] = &new_shaders[i];
         changes[i] = 0;
         struct shader *shader = &program->shaders[i];
-
-        if (!shader)
-            continue;
+        new_shaders_p[i] = shader;
 
         time_t mtime = file_mtime(shader->filename);
         int changed = mtime != shader->load_mtime;
 
-        for (int j = 0; i < shader->n_includes; ++j) {
+        for (int j = 0; j < shader->n_includes; ++j) {
             time_t include_mtime = shader->include_mtimes[j];
             time_t new_mtime = file_mtime(shader->includes[j]);
-            changed |= mtime != new_mtime;
+            changed |= include_mtime != new_mtime;
         }
  
         changes[i] = changed;
 
         if (changed) {
-            GLuint old_handle = shader->handle;
-
+            /* printf("making shader %s\n", shader->filename); */
             ok = make_shader(shader->type, shader->filename, &new_shaders[i]);
             if (!ok) {
                 // clean up all the new shaders we've created so far
@@ -156,6 +180,7 @@ int reload_program(struct gpu_program *program) {
                     glDeleteShader(new_shaders[k].handle);
                 return 0;
             }
+            new_shaders_p[i] = &new_shaders[i];
         }
     }
 
@@ -163,18 +188,21 @@ int reload_program(struct gpu_program *program) {
     for (int i = 0; i < n_shaders; i++)
         any_changes |= changes[i];
 
-    if (!any_changes)
+    if (!any_changes) {
         return 2;
-
-    // delete old shaders
-    for (int i = 0; i < n_shaders; i++) {
-        glDeleteShader(program->shaders[i].handle);
     }
 
-	glDeleteProgram(program->handle);
+	ok = make_program_from_shaders(new_shaders_p, n_shaders, &new_program);
 
-    // TODO: cleanup failed make_program?
-	return make_program_from_shaders(new_shaders_p, n_shaders, program);
+    if (!ok) {
+        for (int i = 0; i < n_shaders; i++) {
+            glDeleteShader(program->shaders[i].handle);
+        }
+        return 0;
+    }
+
+    *program = new_program;
+    return 1;
 }
 #endif
 
@@ -194,12 +222,18 @@ make_program_from_shaders(struct shader **shaders, int n_shaders, struct gpu_pro
 
 	// TODO: relax these constraints
 	program->handle = glCreateProgram();
+    program->n_shaders = n_shaders;
 
     assert(n_shaders <= MAX_SHADERS);
     for (int i = 0; i < n_shaders; i++) {
-        program->shaders[i] = *shaders[i];
-        struct shader *shader = &program->shaders[i];
-        glAttachShader(program->handle, shaders[i]->handle);
+        struct shader *shader = shaders[i];
+        program->shaders[i] = *shader;
+        /* printf("attaching shader %s\n", shader->filename); */
+        /* for (int j = 0; j < shader->n_includes; ++j) { */
+        /*     printf("attaching shader %s dep %s \n", shader->filename, */
+        /*            shader->includes[j]); */
+        /* } */
+        glAttachShader(program->handle, shader->handle);
     }
 
 	glLinkProgram(program->handle);

@@ -68,7 +68,7 @@ void render_ui(struct ui *ui, float *view) {
     check_gl();
 
     // render quad
-    render_geometry(&ui->quad, &ui->attrs);
+    render_geometry(&ui->quad, &ui->attrs, ui->shader);
     check_gl();
 }
 

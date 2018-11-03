@@ -1,3 +1,4 @@
+
 #include profile
 
 out vec4 frag_color;
@@ -23,11 +24,11 @@ void main() {
   //     + color_smooth * smoothness;
   vec3 color = standard_light(vertex.color, vertex.position, vertex.normal);
 
-  if (fog_on) {
-    vec3 fog = apply_fog(color, length(v_ray), camera_position, v_ray);
-    // vec3 fog = depth_fog(color, shadow_sample);
-    color = fog;
-  }
+  // if (fog_on) {
+  //   vec3 fog = apply_fog(color, length(v_ray), camera_position, v_ray);
+  //   // vec3 fog = depth_fog(color, shadow_sample);
+  //   color = fog;
+  // }
 
   if (light_dir.z > 0.0 && shadow_sample.z < vertex.shadow_coord.z ) {
     float factor = 1.0/dot(light_dir, vec3(0.0, 0.0, 1.0));

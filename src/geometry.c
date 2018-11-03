@@ -43,10 +43,19 @@ void bind_geometry(struct geometry *geom, struct attributes *attrs) {
     check_gl();
 }
 
-void render_geometry(struct geometry *geom, struct attributes *attrs)
+void render_geometry(struct geometry *geom, struct attributes *attrs,
+                     struct gpu_program *program)
 {
+    int has_tess_shader =
+        get_program_shader(program, GL_TESS_EVALUATION_SHADER) != NULL;
+
+    int type = GL_TRIANGLES;
+    if (has_tess_shader) {
+        glPatchParameteri(GL_PATCH_VERTICES, 3);
+        type = GL_PATCHES;
+    }
     bind_geometry(geom, attrs);
-    glDrawElements(GL_TRIANGLES,
+    glDrawElements(type,
                    geom->num_indices, /* count */
                    GL_UNSIGNED_INT,    /* type */
                    (void*)0            /* element array buffer offset */

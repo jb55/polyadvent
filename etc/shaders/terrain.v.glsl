@@ -7,9 +7,11 @@ in vec3 normal;
 
 #include uniforms.glsl
 
-out shader_datab {
+out shader_data {
+
 #include shadervars.glsl
-} vertex;
+
+} data_out;
 
 void main()
 {
@@ -41,5 +43,5 @@ void main()
 #include standard_vtxos.glsl
 
     gl_Position = v4_pos;
-    vertex.position = gl_Position.xyz;
+    data_out.position = gl_Position.xyz;
 }

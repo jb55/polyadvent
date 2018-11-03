@@ -28,9 +28,8 @@ void main() {
         // vertex.shadow_coord = vertices[i].shadow_coord;
         // vertex.frag_pos = vertices[i].frag_pos;
 
-        gl_Position = mvp * gl_in[i].gl_Position;
-        vertex.position = gl_Position.xyz;
-        // gl_Position = vec4(vertices[i].position, 1.0);
+        // gl_Position = mvp * vec4(400.0 + i * 50.0, 300.0 + i * 50.0, 200.0 + i * 50.0, 1.0);
+        gl_Position = mvp * vec4(vertices[i].position, 1.0);
 
         EmitVertex();
     }

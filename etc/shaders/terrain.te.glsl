@@ -2,13 +2,13 @@
 
 layout(triangles, equal_spacing, cw) in;
 
-in shader_dataz {
+in shader_data {
 #include shadervars.glsl
-} tc_vertices[];
+} data_in[];
 
 out shader_data {
 #include shadervars.glsl
-} vertex;
+} data_out;
 
 #include uniforms.glsl
 
@@ -18,16 +18,17 @@ out shader_data {
 
 void main()
 {
-    vertex.color = tc_vertices[0].color;
-    vertex.color_smooth = tc_vertices[0].color_smooth;
-    vertex.normal = tc_vertices[0].normal;
-    vertex.shadow_coord = depth_mvp * tc_vertices[0].shadow_coord;
-
-    vec4 v = gl_TessCoord.x * gl_in[0].gl_Position;
-           + gl_TessCoord.y * gl_in[1].gl_Position;
-           + gl_TessCoord.z * gl_in[2].gl_Position;
+    vec4 v = gl_TessCoord.x * vec4(data_in[0].position, 1.0);
+    + gl_TessCoord.y * vec4(data_in[1].position, 1.0);
+    + gl_TessCoord.z * vec4(data_in[2].position, 1.0);
     // tePatchDistance = gl_TessCoord;
-    vertex.frag_pos = (world * v).xyz;
     gl_Position = mvp * v;
-    vertex.position = gl_Position.xyz;
+
+    data_out.position = gl_Position.xyz;
+    data_out.color = data_in[0].color;
+    data_out.color_smooth = data_in[0].color_smooth;
+    data_out.normal = data_in[0].normal;
+    data_out.shadow_coord = depth_mvp * data_in[0].shadow_coord;
+    data_out.frag_pos = (world * v).xyz;
+
 }

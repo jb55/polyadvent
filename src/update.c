@@ -39,10 +39,10 @@ static void movement(struct game *game, struct node *node, float speed_mult) {
   if (game->input.keystates[SDL_SCANCODE_S])
     node_forward(node, V3(0,-amt,0));
 
-  if (game->input.keystates[SDL_SCANCODE_R])
+  if (game->input.keystates[SDL_SCANCODE_K])
     node_translate(node, V3(0, 0,amt));
 
-  if (game->input.keystates[SDL_SCANCODE_F])
+  if (game->input.keystates[SDL_SCANCODE_J])
     node_translate(node, V3(0, 0,-amt));
 
   if (game->input.keystates[SDL_SCANCODE_E])
@@ -188,6 +188,7 @@ static void player_movement(struct game *game) {
 #ifdef DEBUG
 static int try_reload_shaders(struct resources *res) {
 	int ret;
+    static int wut = 0;
     for (int i = 0; i < NUM_PROGRAMS; ++i) {
         struct gpu_program *program = &res->programs[i];
         ret = reload_program(program);

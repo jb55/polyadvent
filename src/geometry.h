@@ -4,6 +4,7 @@
 
 #include "common.h"
 #include "buffer.h"
+#include "shader.h"
 
 struct buffer_geometry {
     struct vbo vertex;
@@ -24,7 +25,8 @@ struct geometry {
     float *tex_coords;
 };
 
-void render_geometry(struct geometry *geom, struct attributes *);
+void render_geometry(struct geometry *geom, struct attributes *,
+                     struct gpu_program *current_program);
 void bind_geometry(struct geometry *geom, struct attributes *);
 void init_geometry(struct geometry *geom);
 void make_buffer_geometry(struct geometry *geom);

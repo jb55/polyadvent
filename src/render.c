@@ -106,11 +106,11 @@ init_gl(struct resources *resources, int width, int height) {
     /*     { &terrain_vertex, &fragment, &terrain_tc, &terrain_teval, */
     /*       &terrain_geom }; */
 
-    struct shader *terrain_shaders[] =
-        { &terrain_vertex, &fragment, &terrain_tc, &terrain_teval };
-
     /* struct shader *terrain_shaders[] = */
-    /*     { &terrain_vertex, &fragment, &terrain_geom }; */
+    /*     { &terrain_vertex, &fragment, &terrain_tc, &terrain_teval }; */
+
+    struct shader *terrain_shaders[] =
+        { &terrain_vertex, &fragment, &terrain_geom };
 
     /* struct shader *terrain_shaders[] = */
     /*     { &terrain_vertex, &fragment }; */
@@ -256,8 +256,13 @@ void render (struct game *game, struct render_config *config) {
         , &game->test_resources.player
         };
 
-    int terrain_program = game->test_resources.programs[TERRAIN_PROGRAM].handle;
-    int default_program = game->test_resources.programs[DEFAULT_PROGRAM].handle;
+    struct gpu_program *current_program = NULL;
+
+    struct gpu_program *terrain_program =
+        &game->test_resources.programs[TERRAIN_PROGRAM];
+
+    struct gpu_program *default_program =
+        &game->test_resources.programs[DEFAULT_PROGRAM];
 
     for (size_t i = 0; i < ARRAY_SIZE(entities); ++i) {
         struct entity *entity = entities[i];
@@ -265,10 +270,8 @@ void render (struct game *game, struct render_config *config) {
             continue;
         // TODO this is a bit wonky, refactor this
 
-        if (i == 0)
-            glUseProgram(terrain_program);
-        else if (i == 1)
-            glUseProgram(default_program);
+        current_program = i == 0 ? terrain_program : default_program;
+        glUseProgram(current_program->handle);
         check_gl();
 
         mat4_inverse(camera, view);
@@ -288,17 +291,14 @@ void render (struct game *game, struct render_config *config) {
                     camera[M_X],
                     camera[M_Y],
                     camera[M_Z]);
-        printf("%d depth ? %d\n", (int)i, config->is_depth_pass);
 
         glUniform1i(res->uniforms.fog_on, res->fog_on);
         glUniform1i(res->uniforms.diffuse_on, res->diffuse_on);
         glUniform3f(res->uniforms.light_dir, light[0], light[1], light[2]);
         glUniform1f(res->uniforms.light_intensity, res->light_intensity);
         check_gl();
-        printf("light_intensity uniform %d\n", res->uniforms.light_intensity);
         /* glUniform1f(res->uniforms.time, res->time); */
         check_gl();
-        printf("sky_intensity uniform %d\n", res->uniforms.sky_intensity);
         glUniform1f(res->uniforms.sky_intensity, sky_intensity);
         check_gl();
         glUniform3f(res->uniforms.sun_color,
@@ -322,21 +322,8 @@ void render (struct game *game, struct render_config *config) {
         recalc_normals(res->uniforms.normal_matrix, model_view, normal_matrix);
         check_gl();
 
-        if (i != 0) {
-            render_geometry(&entity->model.geom, &res->attributes);
-            check_gl();
-        }
-        else {
-            glPatchParameteri(GL_PATCH_VERTICES, 3);
-            check_gl();
-            bind_geometry(&entity->model.geom, &res->attributes);
-            check_gl();
-            glDrawElements(GL_PATCHES,
-                           entity->model.geom.num_indices,
-                           GL_UNSIGNED_INT, 0);
-            check_gl();
-        }
-
+        render_geometry(&entity->model.geom, &res->attributes, current_program);
+        check_gl();
     }
 
     if (config->draw_ui)

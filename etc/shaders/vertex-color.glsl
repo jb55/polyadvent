@@ -6,7 +6,7 @@ in vec3 color;
 
 out shader_data {
 #include shadervars.glsl
-} vertex;
+} data_out;
 
 #include uniforms.glsl
 
@@ -14,6 +14,5 @@ out shader_data {
 void main()
 {
 #include standard_vtxos.glsl
-
     gl_Position = mvp * v4_pos;
 }
