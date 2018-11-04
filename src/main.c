@@ -35,13 +35,9 @@ int main(void)
     int width = 640;
     int height = 480;
 
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 4);
-
     SDL_Window *window = SDL_CreateWindow(
         "SDL2/OpenGL Demo", 0, 0, width, height,
         SDL_WINDOW_OPENGL|SDL_WINDOW_RESIZABLE);
-
 
     SDL_GL_CreateContext(window);
     game_init(&game, width, height);

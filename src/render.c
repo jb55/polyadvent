@@ -68,8 +68,10 @@ init_gl(struct resources *resources, int width, int height) {
 	int ok = 0;
 
 	glEnable(GL_DEPTH_TEST);
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 4);
 
 	// Shaders
 	ok = make_shader(GL_VERTEX_SHADER, SHADER("vertex-color.glsl"), &vertex);
@@ -231,7 +233,6 @@ void render (struct game *game, struct render_config *config) {
     glClearColor( gtmp[0], gtmp[1], gtmp[2], 1.0 ); //clear background screen to black
     /* glClearColor( 0.5294f * adjust, 0.8078f * adjust, 0.9216f * adjust, 1.0f ); //clear background screen to black */
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-    glDisable(GL_CULL_FACE);
 
     check_gl();
 
@@ -277,7 +278,7 @@ void render (struct game *game, struct render_config *config) {
 
         if (config->is_depth_pass) {
             mat4_multiply(bias_matrix, view_proj, config->depth_mvp);
-            glCullFace(GL_FRONT);
+            /* glCullFace(GL_FRONT); */
         }
         else {
             glUniformMatrix4fv(res->uniforms.depth_mvp, 1, 0, config->depth_mvp);

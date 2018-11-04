@@ -132,3 +132,10 @@ make_buffer_geometry(struct geometry *geom) {
                     &geom->vbos.index
                     );
 }
+
+
+
+void geometry_centroid(struct geometry *geom, float *dest) {
+    vec3_subtract(geom->max, geom->min, dest);
+    vec3_scale(dest, 0.5, dest);
+};

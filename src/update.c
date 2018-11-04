@@ -220,11 +220,13 @@ void resize_fbos(struct game *game, int width, int height) {
         delete_fbo(&res->shadow_buffer);
     }
 
-    const float factor = 8.0;
+    // TODO: compute better bounds based
+    const float factor = 4.0;
     float left = res->player.model.geom.min[0] * factor;
     float right = res->player.model.geom.max[0] * factor;
     float bottom = res->player.model.geom.min[1] * factor;
     float top = res->player.model.geom.max[1] * factor;
+
     const float near = -10000.0;
     const float far = 10000.0;
 
@@ -249,6 +251,7 @@ void resize_fbos(struct game *game, int width, int height) {
 static void day_night_cycle(float time, struct resources *res) {
     float val = time * 0.0001;
     float intensity = max(0.0, vec3_dot(res->light_dir, V3(0.0, 0.0, 0.8)));
+    struct entity *player = &res->player;
 
     float light_pos[3];
 
@@ -281,9 +284,15 @@ static void day_night_cycle(float time, struct resources *res) {
     /* printf("intensity %f(%f) n %f light_dir %f %f\n", roots, intensity, */
     /*        n, res->light_dir[1], res->light_dir[2]); */
 
-    vec3_add(res->player.node.pos, res->light_dir, light_pos);
+    vec3_add(player->node.pos, res->light_dir, light_pos);
 
-    look_at(light_pos, res->player.node.pos, V3(0, 0, 1.0), res->sun_camera.mat);
+    /* float target[3]; */
+    /* float hh = player->model.geom.max[2] / 2.0; */
+    /* vec3_copy(player->node.pos, target); */
+    /* target[2] += 2.0; */
+
+    look_at(light_pos, player->node.pos, V3(0, 0, 1.0), res->sun_camera.mat);
+    /* look_at(light_pos, player->node.pos, V3(0, 0, 1.0), res->sun_camera.mat); */
 }
 
 static void gravity(struct game *game) {

@@ -33,5 +33,6 @@ void bind_geometry(struct geometry *geom, struct attributes *);
 void init_geometry(struct geometry *geom);
 void make_buffer_geometry(struct geometry *geom);
 void destroy_buffer_geometry(struct geometry *geom);
+void geometry_centroid(struct geometry *geom, float *v3);
 
 #endif /* GEOMETRY_H */
