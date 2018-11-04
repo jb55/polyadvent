@@ -6,6 +6,7 @@
 #include "file.h"
 #include "common.h"
 #include "ply.h"
+#include "vec3.h"
 
 /* void parse_vertex( */
 
@@ -157,6 +158,16 @@ int parse_ply(const char *filename, struct geometry *geom) {
                 printf("failed parsing verts\n");
                 done = 1;
                 break;
+            }
+
+            // compute bounding box as we go
+            if (cvert == 0) {
+                vec3_copy(vert, geom->min);
+                vec3_copy(vert, geom->max);
+            }
+            else {
+                vec3_min(vert, geom->min, geom->min);
+                vec3_max(vert, geom->max, geom->max);
             }
 
             geom->vertices[cvert * 3]     = vert[0];

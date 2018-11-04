@@ -16,6 +16,8 @@ struct buffer_geometry {
 
 struct geometry {
     struct buffer_geometry vbos;
+    float min[3];
+    float max[3];
     int num_indices;
     int num_verts;
     float *vertices;
