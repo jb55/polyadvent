@@ -220,6 +220,17 @@ void resize_fbos(struct game *game, int width, int height) {
         delete_fbo(&res->shadow_buffer);
     }
 
+    const float factor = 8.0;
+    float left = res->player.model.geom.min[0] * factor;
+    float right = res->player.model.geom.max[0] * factor;
+    float bottom = res->player.model.geom.min[1] * factor;
+    float top = res->player.model.geom.max[1] * factor;
+    const float near = -10000.0;
+    const float far = 10000.0;
+
+    // default ortho screenspace projection
+    mat4_ortho(left, right, bottom, top, near, far, res->proj_ortho);
+
     create_fbo(&res->shadow_buffer, width, height);
     /* fbo_attach_renderbuffer(&res->shadow_buffer, GL_DEPTH24_STENCIL8, */
     /*                         GL_DEPTH_STENCIL_ATTACHMENT); */

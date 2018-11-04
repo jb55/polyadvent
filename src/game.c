@@ -40,7 +40,7 @@ void game_init(struct game *game, int width, int height) {
     mat4 *light_dir = res->light_dir;
     int ok = 0;
 
-    const double size = 1000;
+    const double size = 10000;
 
     terrain->settings = (struct perlin_settings){
         .depth = 1,
@@ -53,18 +53,6 @@ void game_init(struct game *game, int width, int height) {
         .exp = 5.3,
         .scale = 1.0
     };
-
-    static const int shadowmap_scale = 10.0;
-
-    // default ortho screenspace projection
-    mat4_ortho(-shadowmap_scale, // left
-               shadowmap_scale, // right
-               -shadowmap_scale, // bottom
-               shadowmap_scale, // top
-               -10000.0, // near
-               10000.0,  // far
-               res->proj_ortho
-               );
 
     create_ui(&game->ui, width, height, &res->programs[UI_PROGRAM]);
 
@@ -118,7 +106,7 @@ void game_init(struct game *game, int width, int height) {
     terrain->entity.casts_shadows = 0;
 
     // player init
-    ok = load_model(&player->model, "ico-sphere");
+    ok = load_model(&player->model, "tower");
     assert(ok);
     player->model.shading = SHADING_VERT_COLOR;
     player->node.label = "player";
