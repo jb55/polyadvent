@@ -44,15 +44,15 @@ int main(void)
 
     check_gl();
     double last = hires_time_in_seconds();
-    static float depth_mvp[MAT4_ELEMS];
-    mat4_id(depth_mvp);
+    static float depth_vp[MAT4_ELEMS];
+    mat4_id(depth_vp);
 
     struct render_config fbo_render_config = {
       .draw_ui = 0,
       .is_depth_pass = 1,
       .camera = game.test_resources.sun_camera.mat,
       .projection = game.test_resources.proj_ortho,
-      .depth_mvp = depth_mvp
+      .depth_vp = depth_vp
     };
 
     struct render_config default_config = {
@@ -60,7 +60,7 @@ int main(void)
       .is_depth_pass = 0,
       .camera = game.test_resources.camera.mat,
       .projection = game.test_resources.proj_persp,
-      .depth_mvp = depth_mvp
+      .depth_vp = depth_vp
     };
 
     while (1) {

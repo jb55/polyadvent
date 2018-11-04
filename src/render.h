@@ -10,7 +10,7 @@ struct render_config {
     int is_depth_pass;
     float *camera;
     float *projection;
-    float *depth_mvp;
+    float *depth_vp;
 };
 
 void init_gl(struct resources *resources, int width, int height);

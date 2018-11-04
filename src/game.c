@@ -40,7 +40,7 @@ void game_init(struct game *game, int width, int height) {
     mat4 *light_dir = res->light_dir;
     int ok = 0;
 
-    const double size = 10000;
+    const double size = 10000.0;
 
     terrain->settings = (struct perlin_settings){
         .depth = 1,
@@ -106,7 +106,7 @@ void game_init(struct game *game, int width, int height) {
     terrain->entity.casts_shadows = 0;
 
     // player init
-    ok = load_model(&player->model, "tower");
+    ok = load_model(&player->model, "pirate-officer");
     assert(ok);
     player->model.shading = SHADING_VERT_COLOR;
     player->node.label = "player";

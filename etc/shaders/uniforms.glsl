@@ -4,7 +4,7 @@ uniform bool fog_on;
 uniform float sky_intensity;
 uniform float light_intensity;
 uniform mat4 depth_mvp;
-// uniform mat4 model_view;
+uniform mat4 model_view;
 uniform mat4 mvp;
 uniform mat4 normal_matrix;
 uniform mat4 world;

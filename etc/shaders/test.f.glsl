@@ -24,18 +24,27 @@ void main() {
   //     + color_smooth * smoothness;
   vec3 color = standard_light(vertex.color, vertex.position, vertex.normal);
 
-  // if (fog_on) {
-  //   vec3 fog = apply_fog(color, length(v_ray), camera_position, v_ray);
-  //   // vec3 fog = depth_fog(color, shadow_sample);
-  //   color = fog;
-  // }
-
-  if (light_dir.z > 0.0 && shadow_sample.z < vertex.shadow_coord.z ) {
-    float factor = 1.0/dot(light_dir, vec3(0.0, 0.0, 1.0));
-    visibility = clamp(0.2 * factor, 0.5, 1.0);
+  if (fog_on) {
+    vec3 fog = apply_fog(color, length(v_ray), camera_position, v_ray);
+    // vec3 fog = depth_fog(color, shadow_sample);
+    color = fog;
   }
 
-  color = color * visibility;
+  float bias = 0.006;
+  bool in_shadow =
+      shadow_sample.z < vertex.shadow_coord.z - bias
+      && shadow_sample.y < 1.0;
+
+  if (light_dir.z > 0.0 && in_shadow) {
+      float factor = 1.0/(dot(light_dir, vec3(0.0, 0.0, 1.0)));
+      // float factor = 1.0;
+      visibility = clamp(0.2 * factor, 0.5, 1.0);
+      // visibility = shadow_sample;
+  }
+
+  // float factor = 1.0/(dot(light_dir, vec3(0.0, 0.0, 1.0)));
+  color *= visibility;
+  // color += shadow_sample.z * factor;
   // float dist = length(camera_position - vertex.position);
 
   frag_color = vec4(color, 1.0);

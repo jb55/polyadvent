@@ -180,8 +180,8 @@ init_gl(struct resources *resources, int width, int height) {
             glGetUniformLocation(handle, "mvp");
         check_gl();
 
-        /* resources->uniforms.model_view = */
-        /*     glGetUniformLocation(handle, "model_view"); */
+        resources->uniforms.model_view =
+            glGetUniformLocation(handle, "model_view");
 
         resources->uniforms.normal_matrix =
             glGetUniformLocation(handle, "normal_matrix");
@@ -241,6 +241,7 @@ void render (struct game *game, struct render_config *config) {
     static float view_proj[MAT4_ELEMS] = { 0 };
     static float normal_matrix[MAT4_ELEMS] = { 0 };
     static float model_view[MAT4_ELEMS] = { 0 };
+    static float depth_mvp[MAT4_ELEMS] = { 0 };
     mat4_id(id);
     mat4_id(model_view);
 
@@ -263,6 +264,17 @@ void render (struct game *game, struct render_config *config) {
     struct gpu_program *default_program =
         &game->test_resources.programs[DEFAULT_PROGRAM];
 
+    mat4_inverse(camera, view);
+    mat4_multiply(projection, view, view_proj);
+
+    if (config->is_depth_pass) {
+        /* glCullFace(GL_FRONT); */
+        mat4_multiply(bias_matrix, view_proj, config->depth_vp);
+    }
+    else {
+        glCullFace(GL_BACK);
+    }
+
     for (size_t i = 0; i < ARRAY_SIZE(entities); ++i) {
         struct entity *entity = entities[i];
         if (config->is_depth_pass && !entity->casts_shadows)
@@ -273,18 +285,6 @@ void render (struct game *game, struct render_config *config) {
         glUseProgram(current_program->handle);
         check_gl();
 
-        mat4_inverse(camera, view);
-        mat4_multiply(projection, view, view_proj);
-
-        if (config->is_depth_pass) {
-            mat4_multiply(bias_matrix, view_proj, config->depth_mvp);
-            /* glCullFace(GL_FRONT); */
-        }
-        else {
-            glUniformMatrix4fv(res->uniforms.depth_mvp, 1, 0, config->depth_mvp);
-            glCullFace(GL_BACK);
-        }
-        check_gl();
 
         glUniform3f(res->uniforms.camera_position,
                     camera[M_X],
@@ -309,11 +309,15 @@ void render (struct game *game, struct render_config *config) {
         mat4_multiply(view_proj, entity->node.mat, mvp);
         mat4_copy(entity->node.mat, model_view);
 
+        /* if (i == 1) */
+        /*     mat4_multiply(bias_matrix, mvp, config->depth_mvp); */
+        mat4_multiply(config->depth_vp, model_view, depth_mvp);
+
         glUniformMatrix4fv(res->uniforms.mvp, 1, 0, mvp);
         check_gl();
-        glUniformMatrix4fv(res->uniforms.depth_mvp, 1, 0, config->depth_mvp);
+        glUniformMatrix4fv(res->uniforms.depth_mvp, 1, 0, depth_mvp);
         check_gl();
-        /* glUniformMatrix4fv(res->uniforms.model_view, 1, 0, model_view); */
+        glUniformMatrix4fv(res->uniforms.model_view, 1, 0, model_view);
         check_gl();
         glUniformMatrix4fv(res->uniforms.world, 1, 0, entity->node.mat);
         check_gl();

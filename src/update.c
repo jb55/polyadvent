@@ -221,14 +221,14 @@ void resize_fbos(struct game *game, int width, int height) {
     }
 
     // TODO: compute better bounds based
-    const float factor = 4.0;
-    float left = res->player.model.geom.min[0] * factor;
-    float right = res->player.model.geom.max[0] * factor;
-    float bottom = res->player.model.geom.min[1] * factor;
-    float top = res->player.model.geom.max[1] * factor;
+    const float factor = 10.0;
+    float left = res->player.model.geom.min[0] - factor;
+    float right = res->player.model.geom.max[0] + factor;
+    float bottom = res->player.model.geom.min[1] - factor;
+    float top = res->player.model.geom.max[1] + factor;
 
-    const float near = -10000.0;
-    const float far = 10000.0;
+    const float near = -50.0;
+    const float far = 50.0;
 
     // default ortho screenspace projection
     mat4_ortho(left, right, bottom, top, near, far, res->proj_ortho);
