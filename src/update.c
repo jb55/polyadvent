@@ -84,73 +84,73 @@ static void remap_samples(struct point *points, int n_samples,
     }
 }
 
-void update_terrain(struct game *game) {
-  static int first = 1;
-  static float last_scale = -1.0;
+void update_terrain(struct terrain *terrain) {
+    static int first = 1;
+    static float last_scale = -1.0;
 
-  struct perlin_settings *ts = &game->terrain.settings;
-  struct node *tnode = &game->terrain.entity.node;
-  struct terrain *terrain = &game->terrain;
+    struct entity *ent = get_entity(&terrain->entity_id);
+    assert(ent);
+    struct perlin_settings *ts = &terrain->settings;
+    struct node *tnode = &ent->node;
 
-  printf("updating terrain\n");
+    printf("updating terrain\n");
 
-  if (first) {
-    terrain_init(terrain);
-    tnode->pos[0] = rand_0to1() * 100000.0;
-    tnode->pos[1] = rand_0to1() * 100000.0;
-    first = 0;
-  }
+    if (first) {
+        reset_terrain(terrain, terrain->size);
+        tnode->pos[0] = rand_0to1() * terrain->size;
+        tnode->pos[1] = rand_0to1() * terrain->size;
+        first = 0;
+    }
 
-  ts->ox = tnode->pos[0];
-  ts->oy = tnode->pos[1];
+    ts->ox = tnode->pos[0];
+    ts->oy = tnode->pos[1];
 
-  double scale = tnode->pos[2] * 0.0015;
-  if (scale == 0) scale = 1.0;
+    double scale = tnode->pos[2] * 0.0015;
+    if (scale == 0) scale = 1.0;
 
-  printf("terrain %f %f %f\n", tnode->pos[0], tnode->pos[1], tnode->pos[2]);
+    printf("terrain %f %f %f\n", tnode->pos[0], tnode->pos[1], tnode->pos[2]);
 
-  /* ts.o1s = fabs(sin(1/n) * 0.25); */
-  /* ts.o1 = fabs(cos(n*0.2) * 0.5); */
-  /* ts.o2s = fabs(cos(n+2) * 0.5); */
-  /* ts.o2 = fabs(sin(n*0.02) * 2); */
-  ts->freq = scale * 0.05;
-  ts->amplitude = 50.0;
+    /* ts.o1s = fabs(sin(1/n) * 0.25); */
+    /* ts.o1 = fabs(cos(n*0.2) * 0.5); */
+    /* ts.o2s = fabs(cos(n+2) * 0.5); */
+    /* ts.o2 = fabs(sin(n*0.02) * 2); */
+    ts->freq = scale * 0.05;
+    ts->amplitude = 50.0;
 
-  if (terrain->fn)
-    terrain_destroy(&game->terrain);
+    /* if (terrain->fn) */
+    /*     destroy_terrain(terrain); */
 
+    /* const double pdist = min(5.0, max(1.1, 1.0/scale*1.4)); */
 
-  /* const double pdist = min(5.0, max(1.1, 1.0/scale*1.4)); */
+    /* printf("pdist %f\n", pdist); */
 
-  /* printf("pdist %f\n", pdist); */
+    if (last_scale == -1.0 || fabs(scale - last_scale) > 0.00001) {
+        printf("generating new samples\n");
 
-  if (last_scale == -1.0 || fabs(scale - last_scale) > 0.00001) {
-    printf("generating new samples\n");
+        if (terrain->samples)
+        free(terrain->samples);
 
-    if (terrain->samples)
-      free(terrain->samples);
+        int n_samples =
+        (terrain->size * terrain->size) / (scale * scale);
 
-    int n_samples =
-      (terrain->size * game->terrain.size) / (scale * scale);
+        /* struct point *samples = */
+        /*   uniform_samples(n_samples, game->terrain.size); */
 
-    /* struct point *samples = */
-    /*   uniform_samples(n_samples, game->terrain.size); */
+        static const double pdist = 24.0;
 
-    static const double pdist = 24.0;
+        struct point *samples =
+        poisson_disk_samples(pdist, terrain->size, 30, &n_samples);
 
-    struct point *samples =
-      poisson_disk_samples(pdist, game->terrain.size, 30, &n_samples);
+        /* remap_samples(samples, n_samples, game->terrain.size); */
 
-    /* remap_samples(samples, n_samples, game->terrain.size); */
+        /* draw_samples(samples, pdist, n_samples, game->terrain.size); */
 
-    /* draw_samples(samples, pdist, n_samples, game->terrain.size); */
+        terrain->samples = samples;
+        terrain->n_samples = n_samples;
+    }
 
-    terrain->samples = samples;
-    terrain->n_samples = n_samples;
-  }
-
-  last_scale = scale;
-  terrain_create(&game->terrain);
+    last_scale = scale;
+    create_terrain(terrain);
 }
 
 static void player_terrain_collision(struct terrain *terrain, struct entity *player) {
@@ -161,7 +161,7 @@ static void player_terrain_collision(struct terrain *terrain, struct entity *pla
         float player_z = player->node.pos[2];
 
         float terrain_z =
-            terrain->fn(terrain, player->node.pos[0], player->node.pos[1]) + 5.0;
+            terrain->fn(terrain, player->node.pos[0], player->node.pos[1]);
 
         float inset =
             min(0.0, player_z - terrain_z);
@@ -172,9 +172,8 @@ static void player_terrain_collision(struct terrain *terrain, struct entity *pla
 
 }
 
-static void player_movement(struct game *game) {
-  struct resources *res = &game->test_resources;
-  movement(game, &res->player.node, 2.0);
+static void player_movement(struct game *game, struct entity *player) {
+  movement(game, &player->node, 2.0);
 
   /* vec3 *camera_world = node_world(&res->camera); */
   /* float cam_terrain_z = */
@@ -210,37 +209,36 @@ static int try_reload_shaders(struct resources *res) {
 }
 #endif
 
-void resize_fbos(struct game *game, int width, int height) {
-    struct resources *res = &game->test_resources;
-
-    if (res->shadow_buffer.handle) {
+void resize_fbos(struct entity *player, struct fbo *shadow_buffer,
+                 float *m4_ortho, int width, int height) {
+    if (shadow_buffer->handle) {
         // TODO: remove once delete_fbo deletes attachments
-        glDeleteTextures(1, &res->shadow_buffer.attachments[1]);
-        glDeleteRenderbuffers(1, &res->shadow_buffer.attachments[0]);
-        delete_fbo(&res->shadow_buffer);
+        glDeleteTextures(1, &shadow_buffer->attachments[1]);
+        glDeleteRenderbuffers(1, &shadow_buffer->attachments[0]);
+        delete_fbo(shadow_buffer);
     }
 
     // TODO: compute better bounds based
-    const float factor = 10.0;
-    float left = res->player.model.geom.min[0] - factor;
-    float right = res->player.model.geom.max[0] + factor;
-    float bottom = res->player.model.geom.min[1] - factor;
-    float top = res->player.model.geom.max[1] + factor;
+    const float factor = 50.0;
+    float left   = player->model.geom.min[0] - factor;
+    float right  = player->model.geom.max[0] + factor;
+    float bottom = player->model.geom.min[1] - factor;
+    float top    = player->model.geom.max[1] + factor;
 
-    const float near = -50.0;
-    const float far = 50.0;
+    const float near = -80.0;
+    const float far = 80.0;
 
     // default ortho screenspace projection
-    mat4_ortho(left, right, bottom, top, near, far, res->proj_ortho);
+    mat4_ortho(left, right, bottom, top, near, far, m4_ortho);
 
-    create_fbo(&res->shadow_buffer, width, height);
+    create_fbo(shadow_buffer, width, height );
     /* fbo_attach_renderbuffer(&res->shadow_buffer, GL_DEPTH24_STENCIL8, */
     /*                         GL_DEPTH_STENCIL_ATTACHMENT); */
 
     /* fbo_attach_color_texture(&res->shadow_buffer); */
-    fbo_attach_depth_texture(&res->shadow_buffer);
+    fbo_attach_depth_texture(shadow_buffer);
 
-    check_fbo(&res->shadow_buffer);
+    check_fbo(shadow_buffer);
 
     /* fbo_attach_texture(&res->shadow_buffer, GL_DEPTH_COMPONENT16, */
     /*                    GL_DEPTH_COMPONENT, GL_DEPTH_ATTACHMENT); */
@@ -251,7 +249,7 @@ void resize_fbos(struct game *game, int width, int height) {
 static void day_night_cycle(float time, struct resources *res) {
     float val = time * 0.0001;
     float intensity = max(0.0, vec3_dot(res->light_dir, V3(0.0, 0.0, 0.8)));
-    struct entity *player = &res->player;
+    struct entity *player = get_player(res);
 
     float light_pos[3];
 
@@ -296,7 +294,7 @@ static void day_night_cycle(float time, struct resources *res) {
 }
 
 static void gravity(struct game *game) {
-    struct entity *player = &game->test_resources.player;
+    struct entity *player = get_player(&game->test_resources);
 
     node_translate(&player->node, V3(0.0, 0.0, -1.0));
 }
@@ -316,19 +314,21 @@ void update (struct game *game) {
 	static int toggle_fog = 0;
 	static int first = 1;
 	struct resources *res = &game->test_resources;
-	struct node *tnode = &game->terrain.entity.node;
+    struct terrain *terrain = &game->terrain;
+	struct node *tnode = &get_entity(&terrain->entity_id)->node;
 	struct node *root = &game->test_resources.root;
+    struct entity *player = get_player(res);
     float *time = &res->time;
 	float *light = res->light_dir;
 
     gravity(game);
 
 	if (first) {
-		update_terrain(game);
+		update_terrain(terrain);
 		first = 0;
 	}
 
-    player_update(game, &res->player);
+    player_update(game, player);
 
 	if (game->input.modifiers & KMOD_LALT) {
 		movement(game, &res->camera, 1.0);
@@ -337,7 +337,7 @@ void update (struct game *game) {
 		movement(game, tnode, 5.0);
 	}
 	else {
-		player_movement(game);
+		player_movement(game, player);
 	}
 
 

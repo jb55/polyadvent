@@ -19,29 +19,28 @@ vec3 gamma_correct(vec3 color) {
     return pow(color, vec3(1.0/2.2));
 }
 
-vec3 standard_light(vec3 color, vec3 position, vec3 normal) {
-    vec4 trans_normal = normal_matrix * vec4(normal, 1.0);
-
+vec3 standard_light(vec3 color, vec4 position, vec4 normal) {
     // vec3 light_dir = vec3()
     const float pi = 3.14159265;
     const float shiny = 12.0;
     const float exposure = 0.2;
-    const float ambient_str = 0.2;
+    float ambient_str = 0.25;
     float spec_str = 0.8 * light_intensity;
+
+    vec4 trans_normal = normal_matrix * normal;
+    vec3 L = light_dir;
+    vec3 N = normalize(trans_normal.xyz);
+    float cos_theta = max(0.0, dot(L,N));
 
     // float light_intensity = light_intensity * 0.01;
 
     // too much ambient during daytime is making things look weird
     // ambient_str =- light_intensity * ambient_str;
 
-    vec3 ray = camera_position - position;
+    vec3 ray = camera_position - position.xyz;
     vec3 view_dir = normalize(ray);
-    float distance = length(ray);
-    float attenuation = 1.0 / distance;
 
-    vec3 L = light_dir;
-    vec3 N = normalize(trans_normal.xyz);
-    float brightness = max(0.0, dot(L,N)) * light_intensity;
+    float brightness = cos_theta * light_intensity;
 
 
     // brightness += clouds(position);
@@ -55,12 +54,12 @@ vec3 standard_light(vec3 color, vec3 position, vec3 normal) {
     if (blinn) {
         const float energy_conservation = ( 8.0 + shiny ) / ( 8.0 * pi );
         vec3 halfway_dir = normalize(light_dir + view_dir);   // blinn-phong
-        spec = energy_conservation * pow(max(dot(normal, halfway_dir), 0.0), shiny);
+        spec = energy_conservation * pow(max(dot(normal.xyz, halfway_dir), 0.0), shiny);
     }
 
     else {
         const float energy_conservation = ( 2.0 + shiny ) / ( 2.0 * pi );
-        vec3 reflect_dir = reflect(-light_dir, normal); // phong
+        vec3 reflect_dir = reflect(-light_dir, normal.xyz); // phong
         spec = energy_conservation * pow(max(dot(view_dir, reflect_dir), 0.0), shiny);
     }
     // spec += pow(max(dot(view_dir, reflect_dir), 0.0), 16.0) * 0.5;

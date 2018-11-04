@@ -41,146 +41,166 @@ void deriv(noisefn fn, void* data, double x, double y, double z1, double *dx, do
   *dy = (zy - z1)/h;
 }
 
-void
-terrain_init(struct terrain *terrain) {
-  terrain->samples = NULL;
-  terrain->n_samples = 0;
-  terrain->fn = 0;
-  // TODO: init model
-  init_geometry(&terrain->entity.model.geom);
+void reset_terrain(struct terrain *terrain, float size) {
+    terrain->samples = NULL;
+    terrain->n_samples = 0;
+    terrain->fn = 0;
+    terrain->size = size;
+
+    struct entity *ent = get_entity(&terrain->entity_id);
+    assert(ent);
+}
+
+void init_terrain(struct terrain *terrain, float size) {
+    struct entity *ent;
+
+    ent = new_entity(&terrain->entity_id);
+    assert(terrain->entity_id.uuid == 0);
+    ent->model.shading = SHADING_TERRAIN;
+    ent->node.label = "terrain_node";
+    ent->casts_shadows = 0;
+
+    // this is scale for some reason!?
+    ent->node.pos[2] = 20.0;
+
+    reset_terrain(terrain, size);
 }
 
 double offset_fn(struct terrain* terrain, double x, double y) {
-  struct perlin_settings *perlin = &terrain->settings;
-  double ox = perlin->ox;
-  double oy = perlin->oy;
-  return old_noisy_boi(terrain, ox+x, oy+y);
+    struct perlin_settings *perlin = &terrain->settings;
+    double ox = perlin->ox;
+    double oy = perlin->oy;
+    return old_noisy_boi(terrain, ox+x, oy+y);
 }
 
-void
-terrain_create(struct terrain *terrain) {
-  u32 i;
-  const double size = terrain->size;
+void create_terrain(struct terrain *terrain) {
+    u32 i;
+    const double size = terrain->size;
 
-  float tmp1[3], tmp2[3];
-  assert(terrain->n_samples > 0);
-  del_point2d_t *points = calloc(terrain->n_samples, sizeof(*points));
+    float tmp1[3], tmp2[3];
+    assert(terrain->n_samples > 0);
+    del_point2d_t *points = calloc(terrain->n_samples, sizeof(*points));
 
-  float *verts = calloc(terrain->n_samples * 3, sizeof(*verts));
-  /* float *normals = calloc(terrain->n_samples * 3, sizeof(*verts)); */
+    float *verts = calloc(terrain->n_samples * 3, sizeof(*verts));
+    /* float *normals = calloc(terrain->n_samples * 3, sizeof(*verts)); */
 
-  terrain->fn = offset_fn;
+    terrain->fn = offset_fn;
 
-  // 100 random samples from our noise function
-  for (i = 0; i < (u32)terrain->n_samples; i++) {
-    int n = i*3;
-    double x, y;
-    /* double dx, dy; */
+    // 100 random samples from our noise function
+    for (i = 0; i < (u32)terrain->n_samples; i++) {
+        int n = i*3;
+        double x, y;
+        /* double dx, dy; */
 
-    x = terrain->samples[i].x;
-    y = terrain->samples[i].y;
+        x = terrain->samples[i].x;
+        y = terrain->samples[i].y;
 
-    double z = terrain->fn(terrain, x, y);
+        double z = terrain->fn(terrain, x, y);
 
-    points[i].x = x;
-    points[i].y = y;
+        points[i].x = x;
+        points[i].y = y;
 
-    verts[n] = (float)x;
-    verts[n+1] = (float)y;
+        verts[n] = (float)x;
+        verts[n+1] = (float)y;
 
-    static const double limit = 1.4;
-    if (x < limit || x > size-limit || y < limit || y > size-limit)
-      verts[n+2] = 0;
-    else
-      verts[n+2] = (float)z;
-  }
-
-  delaunay2d_t *del = delaunay2d_from(points, terrain->n_samples);
-  tri_delaunay2d_t *tri = tri_delaunay2d_from(del);
-
-  int num_verts = tri->num_triangles * 3;
-  float *del_verts = calloc(num_verts * 3, sizeof(*del_verts));
-  float *del_norms = calloc(num_verts * 3, sizeof(*del_norms));
-  u32   *del_indices = calloc(num_verts, sizeof(*del_indices));
-
-  /// XXX (perf): we should be able to do this directly from del instead of
-  /// triangulating with tri
-  for (i = 0; i < tri->num_triangles; ++i) {
-    int nv = i * 3;
-    int ndv = i * 9;
-
-    int p[3] = {
-      tri->tris[nv + 0],
-      tri->tris[nv + 1],
-      tri->tris[nv + 2],
-    };
-
-    float *v[3] = {
-      &verts[p[0]*3],
-      &verts[p[1]*3],
-      &verts[p[2]*3]
-    };
-
-    del_verts[ndv+0] = v[0][0];
-    del_verts[ndv+1] = v[0][1];
-    del_verts[ndv+2] = v[0][2];
-
-    del_verts[ndv+3] = v[1][0];
-    del_verts[ndv+4] = v[1][1];
-    del_verts[ndv+5] = v[1][2];
-
-    del_verts[ndv+6] = v[2][0];
-    del_verts[ndv+7] = v[2][1];
-    del_verts[ndv+8] = v[2][2];
-
-    // centroid normals
-    /* float c[3]; */
-    /* c[0] = (v[0][0] + v[1][0] + v[2][0]) / 3.0; */
-    /* c[1] = (v[0][1] + v[1][1] + v[2][1]) / 3.0; */
-    /* c[2] = (v[0][2] + v[1][2] + v[2][2]) / 3.0; */
-    /* double dx, dy; */
-    /* deriv((noisefn)terrain->fn, terrain, c[0], c[1], c[2], &dx, &dy); */
-    /* vec3_subtract(v[1], c, tmp1); */
-    /* vec3_subtract(v[2], c, tmp2); */
-
-    // standard normals
-    vec3_subtract(v[1], v[0], tmp1);
-    vec3_subtract(v[2], v[0], tmp2);
-
-    vec3_cross(tmp1, tmp2, tmp2);
-    vec3_normalize(tmp2, tmp2);
-
-    for (int j = 0; j < 9; ++j) {
-      del_norms[ndv+j] = tmp2[j%3];
+        static const double limit = 1.4;
+        if (x < limit || x > size-limit || y < limit || y > size-limit)
+        verts[n+2] = 0;
+        else
+        verts[n+2] = (float)z;
     }
 
-    del_indices[nv+0] = nv+0;
-    del_indices[nv+1] = nv+1;
-    del_indices[nv+2] = nv+2;
-  }
+    delaunay2d_t *del = delaunay2d_from(points, terrain->n_samples);
+    tri_delaunay2d_t *tri = tri_delaunay2d_from(del);
 
-  /* printf("faces %d tris %d points %d\n", */
-  /*        del->num_faces, tri->num_triangles, tri->num_points); */
+    int num_verts = tri->num_triangles * 3;
+    float *del_verts = calloc(num_verts * 3, sizeof(*del_verts));
+    float *del_norms = calloc(num_verts * 3, sizeof(*del_norms));
+    u32   *del_indices = calloc(num_verts, sizeof(*del_indices));
 
-  terrain->entity.model.geom.num_verts = num_verts;
-  terrain->entity.model.geom.vertices = (float*)del_verts;
-  terrain->entity.model.geom.normals = (float*)del_norms;
-  terrain->entity.model.geom.indices = (u32*)del_indices;
-  terrain->entity.model.geom.num_indices = num_verts;
+    /// XXX (perf): we should be able to do this directly from del instead of
+    /// triangulating with tri
+    for (i = 0; i < tri->num_triangles; ++i) {
+        int nv = i * 3;
+        int ndv = i * 9;
 
-  make_buffer_geometry(&terrain->entity.model.geom);
+        int p[3] = {
+        tri->tris[nv + 0],
+        tri->tris[nv + 1],
+        tri->tris[nv + 2],
+        };
 
-  delaunay2d_release(del);
-  tri_delaunay2d_release(tri);
+        float *v[3] = {
+        &verts[p[0]*3],
+        &verts[p[1]*3],
+        &verts[p[2]*3]
+        };
 
-  free(points);
-  free(verts);
-  free(del_verts);
-  free(del_norms);
-  free(del_indices);
+        del_verts[ndv+0] = v[0][0];
+        del_verts[ndv+1] = v[0][1];
+        del_verts[ndv+2] = v[0][2];
+
+        del_verts[ndv+3] = v[1][0];
+        del_verts[ndv+4] = v[1][1];
+        del_verts[ndv+5] = v[1][2];
+
+        del_verts[ndv+6] = v[2][0];
+        del_verts[ndv+7] = v[2][1];
+        del_verts[ndv+8] = v[2][2];
+
+        // centroid normals
+        /* float c[3]; */
+        /* c[0] = (v[0][0] + v[1][0] + v[2][0]) / 3.0; */
+        /* c[1] = (v[0][1] + v[1][1] + v[2][1]) / 3.0; */
+        /* c[2] = (v[0][2] + v[1][2] + v[2][2]) / 3.0; */
+        /* double dx, dy; */
+        /* deriv((noisefn)terrain->fn, terrain, c[0], c[1], c[2], &dx, &dy); */
+        /* vec3_subtract(v[1], c, tmp1); */
+        /* vec3_subtract(v[2], c, tmp2); */
+
+        // standard normals
+        vec3_subtract(v[1], v[0], tmp1);
+        vec3_subtract(v[2], v[0], tmp2);
+
+        vec3_cross(tmp1, tmp2, tmp2);
+        vec3_normalize(tmp2, tmp2);
+
+        for (int j = 0; j < 9; ++j) {
+        del_norms[ndv+j] = tmp2[j%3];
+        }
+
+        del_indices[nv+0] = nv+0;
+        del_indices[nv+1] = nv+1;
+        del_indices[nv+2] = nv+2;
+    }
+
+    /* printf("faces %d tris %d points %d\n", */
+    /*        del->num_faces, tri->num_triangles, tri->num_points); */
+
+    struct entity *ent = get_entity(&terrain->entity_id);
+    assert(ent);
+
+    ent->model.geom.num_verts = num_verts;
+    ent->model.geom.vertices = (float*)del_verts;
+    ent->model.geom.normals = (float*)del_norms;
+    ent->model.geom.indices = (u32*)del_indices;
+    ent->model.geom.num_indices = num_verts;
+
+    make_buffer_geometry(&ent->model.geom);
+
+    delaunay2d_release(del);
+    tri_delaunay2d_release(tri);
+
+    free(points);
+    free(verts);
+    free(del_verts);
+    free(del_norms);
+    free(del_indices);
 }
 
 
-void terrain_destroy(struct terrain *terrain) {
-  destroy_buffer_geometry(&terrain->entity.model.geom);
+void destroy_terrain(struct terrain *terrain) {
+    struct entity *ent = get_entity(&terrain->entity_id);
+    assert(ent);
+    destroy_buffer_geometry(&ent->model.geom);
 }

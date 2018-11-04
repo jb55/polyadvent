@@ -25,17 +25,25 @@ static void camera_update(struct node *node) {
   mat4_multiply(persp, mat, mat);
 }
 
+struct entity *get_player(struct resources *res) {
+    struct entity *player = get_entity(&res->player_id);
+    assert(player);
+    return player;
+}
+
 void game_init(struct game *game, int width, int height) {
     init_gl(&game->test_resources, width, height);
+    init_entity_system();
     check_gl();
 
+    float pos[3];
     struct resources *res = &game->test_resources;
     mat4 *mvp = res->test_mvp;
     struct node *root = &res->root;
     struct node *camera = &res->camera;
     struct node *sun_camera = &res->sun_camera;
-    struct entity *player = &res->player;
     struct terrain *terrain = &game->terrain;
+    struct entity *player;
 
     mat4 *light_dir = res->light_dir;
     int ok = 0;
@@ -58,9 +66,7 @@ void game_init(struct game *game, int width, int height) {
 
     check_gl();
 
-    terrain_init(terrain);
-    terrain->entity.model.shading = SHADING_TERRAIN;
-    terrain->size = size;
+    init_terrain(terrain, size);
 
     mat4_id(mvp);
 
@@ -79,16 +85,6 @@ void game_init(struct game *game, int width, int height) {
     res->sun_color[1] = 0.6;
     res->sun_color[2] = 0.7;
 
-    /* vec3(0.5,0.6,0.7); */
-
-    // BRB: shadow mapping next!
-
-    // FBO STUFF
-    init_fbo(&res->shadow_buffer);
-    resize_fbos(game, width, height);
-
-    // FBO STUFF END
-
     game->test_resources.fog_on = 1;
     game->test_resources.diffuse_on = 0;
 
@@ -100,32 +96,43 @@ void game_init(struct game *game, int width, int height) {
     node_init(camera);
     node_init(sun_camera);
 
-    init_entity(&terrain->entity);
-    init_entity(player);
-    player->casts_shadows = 1;
-    terrain->entity.casts_shadows = 0;
+    // ENTITIES
 
-    // player init
+    // player entity
+    player = new_entity(&res->player_id);
     ok = load_model(&player->model, "pirate-officer");
     assert(ok);
-    player->model.shading = SHADING_VERT_COLOR;
     player->node.label = "player";
+    node_attach(&player->node, root);
+    node_translate(&player->node, V3(terrain->size/2.,terrain->size/2.,0.0));
+
+    struct entity *tower = new_entity(NULL);
+    ok = load_model(&tower->model, "tower");
+    assert(ok);
+    tower->node.label = "tower";
+    node_attach(&tower->node, &player->node);
+    node_translate(&tower->node, V3(0.0, 40.0, 0.0));
+
+
+    // END ENTITIES
+
+
+    // player init
 
     root->label = "root";
     camera->label = "camera";
-    terrain->entity.node.label = "terrain_node";
 
-    node_attach(&player->node, root);
     node_attach(camera, &player->node);
 
     quat_axis_angle(V3(1,0,0), -45, camera->orientation);
 
-    node_translate(&player->node, V3(terrain->size/2.,terrain->size/2.,0.0));
-
     node_rotate(camera, V3(100, 0, 0));
     node_translate(camera, V3(0,-40,20));
 
-    terrain->entity.node.pos[2] = 20.0;
-
     input_init(&game->input);
+
+    // FBO STUFF
+    init_fbo(&res->shadow_buffer);
+    resize_fbos(player, &res->shadow_buffer, res->proj_ortho, width, height);
+    // FBO STUFF END
 }

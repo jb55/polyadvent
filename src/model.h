@@ -20,6 +20,7 @@ struct model {
 };
 
 
+void init_model(struct model *model);
 int load_model(struct model *model, const char *name);
 
 

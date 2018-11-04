@@ -14,7 +14,10 @@ handle_resize(struct game *game, int width, int height) {
   mat4_perspective(75 /* fov */, (float)width / height, 1, 20000,
                    game->test_resources.proj_persp);
 
-  resize_fbos(game, width, height);
+  resize_fbos(get_entity(&game->test_resources.player_id),
+              &game->test_resources.shadow_buffer,
+              game->test_resources.proj_ortho,
+              width, height);
 
   /* glMatrixMode( GL_PROJECTION ); //Switch to setting the camera perspective */
   /* Set the camera perspective */

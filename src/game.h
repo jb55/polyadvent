@@ -43,6 +43,7 @@ struct resources {
 		GLint sun_color;
 		GLint mvp;
 		GLint depth_mvp;
+		GLint depth_vp;
 		GLint normal_matrix;
 		GLint view;
 		GLint time;
@@ -55,7 +56,7 @@ struct resources {
 	struct attributes attributes;
 
 	struct node root;
-	struct entity player;
+	struct entity_id player_id;
 	struct orbit orbit_camera;
 	struct node camera;
 	struct node sun_camera;
@@ -81,6 +82,7 @@ struct game {
     struct terrain terrain;
 };
 
+struct entity *get_player(struct resources *);
 void game_init(struct game *game, int width, int height);
 void should_update(struct game *game);
 

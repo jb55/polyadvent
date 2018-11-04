@@ -23,9 +23,9 @@ void main() {
         vertex.color = vertices[i].color;
         vertex.color_smooth = vertices[i].color_smooth;
         vertex.normal = vertices[i].normal;
-        vertex.shadow_coord = depth_mvp * v4_pos;
+        // vertex.shadow_coord = depth_mvp * v4_pos;
         vertex.frag_pos = (world * v4_pos).xyz;
-        // vertex.shadow_coord = vertices[i].shadow_coord;
+        vertex.shadow_coord = vertices[i].shadow_coord;
         // vertex.frag_pos = vertices[i].frag_pos;
 
         // gl_Position = mvp * vec4(400.0 + i * 50.0, 300.0 + i * 50.0, 200.0 + i * 50.0, 1.0);

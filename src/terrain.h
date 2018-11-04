@@ -21,7 +21,7 @@ struct perlin_settings {
 
 
 struct terrain {
-    struct entity entity;
+    struct entity_id entity_id;
     struct perlin_settings settings;
     struct point *samples;
     double (*fn)(struct terrain *, double, double);
@@ -31,9 +31,10 @@ struct terrain {
 
 double old_noisy_boi(struct terrain *, double x, double y);
 
-void terrain_init(struct terrain *terrain);
-void terrain_create(struct terrain *terrain);
-void terrain_destroy(struct terrain *terrain);
+void init_terrain(struct terrain *terrain, float size);
+void reset_terrain(struct terrain *terrain, float size);
+void create_terrain(struct terrain *terrain);
+void destroy_terrain(struct terrain *terrain);
 
 
 #endif /* POLYADVENT_TERRAIN_H */

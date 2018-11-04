@@ -140,6 +140,10 @@ init_gl(struct resources *resources, int width, int height) {
             glGetUniformLocation(handle, "camera_position");
         check_gl();
 
+        resources->uniforms.depth_vp =
+            glGetUniformLocation(handle, "depth_vp");
+        check_gl();
+
         resources->uniforms.depth_mvp =
             glGetUniformLocation(handle, "depth_mvp");
         check_gl();
@@ -250,11 +254,10 @@ void render (struct game *game, struct render_config *config) {
     mat4 *light = res->light_dir;
 
     float *camera = config->camera;
+    u32 num_entities;
 
-    struct entity *entities[] =
-        { &game->terrain.entity
-        , &game->test_resources.player
-        };
+    struct entity *entities =
+        get_all_entities(&num_entities, NULL);
 
     struct gpu_program *current_program = NULL;
 
@@ -268,19 +271,19 @@ void render (struct game *game, struct render_config *config) {
     mat4_multiply(projection, view, view_proj);
 
     if (config->is_depth_pass) {
-        /* glCullFace(GL_FRONT); */
+        glDisable(GL_CULL_FACE);
         mat4_multiply(bias_matrix, view_proj, config->depth_vp);
     }
     else {
         glCullFace(GL_BACK);
     }
 
-    for (size_t i = 0; i < ARRAY_SIZE(entities); ++i) {
-        struct entity *entity = entities[i];
+    for (u32 i = 0; i < num_entities; ++i) {
+        struct entity *entity = &entities[i];
         if (config->is_depth_pass && !entity->casts_shadows)
             continue;
-        // TODO this is a bit wonky, refactor this
 
+        // TODO this is a bit wonky, refactor this
         current_program = i == 0 ? terrain_program : default_program;
         glUseProgram(current_program->handle);
         check_gl();
@@ -316,6 +319,8 @@ void render (struct game *game, struct render_config *config) {
         glUniformMatrix4fv(res->uniforms.mvp, 1, 0, mvp);
         check_gl();
         glUniformMatrix4fv(res->uniforms.depth_mvp, 1, 0, depth_mvp);
+        check_gl();
+        glUniformMatrix4fv(res->uniforms.depth_vp, 1, 0, config->depth_vp);
         check_gl();
         glUniformMatrix4fv(res->uniforms.model_view, 1, 0, model_view);
         check_gl();

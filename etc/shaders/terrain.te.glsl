@@ -28,7 +28,7 @@ void main()
     data_out.color = data_in[0].color;
     data_out.color_smooth = data_in[0].color_smooth;
     data_out.normal = data_in[0].normal;
-    data_out.shadow_coord = depth_mvp * data_in[0].shadow_coord;
+    // data_out.shadow_coord = depth_mvp * data_in[0].shadow_coord;
     data_out.frag_pos = (world * v).xyz;
 
 }
