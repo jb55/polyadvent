@@ -236,3 +236,26 @@ void vec3_copy(vec3 *a, vec3 *dest) {
   dest[1] = a[1];
   dest[2] = a[2];
 }
+
+
+static inline double max(double a, double b) {
+    return a > b ? a : b;
+}
+
+static inline double min(double a, double b) {
+    return a < b ? a : b;
+}
+
+vec3 *vec3_min(vec3 *vec, vec3* vec2, vec3 *dest) {
+    dest[0] = min(vec[0], vec2[0]);
+    dest[1] = min(vec[1], vec2[1]);
+    dest[2] = min(vec[2], vec2[2]);
+    return dest;
+}
+
+vec3 *vec3_max(vec3 *vec, vec3* vec2, vec3 *dest) {
+    dest[0] = max(vec[0], vec2[0]);
+    dest[1] = max(vec[1], vec2[1]);
+    dest[2] = max(vec[2], vec2[2]);
+    return dest;
+}

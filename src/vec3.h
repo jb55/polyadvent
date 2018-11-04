@@ -12,6 +12,8 @@ vec3 *vec3_cross (vec3 *vec, vec3 *vec2, vec3 *dest);
 vec3 *vec3_multiply(vec3 *vec, vec3 *vec2, vec3 *dest);
 vec3 *vec3_scale(vec3 *vec, float val, vec3 *dest);
 vec3 *vec3_normalize(vec3 *vec, vec3 *dest);
+vec3 *vec3_min(vec3 *vec, vec3* vec2, vec3 *dest);
+vec3 *vec3_max(vec3 *vec, vec3* vec2, vec3 *dest);
 float vec3_dist(vec3 *vec, vec3 *vec2);
 float vec3_distsq(vec3 *vec, vec3 *vec2);
 float *vec3_set(vec3 *vec, vec3 *dest);
