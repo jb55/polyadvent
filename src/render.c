@@ -240,8 +240,6 @@ void render (struct game *game, struct render_config *config) {
     static float view_proj[MAT4_ELEMS] = { 0 };
     static float normal_matrix[MAT4_ELEMS] = { 0 };
     static float model_view[MAT4_ELEMS] = { 0 };
-    static float depth_bias[MAT4_ELEMS] = { 0 };
-    static float tmp[MAT4_ELEMS] = { 0 };
     mat4_id(id);
     mat4_id(model_view);
 
@@ -279,11 +277,11 @@ void render (struct game *game, struct render_config *config) {
 
         if (config->is_depth_pass) {
             mat4_multiply(bias_matrix, view_proj, config->depth_mvp);
-            /* glCullFace(GL_FRONT); */
+            glCullFace(GL_FRONT);
         }
         else {
             glUniformMatrix4fv(res->uniforms.depth_mvp, 1, 0, config->depth_mvp);
-            /* glCullFace(GL_BACK); */
+            glCullFace(GL_BACK);
         }
         check_gl();
 
