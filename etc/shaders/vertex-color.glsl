@@ -1,5 +1,5 @@
 #include profile
-precision mediump float;
+
 in vec3 position;
 in vec3 normal;
 in vec3 color;
@@ -9,7 +9,6 @@ out shader_data {
 } data_out;
 
 #include uniforms.glsl
-
 
 void main()
 {

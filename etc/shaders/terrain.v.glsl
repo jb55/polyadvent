@@ -1,7 +1,5 @@
 #include profile
 
-precision mediump float;
-
 in vec3 position;
 in vec3 normal;
 
@@ -42,6 +40,6 @@ void main()
 
 #include standard_vtxos.glsl
 
-    gl_Position = v4_pos;
+    gl_Position = mvp * v4_pos;
     data_out.position = gl_Position.xyz;
 }

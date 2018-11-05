@@ -70,8 +70,10 @@ init_gl(struct resources *resources, int width, int height) {
 	glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 4);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
+    check_gl();
+
 
 	// Shaders
 	ok = make_shader(GL_VERTEX_SHADER, SHADER("vertex-color.glsl"), &vertex);
@@ -80,21 +82,25 @@ init_gl(struct resources *resources, int width, int height) {
     ok = make_shader(GL_VERTEX_SHADER, SHADER("terrain.v.glsl"),
                      &terrain_vertex);
 	assert(ok && "terrain vertex shader");
+	check_gl();
 
-    ok = make_shader(GL_GEOMETRY_SHADER, SHADER("terrain.g.glsl"),
-                     &terrain_geom);
-	assert(ok && "terrain geometry shader");
+    /* ok = make_shader(GL_GEOMETRY_SHADER, SHADER("terrain.g.glsl"), */
+    /*                  &terrain_geom); */
+    /* 	assert(ok && "terrain geometry shader"); */
 
-    ok = make_shader(GL_TESS_CONTROL_SHADER, SHADER("terrain.tc.glsl"),
-                     &terrain_tc);
-	assert(ok && "terrain tessellation control shader");
+    /* ok = make_shader(GL_TESS_CONTROL_SHADER, SHADER("terrain.tc.glsl"), */
+    /*                  &terrain_tc); */
+    /* 	assert(ok && "terrain tessellation control shader"); */
+    /* 	check_gl(); */
 
-    ok = make_shader(GL_TESS_EVALUATION_SHADER, SHADER("terrain.te.glsl"),
-                     &terrain_teval);
-	assert(ok && "terrain tessellation eval shader");
+    /* ok = make_shader(GL_TESS_EVALUATION_SHADER, SHADER("terrain.te.glsl"), */
+    /*                  &terrain_teval); */
+    /* 	assert(ok && "terrain tessellation eval shader"); */
+    /* 	check_gl(); */
 
 	ok = make_shader(GL_FRAGMENT_SHADER, SHADER("test.f.glsl"), &fragment);
 	assert(ok && "default fragment shader");
+	check_gl();
 
 	// camera
 	mat4_perspective(90 /* fov */,
@@ -111,11 +117,12 @@ init_gl(struct resources *resources, int width, int height) {
     /* struct shader *terrain_shaders[] = */
     /*     { &terrain_vertex, &fragment, &terrain_tc, &terrain_teval }; */
 
-    struct shader *terrain_shaders[] =
-        { &terrain_vertex, &fragment, &terrain_geom };
-
     /* struct shader *terrain_shaders[] = */
-    /*     { &terrain_vertex, &fragment }; */
+    /*     { &terrain_vertex, &fragment, &terrain_geom }; */
+
+    struct shader *terrain_shaders[] =
+        { &terrain_vertex, &fragment };
+
     ok = make_program_from_shaders(terrain_shaders, ARRAY_SIZE(terrain_shaders),
                                    &resources->programs[TERRAIN_PROGRAM]);
 
@@ -140,9 +147,9 @@ init_gl(struct resources *resources, int width, int height) {
             glGetUniformLocation(handle, "camera_position");
         check_gl();
 
-        resources->uniforms.depth_vp =
-            glGetUniformLocation(handle, "depth_vp");
-        check_gl();
+        /* resources->uniforms.depth_vp = */
+        /*     glGetUniformLocation(handle, "depth_vp"); */
+        /* check_gl(); */
 
         resources->uniforms.depth_mvp =
             glGetUniformLocation(handle, "depth_mvp");
@@ -176,16 +183,16 @@ init_gl(struct resources *resources, int width, int height) {
             glGetUniformLocation(handle, "fog_on");
         check_gl();
 
-        resources->uniforms.diffuse_on =
-            glGetUniformLocation(handle, "diffuse_on");
-        check_gl();
+        /* resources->uniforms.diffuse_on = */
+        /*     glGetUniformLocation(handle, "diffuse_on"); */
+        /* check_gl(); */
 
         resources->uniforms.mvp =
             glGetUniformLocation(handle, "mvp");
         check_gl();
 
-        resources->uniforms.model_view =
-            glGetUniformLocation(handle, "model_view");
+        /* resources->uniforms.model_view = */
+        /*     glGetUniformLocation(handle, "model_view"); */
 
         resources->uniforms.normal_matrix =
             glGetUniformLocation(handle, "normal_matrix");
@@ -295,8 +302,11 @@ void render (struct game *game, struct render_config *config) {
                     camera[M_Z]);
 
         glUniform1i(res->uniforms.fog_on, res->fog_on);
-        glUniform1i(res->uniforms.diffuse_on, res->diffuse_on);
+        check_gl();
+        /* glUniform1i(res->uniforms.diffuse_on, res->diffuse_on); */
+        /* check_gl(); */
         glUniform3f(res->uniforms.light_dir, light[0], light[1], light[2]);
+        check_gl();
         glUniform1f(res->uniforms.light_intensity, res->light_intensity);
         check_gl();
         /* glUniform1f(res->uniforms.time, res->time); */
@@ -320,10 +330,10 @@ void render (struct game *game, struct render_config *config) {
         check_gl();
         glUniformMatrix4fv(res->uniforms.depth_mvp, 1, 0, depth_mvp);
         check_gl();
-        glUniformMatrix4fv(res->uniforms.depth_vp, 1, 0, config->depth_vp);
-        check_gl();
-        glUniformMatrix4fv(res->uniforms.model_view, 1, 0, model_view);
-        check_gl();
+        /* glUniformMatrix4fv(res->uniforms.depth_vp, 1, 0, config->depth_vp); */
+        /* check_gl(); */
+        /* glUniformMatrix4fv(res->uniforms.model_view, 1, 0, model_view); */
+        /* check_gl(); */
         glUniformMatrix4fv(res->uniforms.world, 1, 0, entity->node.mat);
         check_gl();
 

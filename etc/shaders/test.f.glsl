@@ -1,4 +1,3 @@
-
 #include profile
 
 out vec4 frag_color;
@@ -16,7 +15,6 @@ uniform sampler2D shadow_map;
 #include fog.glsl
 
 void main() {
-  const float smoothness = 0.0;
   vec3 v_ray = camera_position - vertex.frag_pos;
   vec4 v4_pos = vec4(vertex.position, 1.0);
   vec4 v4_normal = vec4(vertex.normal, 1.0);

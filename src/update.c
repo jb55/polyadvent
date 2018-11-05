@@ -219,7 +219,7 @@ void resize_fbos(struct entity *player, struct fbo *shadow_buffer,
     }
 
     // TODO: compute better bounds based
-    const float factor = 50.0;
+    const float factor = 80.0;
     float left   = player->model.geom.min[0] - factor;
     float right  = player->model.geom.max[0] + factor;
     float bottom = player->model.geom.min[1] - factor;

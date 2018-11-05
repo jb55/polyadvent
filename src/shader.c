@@ -4,6 +4,7 @@
 #include <assert.h>
 
 #include "file.h"
+#include "util.h"
 #include "gl.h"
 #include "debug.h"
 #include "shader.h"
@@ -222,6 +223,7 @@ make_program_from_shaders(struct shader **shaders, int n_shaders, struct gpu_pro
 
 	// TODO: relax these constraints
 	program->handle = glCreateProgram();
+    check_gl();
     program->n_shaders = n_shaders;
 
     assert(n_shaders <= MAX_SHADERS);
@@ -234,9 +236,11 @@ make_program_from_shaders(struct shader **shaders, int n_shaders, struct gpu_pro
         /*            shader->includes[j]); */
         /* } */
         glAttachShader(program->handle, shader->handle);
+        check_gl();
     }
 
 	glLinkProgram(program->handle);
+    check_gl();
 
 	glGetProgramiv(program->handle, GL_LINK_STATUS, &program_ok);
 

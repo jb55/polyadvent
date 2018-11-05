@@ -22,9 +22,9 @@ vec3 gamma_correct(vec3 color) {
 vec3 standard_light(vec3 color, vec4 position, vec4 normal) {
     // vec3 light_dir = vec3()
     const float pi = 3.14159265;
-    const float shiny = 12.0;
+    const float shiny = 14.0;
     const float exposure = 0.2;
-    float ambient_str = 0.25;
+    float ambient_str = 0.2;
     float spec_str = 0.8 * light_intensity;
 
     vec4 trans_normal = normal_matrix * normal;
@@ -35,7 +35,7 @@ vec3 standard_light(vec3 color, vec4 position, vec4 normal) {
     // float light_intensity = light_intensity * 0.01;
 
     // too much ambient during daytime is making things look weird
-    // ambient_str =- light_intensity * ambient_str;
+    // ambient_str =- light_intensity * ambient_str * 0.05;
 
     vec3 ray = camera_position - position.xyz;
     vec3 view_dir = normalize(ray);
