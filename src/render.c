@@ -62,18 +62,17 @@ static const float bias_matrix[] = {
 
 void
 init_gl(struct resources *resources, int width, int height) {
-	struct shader vertex, terrain_vertex, terrain_geom, fragment, fragment_smooth;
-	struct shader terrain_teval, terrain_tc;
-	float tmp_matrix[16];
-	int ok = 0;
+    struct shader vertex, terrain_vertex, terrain_geom, fragment, fragment_smooth;
+    struct shader terrain_teval, terrain_tc;
+    float tmp_matrix[16];
+    int ok = 0;
 
-	glEnable(GL_DEPTH_TEST);
+    glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
-    check_gl();
 
+    glEnable(GL_MULTISAMPLE);
+check_gl();
 
 	// Shaders
 	ok = make_shader(GL_VERTEX_SHADER, SHADER("vertex-color.glsl"), &vertex);
