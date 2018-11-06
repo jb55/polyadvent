@@ -9,6 +9,7 @@ typedef float quat;
 void quat_id(quat *dest);
 void quat_multiply(quat *a, quat *b, quat *dest);
 void quat_axis_angle(float *axis, float angle, quat *dest);
+void quat_from_axes(float yaw, float pitch, float roll);
 void quat_to_mat3(quat *quat, float *dest);
 void quat_multiply_vec3(quat *quat, float *vec, float *dest);
 quat *quat_inverse(quat *q, quat *dest);
