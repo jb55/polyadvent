@@ -259,3 +259,12 @@ vec3 *vec3_max(vec3 *vec, vec3* vec2, vec3 *dest) {
     dest[2] = max(vec[2], vec2[2]);
     return dest;
 }
+
+
+vec3 *vec3_from_yaw_pitch(float yaw, float pitch, float *dest) {
+    float theta = yaw;
+    float phi = pitch;
+    dest[0] = sin(theta) * cos(phi);
+    dest[1] = sin(theta) * sin(phi);
+    dest[2] = cos(theta);
+}
