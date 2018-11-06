@@ -5,9 +5,16 @@
 struct node;
 
 struct orbit {
-    float radius;
-    float inclination;
-    float azimuth;
+    float dist;
+    union {
+        struct {
+            float yaw;
+            float pitch;
+            float roll;
+        };
+
+        float ypr[3];
+    } angles;
 };
 
 
