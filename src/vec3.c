@@ -267,4 +267,5 @@ vec3 *vec3_from_yaw_pitch(float yaw, float pitch, float *dest) {
     dest[0] = sin(theta) * cos(phi);
     dest[1] = sin(theta) * sin(phi);
     dest[2] = cos(theta);
+    return dest;
 }

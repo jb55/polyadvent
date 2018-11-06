@@ -11,14 +11,14 @@ void orbit_to_mat4(struct orbit *orbit, float *m)
 
 static void orbit_to_vec3(struct orbit *orbit, float *v3)
 {
-    float x = r * sin(theta) * cos(phi);
+    /* float x = r * sin(theta) * cos(phi); */
 }
 
 /* static void orbit_update_node(struct node *node) { */
 /* } */
 
 void orbit_to_node(struct orbit *orbit, struct node *node) {
-    orbit_to_quat(orbit, node->orientation);
+    /* orbit_to_quat(orbit, node->orientation); */
     node_mark_for_recalc(node);
 }
 
