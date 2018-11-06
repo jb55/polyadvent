@@ -13,8 +13,8 @@
 #include <math.h>
 
 static void movement(struct game *game, struct node *node, float speed_mult) {
-  float amt = 0.03;
-  static const float turn = 0.01;
+  float amt = 3.0 * game->dt;
+  float turn = 1.0 * game->dt;
 
   amt *= speed_mult;
 
@@ -173,7 +173,7 @@ static void player_terrain_collision(struct terrain *terrain, struct entity *pla
 }
 
 static void player_movement(struct game *game, struct entity *player) {
-  movement(game, &player->node, 2.0);
+    movement(game, &player->node, 2.0);
 
   /* vec3 *camera_world = node_world(&res->camera); */
   /* float cam_terrain_z = */
