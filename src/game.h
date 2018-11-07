@@ -12,6 +12,7 @@
 #include "ui.h"
 #include "fbo.h"
 #include "orbit.h"
+#include "texture.h"
 
 #define PLAYER_HEIGHT 1.73
 
@@ -60,6 +61,7 @@ struct resources {
 	struct orbit camera;
 	struct node sun_camera;
 
+    u32 test_cubemap;
     float time;
 	bool fog_on, diffuse_on;
 

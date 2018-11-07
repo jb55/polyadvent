@@ -8,6 +8,8 @@
 #include "util.h"
 #include "update.h"
 #include "entity.h"
+#include "texture.h"
+#include "stb_image.h"
 #include <assert.h>
 
 mat4 *cam_init = (float[16]){
@@ -117,8 +119,6 @@ void game_init(struct game *game, int width, int height) {
     tower->node.label = "tower";
     node_attach(&tower->node, &player->node);
     node_translate(&tower->node, V3(0.0, 40.0, 0.0));
-
-
     // END ENTITIES
 
 
@@ -127,17 +127,22 @@ void game_init(struct game *game, int width, int height) {
     root->label = "root";
     camera->label = "camera";
 
-    /* node_attach(camera, &player->node); */
-
-    /* quat_axis_angle(V3(1,0,0), -45, camera->orientation); */
-
-    /* node_rotate(camera, V3(100, 0, 0)); */
-    /* node_translate(camera, V3(0,-40,20)); */
-
     input_init(&game->input);
 
     // FBO STUFF
     init_fbo(&res->shadow_buffer);
     resize_fbos(player, &res->shadow_buffer, res->proj_ortho, width, height);
     // FBO STUFF END
+
+    // TEXTURES
+    const char *faces[6] = {
+      CUBEMAP("test/right.jpg"),
+      CUBEMAP("test/left.jpg"),
+      CUBEMAP("test/top.jpg"),
+      CUBEMAP("test/bottom.jpg"),
+      CUBEMAP("test/front.jpg"),
+      CUBEMAP("test/back.jpg"),
+    };
+    res->test_cubemap = create_cubemap(faces);
+    // END TEXTURES
 }

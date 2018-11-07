@@ -42,6 +42,8 @@ OBJS += $(SRC)/update.o
 OBJS += $(SRC)/util.o
 OBJS += $(SRC)/vec3.o
 OBJS += $(SRC)/hires.o
+OBJS += $(SRC)/stb_image.o
+OBJS += $(SRC)/texture.o
 
 SRCS=$(OBJS:.o=.c)
 
