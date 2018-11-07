@@ -8,6 +8,7 @@
 #include "camera.h"
 #include "poisson.h"
 #include "uniform.h"
+#include "mat_util.h"
 #include "shader.h"
 #include "file.h"
 #include <math.h>
@@ -299,16 +300,41 @@ static void gravity(struct game *game) {
     node_translate(&player->node, V3(0.0, 0.0, -1.0));
 }
 
+void orbit_update_from_mouse(struct orbit *camera, struct input *input,
+                             float mouse_sens, struct entity *player,
+                             float dt) {
+    float *target;
+    struct node *target_node = &player->node;
+
+    node_recalc(target_node);
+    target = node_world(target_node);
+
+    float mx = 0.0, my = 0.0;
+    if (input_is_dragging(input, SDL_BUTTON_LEFT) ||
+        input_is_dragging(input, SDL_BUTTON_RIGHT)) {
+        mx = -input->mdx * mouse_sens * dt;
+        my = -input->mdy * mouse_sens * dt;
+    }
+
+    camera->coords.azimuth     += mx;
+    camera->coords.inclination += my;
+
+    spherical_look_at(&camera->coords, target, camera->node.mat);
+}
+
 static void player_update(struct game *game, struct entity *player) {
-    struct orbit *orbit_camera = &game->test_resources.orbit_camera;
-    /* orbit_camera->radius += game->dt * 4.0; */
-    /* orbit_camera->inclination += game->dt * 2.0; */
-    /* orbit_camera->azimuth += game->dt * 2.0; */
-    /* orbit_to_node(orbit_camera, &game->test_resources.camera); */
-
-
+    orbit_update_from_mouse(&game->test_resources.camera, &game->input,
+                            game->user_settings.mouse_sens, player, game->dt);
+    // move player camera toward camera orientation
+    if (input_is_dragging(&game->input, SDL_BUTTON_RIGHT)) {
+        float yaw = game->test_resources.camera.coords.azimuth;
+        quat_axis_angle(V3(0.0, 0.0, 1.0), -yaw - RAD(90), player->node.orientation);
+        node_recalc(&player->node);
+    }
     player_terrain_collision(&game->terrain, player);
 }
+
+
 
 void update (struct game *game) {
 	static int toggle_fog = 0;
@@ -331,7 +357,7 @@ void update (struct game *game) {
     player_update(game, player);
 
 	if (game->input.modifiers & KMOD_LALT) {
-		movement(game, &res->camera, 1.0);
+		movement(game, &res->camera.node, 1.0);
 	}
 	else if (game->input.modifiers & KMOD_RCTRL) {
 		movement(game, tnode, 5.0);

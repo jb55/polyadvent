@@ -1,10 +1,7 @@
 
 #include "mat_util.h"
 
-mat4 *mat4_create_transform(float *pos, float *scale, quat *orientation, mat4 *dest) {
-  float rot[9];
-  quat_to_mat3(orientation, rot);
-
+mat4 *mat4_create_transform(float *pos, float *scale, float *rot, mat4 *dest) {
   dest[0] = scale[0] * rot[0];
   dest[1] = scale[0] * rot[1];
   dest[2] = scale[0] * rot[2];
@@ -28,3 +25,12 @@ mat4 *mat4_create_transform(float *pos, float *scale, quat *orientation, mat4 *d
   return dest;
 }
 
+
+vec3 *vec3_forward(vec3 *v, quat *orientation, float *dir, float *dest) {
+    float q[4] = {0};
+    float movement[3] = {0};
+    quat_inverse(orientation, q);
+    quat_multiply_vec3(q, dir, movement);
+    vec3_add(v, movement, dest);
+    return dest;
+}

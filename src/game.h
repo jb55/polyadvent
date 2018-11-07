@@ -57,8 +57,7 @@ struct resources {
 
 	struct node root;
 	struct entity_id player_id;
-	struct orbit orbit_camera;
-	struct node camera;
+	struct orbit camera;
 	struct node sun_camera;
 
     float time;
@@ -72,10 +71,15 @@ struct resources {
 	float proj_ortho[MAT4_ELEMS];
 };
 
+struct user_settings {
+    float mouse_sens;
+};
+
 struct game {
     int counter;
     int seed;
     float dt;
+    struct user_settings user_settings;
     struct ui ui;
     struct resources test_resources;
     struct input input;

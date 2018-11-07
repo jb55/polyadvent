@@ -19,7 +19,7 @@ struct input {
     u8 const *keystates;
     SDL_Keymod modifiers;
     int mx, my, last_mx, last_my;
-    int is_dragging;
+    int mdx, mdy;
     int mbuttons[MOUSE_BUTTONS];
 };
 

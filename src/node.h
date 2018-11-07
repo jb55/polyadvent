@@ -4,6 +4,10 @@
 
 #define MAX_NODE_CHILDREN 4
 
+enum node_flags {
+  NODE_IGNORE_RECALC = 1 << 0
+};
+
 struct node {
   float pos[3];
   float rot[3];
@@ -12,6 +16,7 @@ struct node {
   float orientation[4];
   char *label;
   int needs_recalc;
+  int flags;
   int n_children;
   void (*custom_update)(struct node*);
   void *custom_update_data;

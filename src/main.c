@@ -73,7 +73,7 @@ int main(void)
     struct render_config default_config = {
       .draw_ui = 1,
       .is_depth_pass = 0,
-      .camera = game.test_resources.camera.mat,
+      .camera = game.test_resources.camera.node.mat,
       .projection = game.test_resources.proj_persp,
       .depth_vp = depth_vp
     };

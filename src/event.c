@@ -9,6 +9,9 @@ void process_events(struct game *game, float *camera) {
   int mdx = 0;
   int mdy = 0;
 
+  game->input.last_mx = game->input.mx;
+  game->input.last_my = game->input.my;
+
   input_reset(&game->input);
 
   while (SDL_PollEvent(&event)) {
@@ -27,14 +30,10 @@ void process_events(struct game *game, float *camera) {
             game->input.mbuttons[event.button.button-1] = 0;
         break;
     case SDL_MOUSEMOTION:
-        if (event.button.button) {
-            /* printf("drag... %d %d\n", event.motion.xrel, event.motion.yrel); */
-            game->input.last_mx = game->input.mx;
-            game->input.last_my = game->input.mx;
-            game->input.mx = event.motion.x;
-            game->input.my = event.motion.y;
-
-        }
+        game->input.mx = event.motion.x;
+        game->input.my = event.motion.y;
+        game->input.mdx += event.motion.xrel;
+        game->input.mdy += event.motion.yrel;
         break;
     case SDL_WINDOWEVENT:
       switch (event.window.event) {

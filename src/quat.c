@@ -74,6 +74,11 @@ void quat_to_mat3(quat *quat, float *dest) {
 	dest[8] = 1.0 - (xx + yy);
 }
 
+
+float quat_yaw(quat *q) {
+    return atan2(q[2],q[3])*2.0;
+}
+
 void quat_multiply_vec3(quat *quat, float *vec, float *dest) {
 	float x  = vec[0], y = vec[1], z = vec[2];
 	float qx = quat[0], qy = quat[1], qz = quat[2], qw = quat[3];
