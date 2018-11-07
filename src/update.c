@@ -176,19 +176,20 @@ static void player_terrain_collision(struct terrain *terrain, struct entity *pla
 static void player_movement(struct game *game, struct entity *player) {
     movement(game, &player->node, 2.0);
 
-  /* vec3 *camera_world = node_world(&res->camera); */
-  /* float cam_terrain_z = */
-  /*   game->terrain.fn(&game->terrain, camera_world[0], camera_world[1]); */
+    vec3 *camera_world = node_world(&game->test_resources.camera.node);
+    float cam_terrain_z =
+        game->terrain.fn(&game->terrain, camera_world[0], camera_world[1]);
 
-  /* if (camera_world[2] < cam_terrain_z) */
-  /*   camera_world[2] = cam_terrain_z + 20.0; */
+    const float bias = 20.0;
+
+    if (camera_world[2] < cam_terrain_z + bias)
+        camera_world[2] = cam_terrain_z + bias;
 }
 
 
 #ifdef DEBUG
 static int try_reload_shaders(struct resources *res) {
 	int ret;
-    static int wut = 0;
     for (int i = 0; i < NUM_PROGRAMS; ++i) {
         struct gpu_program *program = &res->programs[i];
         ret = reload_program(program);
