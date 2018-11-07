@@ -24,17 +24,22 @@ float *spherical_to_cartesian(struct spherical *s, float *v3)
     return v3;
 }
 
+vec3 *spherical_dir(struct spherical s, vec3 *dir) {
+    s.radius = 1.0;
+    spherical_to_cartesian(&s, dir);
+    return dir;
+}
 
 // from: in
 // to:   out
-float *spherical_pos(struct spherical *s, vec3 *from, vec3 *to) {
+vec3 *spherical_pos(struct spherical *s, vec3 *from, vec3 *to) {
     float spherical_offset[3];
     spherical_to_cartesian(s, spherical_offset);
     vec3_add(from, spherical_offset, to);
     return to;
 }
 
-float *spherical_look_at(struct spherical *s, vec3 *target, mat4 *mat) {
+vec3 *spherical_look_at(struct spherical *s, vec3 *target, mat4 *mat) {
     float eye[3];
 
     spherical_pos(s, target, eye);

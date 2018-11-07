@@ -33,7 +33,7 @@ struct entity *get_player(struct resources *res) {
 
 static void init_user_settings(struct user_settings *settings) {
     SDL_SetRelativeMouseMode(SDL_TRUE);
-    settings->mouse_sens = 0.2;
+    settings->mouse_sens = 0.1;
 }
 
 void game_init(struct game *game, int width, int height) {

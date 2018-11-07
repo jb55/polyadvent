@@ -17,8 +17,9 @@ struct orbit {
     struct node node;
 };
 
-float *spherical_pos(struct spherical *s, vec3 *from, vec3 *to);
-float *spherical_look_at(struct spherical *s, vec3 *target, mat4 *mat);
-float *spherical_to_cartesian(struct spherical *s, float *v3);
+vec3 *spherical_dir(struct spherical s, vec3 *dir);
+vec3 *spherical_pos(struct spherical *s, vec3 *from, vec3 *to);
+vec3 *spherical_look_at(struct spherical *s, vec3 *target, mat4 *mat);
+vec3 *spherical_to_cartesian(struct spherical *s, float *v3);
 
 #endif /* ORBIT_H */

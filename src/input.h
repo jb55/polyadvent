@@ -20,6 +20,7 @@ struct input {
     SDL_Keymod modifiers;
     int mx, my, last_mx, last_my;
     int mdx, mdy;
+    float wheel_x, wheel_y;
     int mbuttons[MOUSE_BUTTONS];
 };
 

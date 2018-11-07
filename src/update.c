@@ -14,54 +14,54 @@
 #include <math.h>
 
 static void movement(struct game *game, struct node *node, float speed_mult) {
-  float amt = 3.0 * game->dt;
-  float turn = 1.0 * game->dt;
+    float amt = 3.0 * game->dt;
+    float turn = 1.0 * game->dt;
 
-  amt *= speed_mult;
+    amt *= speed_mult;
 
-  if (game->input.modifiers & KMOD_SHIFT)
-    amt *= 50;
+    if (game->input.modifiers & KMOD_SHIFT)
+        amt *= 50;
 
-  if (game->input.keystates[SDL_SCANCODE_A])
-    node_forward(node, V3(-amt,0,0));
+    if (game->input.keystates[SDL_SCANCODE_A])
+        node_forward(node, V3(-amt,0,0));
 
-  if (game->input.keystates[SDL_SCANCODE_UP])
-    node_forward(node, V3(0,0,amt));
+    if (game->input.keystates[SDL_SCANCODE_UP])
+        node_forward(node, V3(0,0,amt));
 
-  if (game->input.keystates[SDL_SCANCODE_DOWN])
-    node_forward(node, V3(0,0,-amt));
+    if (game->input.keystates[SDL_SCANCODE_DOWN])
+        node_forward(node, V3(0,0,-amt));
 
-  if (game->input.keystates[SDL_SCANCODE_D])
-    node_forward(node, V3(amt,0,0));
+    if (game->input.keystates[SDL_SCANCODE_D])
+        node_forward(node, V3(amt,0,0));
 
-  if (game->input.keystates[SDL_SCANCODE_W])
-    node_forward(node, V3(0,amt,0));
+    if (game->input.keystates[SDL_SCANCODE_W])
+        node_forward(node, V3(0,amt,0));
 
-  if (game->input.keystates[SDL_SCANCODE_S])
-    node_forward(node, V3(0,-amt,0));
+    if (game->input.keystates[SDL_SCANCODE_S])
+        node_forward(node, V3(0,-amt,0));
 
-  if (game->input.keystates[SDL_SCANCODE_K])
-    node_translate(node, V3(0, 0,amt));
+    if (game->input.keystates[SDL_SCANCODE_K])
+        node_forward(node, V3(0, 0,amt));
 
-  if (game->input.keystates[SDL_SCANCODE_J])
-    node_translate(node, V3(0, 0,-amt));
+    if (game->input.keystates[SDL_SCANCODE_J])
+        node_forward(node, V3(0, 0,-amt));
 
-  if (game->input.keystates[SDL_SCANCODE_E])
-    node_rotate(node, V3(0, 0, turn));
+    if (game->input.keystates[SDL_SCANCODE_E])
+        node_rotate(node, V3(0, 0, turn));
 
-  if (game->input.keystates[SDL_SCANCODE_Q])
-    node_rotate(node, V3(0, 0, -turn));
+    if (game->input.keystates[SDL_SCANCODE_Q])
+        node_rotate(node, V3(0, 0, -turn));
 
-  /* if (game->input.keystates[SDL_SCANCODE_DOWN]) */
-  /*   node_translate(node, V3(0, 0, -amt)); */
+    /* if (game->input.keystates[SDL_SCANCODE_DOWN]) */
+    /*   node_translate(node, V3(0, 0, -amt)); */
 
-  if (game->input.keystates[SDL_SCANCODE_P]) {
-    printf("%f %f %f\n",
-           node->pos[0],
-           node->pos[1],
-           node->pos[2]);
-    mat4_print(node->mat);
-  }
+    if (game->input.keystates[SDL_SCANCODE_P]) {
+        printf("%f %f %f\n",
+                node->pos[0],
+                node->pos[1],
+                node->pos[2]);
+        mat4_print(node->mat);
+    }
 }
 
 static void remap_samples(struct point *points, int n_samples,
@@ -318,6 +318,10 @@ void orbit_update_from_mouse(struct orbit *camera, struct input *input,
 
     camera->coords.azimuth     += mx;
     camera->coords.inclination += my;
+    /* printf("coords azimuth %f inclination %f radius %f\n", */
+    /*        camera->coords.azimuth, */
+    /*        camera->coords.inclination, */
+    /*        camera->coords.radius); */
 
     spherical_look_at(&camera->coords, target, camera->node.mat);
 }
@@ -341,7 +345,6 @@ void update (struct game *game) {
 	static int first = 1;
 	struct resources *res = &game->test_resources;
     struct terrain *terrain = &game->terrain;
-	struct node *tnode = &get_entity(&terrain->entity_id)->node;
 	struct node *root = &game->test_resources.root;
     struct entity *player = get_player(res);
     float *time = &res->time;
@@ -355,12 +358,11 @@ void update (struct game *game) {
 	}
 
     player_update(game, player);
+    /* spherical_dir(game->test_resources.camera.coords, camera_dir); */
+    /* vec3_scale(camera_dir, -1, camera_dir); */
 
 	if (game->input.modifiers & KMOD_LALT) {
 		movement(game, &res->camera.node, 1.0);
-	}
-	else if (game->input.modifiers & KMOD_RCTRL) {
-		movement(game, tnode, 5.0);
 	}
 	else {
 		player_movement(game, player);

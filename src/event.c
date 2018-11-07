@@ -9,31 +9,37 @@ void process_events(struct game *game, float *camera) {
   int mdx = 0;
   int mdy = 0;
 
-  game->input.last_mx = game->input.mx;
-  game->input.last_my = game->input.my;
+  struct input *input = &game->input;
+
+  input->last_mx = game->input.mx;
+  input->last_my = game->input.my;
 
   input_reset(&game->input);
 
   while (SDL_PollEvent(&event)) {
     switch (event.type) {
+    case SDL_MOUSEWHEEL:
+        input->wheel_x = event.wheel.x;
+        input->wheel_y = event.wheel.y;
+        break;
     case SDL_KEYDOWN:
     case SDL_KEYUP:
-      handle_key(&game->input, event.key);
+      handle_key(input, event.key);
       break;
     case SDL_MOUSEBUTTONDOWN:
         if (event.button.button <= MOUSE_BUTTONS)
-            game->input.mbuttons[event.button.button-1] = 1;
+            input->mbuttons[event.button.button-1] = 1;
 
         break;
     case SDL_MOUSEBUTTONUP:
         if (event.button.button <= MOUSE_BUTTONS)
-            game->input.mbuttons[event.button.button-1] = 0;
+            input->mbuttons[event.button.button-1] = 0;
         break;
     case SDL_MOUSEMOTION:
-        game->input.mx = event.motion.x;
-        game->input.my = event.motion.y;
-        game->input.mdx += event.motion.xrel;
-        game->input.mdy += event.motion.yrel;
+        input->mx = event.motion.x;
+        input->my = event.motion.y;
+        input->mdx += event.motion.xrel;
+        input->mdy += event.motion.yrel;
         break;
     case SDL_WINDOWEVENT:
       switch (event.window.event) {
