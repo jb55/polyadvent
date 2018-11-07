@@ -60,8 +60,8 @@ int node_needs_recalc(struct node *node)
 }
 
 vec3 *node_world(struct node *node) {
-  assert(!node_needs_recalc(node));
-  return &node->mat[M_X];
+    node_recalc(node);
+    return &node->mat[M_X];
 }
 
 void node_mark_for_recalc(struct node *node) {
