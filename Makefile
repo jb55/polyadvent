@@ -22,6 +22,7 @@ OBJS += $(SRC)/fbo.o
 OBJS += $(SRC)/file.o
 OBJS += $(SRC)/game.o
 OBJS += $(SRC)/geometry.o
+OBJS += $(SRC)/hires.o
 OBJS += $(SRC)/input.o
 OBJS += $(SRC)/main.o
 OBJS += $(SRC)/mat4.o
@@ -35,15 +36,15 @@ OBJS += $(SRC)/poisson.o
 OBJS += $(SRC)/quat.o
 OBJS += $(SRC)/render.o
 OBJS += $(SRC)/shader.o
+OBJS += $(SRC)/skybox.o
+OBJS += $(SRC)/stb_image.o
 OBJS += $(SRC)/terrain.o
+OBJS += $(SRC)/texture.o
 OBJS += $(SRC)/ui.o
 OBJS += $(SRC)/uniform.o
 OBJS += $(SRC)/update.o
 OBJS += $(SRC)/util.o
 OBJS += $(SRC)/vec3.o
-OBJS += $(SRC)/hires.o
-OBJS += $(SRC)/stb_image.o
-OBJS += $(SRC)/texture.o
 
 SRCS=$(OBJS:.o=.c)
 

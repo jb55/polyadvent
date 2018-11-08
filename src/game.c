@@ -10,6 +10,7 @@
 #include "entity.h"
 #include "texture.h"
 #include "stb_image.h"
+#include "skybox.h"
 #include <assert.h>
 
 mat4 *cam_init = (float[16]){
@@ -74,6 +75,7 @@ void game_init(struct game *game, int width, int height) {
     check_gl();
 
     init_terrain(terrain, size);
+    create_skybox(&res->skybox);
 
     mat4_id(mvp);
 
@@ -135,14 +137,5 @@ void game_init(struct game *game, int width, int height) {
     // FBO STUFF END
 
     // TEXTURES
-    const char *faces[6] = {
-      CUBEMAP("test/right.jpg"),
-      CUBEMAP("test/left.jpg"),
-      CUBEMAP("test/top.jpg"),
-      CUBEMAP("test/bottom.jpg"),
-      CUBEMAP("test/front.jpg"),
-      CUBEMAP("test/back.jpg"),
-    };
-    res->test_cubemap = create_cubemap(faces);
     // END TEXTURES
 }

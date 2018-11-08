@@ -9,6 +9,7 @@
 #define MAX_SHADER_INCLUDES 16
 #define MAX_INCLUDE_FNAME_LEN 64
 #define MAX_SHADERS 5
+#define MAX_UNIFORMS 16
 
 struct shader {
 	GLenum type;
@@ -29,7 +30,6 @@ struct gpu_program {
 #define NO_GEOM_SHADER NULL
 
 int reload_program(struct gpu_program *program);
-
 int make_shader(GLenum type, const char *filename, struct shader *shader);
 
 int make_program_from_shaders(struct shader **shaders,

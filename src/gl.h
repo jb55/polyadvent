@@ -100,4 +100,6 @@ void glFramebufferTexture(	GLenum target,
 void glPatchParameteri(	GLenum pname,
                         GLint value);
 
+void glBindVertexArray(	GLuint array);
+
 #endif /* POLYADVENT_GL_H */

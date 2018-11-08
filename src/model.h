@@ -17,6 +17,7 @@ enum shading {
 struct model {
     struct geometry geom;
     enum shading shading;
+    u32 texture;
 };
 
 

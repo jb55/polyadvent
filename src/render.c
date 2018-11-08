@@ -12,6 +12,7 @@
 #include "geometry.h"
 #include "debug.h"
 #include "render.h"
+#include "skybox.h"
 #include "util.h"
 
 
@@ -231,7 +232,6 @@ static void gamma_correct(float *c, float *d) {
 }
 
 void render (struct game *game, struct render_config *config) {
-    float adjust = game->test_resources.light_intensity;
     float gtmp[3];
     struct resources *res = &game->test_resources;
 
@@ -283,6 +283,8 @@ void render (struct game *game, struct render_config *config) {
     else {
         glCullFace(GL_BACK);
     }
+
+    render_skybox(&res->skybox, view_proj);
 
     for (u32 i = 0; i < num_entities; ++i) {
         struct entity *entity = &entities[i];

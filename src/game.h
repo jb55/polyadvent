@@ -3,16 +3,17 @@
 #define PA_GAME_H
 
 #include "buffer.h"
+#include "entity.h"
+#include "fbo.h"
 #include "input.h"
 #include "model.h"
 #include "node.h"
-#include "shader.h"
-#include "entity.h"
-#include "terrain.h"
-#include "ui.h"
-#include "fbo.h"
 #include "orbit.h"
+#include "shader.h"
+#include "skybox.h"
+#include "terrain.h"
 #include "texture.h"
+#include "ui.h"
 
 #define PLAYER_HEIGHT 1.73
 
@@ -65,6 +66,7 @@ struct resources {
     float time;
 	bool fog_on, diffuse_on;
 
+    struct skybox skybox;
 	float sun_color[3];
 	float test_mvp[MAT4_ELEMS];
 	float light_dir[3];

@@ -43,32 +43,46 @@ void bind_geometry(struct geometry *geom, struct attributes *attrs) {
     check_gl();
 }
 
-void render_geometry(struct geometry *geom, struct attributes *attrs,
-                     struct gpu_program *program)
-{
+static void check_for_patches(struct gpu_program *program, int *type) {
     int has_tess_shader =
         get_program_shader(program, GL_TESS_EVALUATION_SHADER) != NULL;
 
-    int type = GL_TRIANGLES;
     if (has_tess_shader) {
         glPatchParameteri(GL_PATCH_VERTICES, 3);
-        type = GL_PATCHES;
+        *type = GL_PATCHES;
     }
+}
+
+
+void render_geometry(struct geometry *geom, struct attributes *attrs,
+                     struct gpu_program *program)
+{
+    int type = GL_TRIANGLES;
+    //check_for_patches(program, &type);
     bind_geometry(geom, attrs);
-    glDrawElements(type,
-                   geom->num_indices, /* count */
-                   GL_UNSIGNED_INT,    /* type */
-                   (void*)0            /* element array buffer offset */
-                   );
-    check_gl();
+    if (geom->indices) {
+        glDrawElements(type,
+                       geom->num_indices, /* count */
+                       GL_UNSIGNED_INT,    /* type */
+                       (void*)0            /* element array buffer offset */
+                       );
+        check_gl();
+    }
+    else {
+        glDrawArrays(type, 0, geom->num_verts);
+        check_gl();
+    }
 }
 
 
 void init_geometry(struct geometry *geom) {
     geom->colors = NULL;
-    geom->vbos.color.handle = 0;
     geom->normals = NULL;
+    geom->indices = NULL;
+    geom->vertices = NULL;
     geom->tex_coords = NULL;
+
+    geom->vbos.color.handle = 0;
     geom->vbos.normal.handle = 0;
     geom->vbos.tex_coord.handle = 0;
 }
@@ -79,8 +93,8 @@ make_buffer_geometry(struct geometry *geom) {
 
     assert(geom->vertices);
     /* assert(geom->normals); */
-    assert(geom->indices);
-    assert(geom->num_indices >= 1);
+    /* assert(geom->indices); */
+    /* assert(geom->num_indices >= 1); */
 
     /* printf("making vertex buffer\n"); */
     make_vertex_buffer(
@@ -125,12 +139,13 @@ make_buffer_geometry(struct geometry *geom) {
 
     /* printf("making index buffer\n"); */
     // cube indices
-    make_index_buffer(
-                    GL_ELEMENT_ARRAY_BUFFER,
-                    geom->indices,
-                    geom->num_indices * (int)sizeof(*geom->indices),
-                    &geom->vbos.index
-                    );
+    if (geom->indices)
+        make_index_buffer(
+                        GL_ELEMENT_ARRAY_BUFFER,
+                        geom->indices,
+                        geom->num_indices * (int)sizeof(*geom->indices),
+                        &geom->vbos.index
+                        );
 }
 
 
