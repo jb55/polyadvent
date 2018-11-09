@@ -11,7 +11,7 @@ void
 handle_resize(struct game *game, int width, int height) {
   /* printf("resizing %d %d\n", width, height); */
   glViewport( 0, 0, width, height );
-  mat4_perspective(75 /* fov */, (float)width / height, 50.0, 10000.0,
+  mat4_perspective(75 /* fov */, (float)width / height, 10.0, 10000.0,
                    game->test_resources.proj_persp);
 
   resize_fbos(get_entity(&game->test_resources.player_id),

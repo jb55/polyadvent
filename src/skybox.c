@@ -3,50 +3,24 @@
 #include "util.h"
 #include "texture.h"
 
-static float skybox_vertices[] = {
-    // positions
-    -1.0f,  1.0f, -1.0f,
-    -1.0f, -1.0f, -1.0f,
-    0.0f, -1.0f, -1.0f,
-    0.0f, -1.0f, -1.0f,
-    0.0f,  1.0f, -1.0f,
-    1.0f,  1.0f, -1.0f,
-
-    1.0f, -1.0f,  1.0f,
-    1.0f, -1.0f, -1.0f,
-    1.0f,  1.0f, -1.0f,
-    1.0f,  1.0f, -1.0f,
-    1.0f,  1.0f,  1.0f,
-    1.0f, -1.0f,  1.0f,
-
-    0.0f, -1.0f, -1.0f,
-    0.0f, -1.0f,  1.0f,
-    0.0f,  1.0f,  1.0f,
-    0.0f,  1.0f,  1.0f,
-    0.0f,  1.0f, -1.0f,
-    0.0f, -1.0f, -1.0f,
-
-    1.0f, -1.0f,  1.0f,
-    1.0f,  1.0f,  1.0f,
-    0.0f,  1.0f,  1.0f,
-    0.0f,  1.0f,  1.0f,
-    0.0f, -1.0f,  1.0f,
-    1.0f, -1.0f,  1.0f,
-
-    1.0f,  1.0f, -1.0f,
-    0.0f,  1.0f, -1.0f,
-    0.0f,  1.0f,  1.0f,
-    0.0f,  1.0f,  1.0f,
-    1.0f,  1.0f,  1.0f,
-    1.0f,  1.0f, -1.0f,
-
-    1.0f, -1.0f, -1.0f,
-    1.0f, -1.0f,  1.0f,
-    0.0f, -1.0f, -1.0f,
-    0.0f, -1.0f, -1.0f,
-    1.0f, -1.0f,  1.0f,
-    0.0f, -1.0f,  1.0f
+static GLfloat skybox_vertices[] = {
+  1.0, 1.0, 1.0,  -1.0, 1.0, 1.0,  -1.0,-1.0, 1.0,   1.0,-1.0, 1.0,    // v0-v1-v2-v3 front
+  1.0, 1.0,-1.0,   1.0, 1.0, 1.0,   1.0,-1.0, 1.0,   1.0,-1.0,-1.0,    // v5-v0-v3-v4 right
+  -1.0, 1.0, 1.0,   1.0, 1.0, 1.0,   1.0, 1.0,-1.0,  -1.0, 1.0,-1.0,   // v1-v0-v5-v6 top
+  -1.0, 1.0, 1.0,  -1.0, 1.0,-1.0,  -1.0,-1.0,-1.0,  -1.0,-1.0, 1.0,   // v1-v6-v7-v2 left
+  1.0,-1.0, 1.0,  -1.0,-1.0, 1.0,  -1.0,-1.0,-1.0,   1.0,-1.0,-1.0,    // v3-v2-v7-v4 bottom
+  -1.0, 1.0,-1.0,   1.0, 1.0,-1.0,   1.0,-1.0,-1.0,  -1.0,-1.0,-1.0     // v4-v7-v6-v5 back
 };
+
+static u32 skybox_indices[] = {
+  0, 1, 2,   0, 2, 3,    // top     (+z)
+  4, 5, 6,   4, 6, 7,    // right   (+x)
+  8, 9,10,   8, 10,11,   // front (+y)
+  12,13,14,  12,14,15,   // left    (-x)
+  16,17,18,  16,18,19,   // back    (-y)
+  20,21,22,  20,22,23    // bottom  (-z)
+};
+
 
 void create_skybox(struct skybox *skybox, struct gpu_program *program) {
     struct shader vertex, frag;
@@ -57,18 +31,22 @@ void create_skybox(struct skybox *skybox, struct gpu_program *program) {
     init_model(&skybox->model);
 
     skybox->program = program;
+
     skybox->model.geom.vertices = skybox_vertices;
+    skybox->model.geom.indices = skybox_indices;
+
     skybox->model.geom.num_verts = ARRAY_SIZE(skybox_vertices);
+    skybox->model.geom.num_indices = ARRAY_SIZE(skybox_indices);
 
     make_buffer_geometry(&skybox->model.geom);
 
     static const char *faces[6] = {
-      CUBEMAP("ame_siege/siege_rt.tga"),
-      CUBEMAP("ame_siege/siege_lf.tga"),
-      CUBEMAP("ame_siege/siege_up.tga"),
-      CUBEMAP("ame_siege/siege_dn.tga"),
-      CUBEMAP("ame_siege/siege_ft.tga"),
+      CUBEMAP("ame_siege/siege_rt_flip.tga"),
+      CUBEMAP("ame_siege/siege_lf_flip.tga"),
+      CUBEMAP("ame_siege/siege_ft_flip.tga"),
       CUBEMAP("ame_siege/siege_bk.tga"),
+      CUBEMAP("ame_siege/siege_up_flip.tga"),
+      CUBEMAP("ame_siege/siege_dn_flip.tga"),
     };
     skybox->model.texture = create_cubemap(faces);
 
@@ -86,6 +64,9 @@ void create_skybox(struct skybox *skybox, struct gpu_program *program) {
 
     skybox->attrs.position = (gpu_addr)
         glGetAttribLocation(skybox->program->handle, "position");
+
+    skybox->attrs.tex_coord = (gpu_addr)
+        glGetAttribLocation(skybox->program->handle, "tex_coord");
 }
 
 

@@ -281,6 +281,11 @@ void render (struct game *game, struct render_config *config) {
         glCullFace(GL_BACK);
     }
 
+    mat4_inverse(camera, view);
+    mat4_remove_translations(view);
+    mat4_multiply(projection, view, view_proj);
+    /* mat4_multiply(view_proj, res->skybox.node.mat, mvp); */
+    render_skybox(&res->skybox, view_proj);
 
     mat4_inverse(camera, view);
     mat4_multiply(projection, view, view_proj);
@@ -346,12 +351,6 @@ void render (struct game *game, struct render_config *config) {
 
     if (config->draw_ui)
         render_ui(&game->ui, view);
-
-    mat4_inverse(camera, view);
-    mat4_remove_translations(view);
-    mat4_multiply(projection, view, view_proj);
-    /* mat4_multiply(view_proj, res->skybox.node.mat, mvp); */
-    render_skybox(&res->skybox, view_proj);
 
     //player
     // y tho
