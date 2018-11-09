@@ -32,6 +32,10 @@ struct vbo *
 make_index_buffer(GLenum target, const void *buffer_data,
                   GLsizei buffer_size, struct vbo *vbo);
 
+struct vbo *
+make_uv_buffer(GLenum target, const void *data,
+               GLsizei buffer_size, struct vbo *vbo, int components);
+
 void bind_uv_vbo(struct vbo *vbo, gpu_addr slot);
 void bind_vbo(struct vbo *vbo, gpu_addr slot);
 void bind_ibo(struct vbo *vbo);

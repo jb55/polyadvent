@@ -43,6 +43,7 @@ static void create_quad(struct geometry *geom)
     geom->tex_coords = quad_uvs;
     geom->num_indices = ARRAY_SIZE(quad_indices);
     geom->num_verts = ARRAY_SIZE(quad_vertices);
+    geom->num_uv_components = 2;
     make_buffer_geometry(geom);
     check_gl();
 }

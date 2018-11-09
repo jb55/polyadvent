@@ -23,7 +23,7 @@ make_buffer(GLenum target, const void *buffer_data, GLsizei buffer_size) {
 struct vbo*
 make_index_buffer(GLenum target, const void *data, GLsizei buffer_size,
                   struct vbo *vbo) {
-  vbo->components = 2;
+  vbo->components = 3;
   vbo->handle = make_buffer(target, data, buffer_size);
   vbo->type = GL_ELEMENT_ARRAY_BUFFER;
   return vbo;
@@ -33,23 +33,32 @@ make_index_buffer(GLenum target, const void *data, GLsizei buffer_size,
 struct vbo*
 make_vertex_buffer(GLenum target, const void *data,
                    GLsizei buffer_size, struct vbo *vbo) {
-  vbo->components = 2;
+  vbo->components = 3;
   vbo->handle = make_buffer(target, data, buffer_size);
   vbo->type = GL_ARRAY_BUFFER;
   return vbo;
+}
+
+struct vbo*
+make_uv_buffer(GLenum target, const void *data,
+               GLsizei buffer_size, struct vbo *vbo, int components) {
+    vbo->components = components;
+    vbo->handle = make_buffer(target, data, buffer_size);
+    vbo->type = GL_ARRAY_BUFFER;
+    return vbo;
 }
 
 void bind_ibo(struct vbo *vbo) {
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbo->handle);
 }
 
-static void bind_vbo_internal(struct vbo *vbo, gpu_addr slot, int size) {
+static void bind_vbo_internal(struct vbo *vbo, gpu_addr slot) {
   glEnableVertexAttribArray(slot);
   check_gl();
   glBindBuffer(vbo->type, vbo->handle);
   check_gl();
   glVertexAttribPointer(slot,              // attribute
-                        size,                 // size
+                        vbo->components,   // size
                         GL_FLOAT,          // type
                         GL_FALSE,          // normalized?
                         0,   // stride
@@ -57,10 +66,6 @@ static void bind_vbo_internal(struct vbo *vbo, gpu_addr slot, int size) {
                         );
 }
 
-void bind_uv_vbo(struct vbo *vbo, gpu_addr slot) {
-    bind_vbo_internal(vbo, slot, 2);
-}
-
 void bind_vbo(struct vbo *vbo, gpu_addr slot) {
-    bind_vbo_internal(vbo, slot, 3);
+    bind_vbo_internal(vbo, slot);
 }

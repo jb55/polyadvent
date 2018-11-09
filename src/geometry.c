@@ -36,7 +36,7 @@ void bind_geometry(struct geometry *geom, struct attributes *attrs) {
         check_gl();
     }
     if (geom->vbos.tex_coord.handle) {
-        bind_uv_vbo(&geom->vbos.tex_coord, attrs->tex_coord);
+        bind_vbo(&geom->vbos.tex_coord, attrs->tex_coord);
         check_gl();
     }
     bind_ibo(&geom->vbos.index);
@@ -82,6 +82,7 @@ void init_geometry(struct geometry *geom) {
     geom->indices = NULL;
     geom->vertices = NULL;
     geom->tex_coords = NULL;
+    geom->num_uv_components = 2;
 
     geom->vbos.color.handle = 0;
     geom->vbos.normal.handle = 0;
@@ -125,6 +126,7 @@ make_buffer_geometry(struct geometry *geom) {
                         );
 
     if (geom->tex_coords != NULL) {
+        assert(geom->num_uv_components);
         printf("%f %f %f %f\n",
                geom->tex_coords[0],
                geom->tex_coords[1],
@@ -132,10 +134,10 @@ make_buffer_geometry(struct geometry *geom) {
                geom->tex_coords[3]
                );
 
-        make_vertex_buffer(GL_ARRAY_BUFFER,
-                           geom->tex_coords,
-                           geom->num_verts * 2 * (int)sizeof(*geom->tex_coords),
-                           &geom->vbos.tex_coord);
+        make_uv_buffer(GL_ARRAY_BUFFER,
+                       geom->tex_coords,
+                       geom->num_verts * geom->num_uv_components * (int)sizeof(*geom->tex_coords),
+                       &geom->vbos.tex_coord, geom->num_uv_components);
     }
 
     /* printf("making index buffer\n"); */

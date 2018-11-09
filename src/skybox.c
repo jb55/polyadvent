@@ -4,13 +4,24 @@
 #include "texture.h"
 
 static GLfloat skybox_vertices[] = {
-  1.0, 1.0, 1.0,  -1.0, 1.0, 1.0,  -1.0,-1.0, 1.0,   1.0,-1.0, 1.0,    // v0-v1-v2-v3 front
+  1.0, 1.0, 1.0,  -1.0, 1.0, 1.0,  -1.0,-1.0, 1.0,   1.0,-1.0, 1.0,    // v0-v1-v2-v3 top
   1.0, 1.0,-1.0,   1.0, 1.0, 1.0,   1.0,-1.0, 1.0,   1.0,-1.0,-1.0,    // v5-v0-v3-v4 right
-  -1.0, 1.0, 1.0,   1.0, 1.0, 1.0,   1.0, 1.0,-1.0,  -1.0, 1.0,-1.0,   // v1-v0-v5-v6 top
+  -1.0, 1.0, 1.0,   1.0, 1.0, 1.0,   1.0, 1.0,-1.0,  -1.0, 1.0,-1.0,   // v1-v0-v5-v6 front
   -1.0, 1.0, 1.0,  -1.0, 1.0,-1.0,  -1.0,-1.0,-1.0,  -1.0,-1.0, 1.0,   // v1-v6-v7-v2 left
-  1.0,-1.0, 1.0,  -1.0,-1.0, 1.0,  -1.0,-1.0,-1.0,   1.0,-1.0,-1.0,    // v3-v2-v7-v4 bottom
-  -1.0, 1.0,-1.0,   1.0, 1.0,-1.0,   1.0,-1.0,-1.0,  -1.0,-1.0,-1.0     // v4-v7-v6-v5 back
+  1.0,-1.0, 1.0,  -1.0,-1.0, 1.0,  -1.0,-1.0,-1.0,   1.0,-1.0,-1.0,    // v3-v2-v7-v4 back
+  -1.0, 1.0,-1.0,   1.0, 1.0,-1.0,   1.0,-1.0,-1.0,  -1.0,-1.0,-1.0     // v4-v7-v6-v5 bottom
 };
+
+
+static GLfloat skybox_uvs[] = {
+  1.0, 1.0, 1.0,  -1.0, 1.0, 1.0,  -1.0,-1.0, 1.0,   1.0,-1.0, 1.0,
+  1.0, 1.0,-1.0,   1.0, 1.0, 1.0,   1.0,-1.0, 1.0,   1.0,-1.0,-1.0,
+  -1.0, 1.0, 1.0,   1.0, 1.0, 1.0,   1.0, 1.0,-1.0,  -1.0, 1.0,-1.0,
+  -1.0, 1.0, 1.0,  -1.0, 1.0,-1.0,  -1.0,-1.0,-1.0,  -1.0,-1.0, 1.0,
+  1.0,-1.0, 1.0,  -1.0,-1.0, 1.0,  -1.0,-1.0,-1.0,   1.0,-1.0,-1.0,
+  -1.0, 1.0,-1.0,   1.0, 1.0,-1.0,   1.0,-1.0,-1.0,  -1.0,-1.0,-1.0
+};
+
 
 static u32 skybox_indices[] = {
   0, 1, 2,   0, 2, 3,    // top     (+z)
@@ -25,6 +36,7 @@ static u32 skybox_indices[] = {
 void create_skybox(struct skybox *skybox, struct gpu_program *program) {
     struct shader vertex, frag;
     struct shader *shaders[] = {&vertex, &frag};
+    struct geometry *geom = &skybox->model.geom;
     int ok;
 
     node_init(&skybox->node);
@@ -32,22 +44,35 @@ void create_skybox(struct skybox *skybox, struct gpu_program *program) {
 
     skybox->program = program;
 
-    skybox->model.geom.vertices = skybox_vertices;
-    skybox->model.geom.indices = skybox_indices;
+    geom->vertices = skybox_vertices;
+    geom->indices = skybox_indices;
+    /* geom->tex_coords = skybox_uvs; */
 
-    skybox->model.geom.num_verts = ARRAY_SIZE(skybox_vertices);
-    skybox->model.geom.num_indices = ARRAY_SIZE(skybox_indices);
+    /* geom->num_uv_components = 3; */
+    geom->num_verts = ARRAY_SIZE(skybox_vertices);
+    geom->num_indices = ARRAY_SIZE(skybox_indices);
 
     make_buffer_geometry(&skybox->model.geom);
 
     static const char *faces[6] = {
-      CUBEMAP("ame_siege/siege_rt_flip.tga"),
-      CUBEMAP("ame_siege/siege_lf_flip.tga"),
-      CUBEMAP("ame_siege/siege_ft_flip.tga"),
-      CUBEMAP("ame_siege/siege_bk.tga"),
-      CUBEMAP("ame_siege/siege_up_flip.tga"),
-      CUBEMAP("ame_siege/siege_dn_flip.tga"),
+      CUBEMAP("hw_sahara/sahara_rt_flip.tga"),
+      CUBEMAP("hw_sahara/sahara_lf_flip.tga"),
+      CUBEMAP("hw_sahara/sahara_ft_flip.tga"),
+      CUBEMAP("hw_sahara/sahara_bk.tga"),
+      CUBEMAP("hw_sahara/sahara_up_flip.tga"),
+      CUBEMAP("hw_sahara/sahara_dn_flip.tga"),
     };
+
+
+    /* static const char *faces[6] = { */
+    /*   CUBEMAP("ame_siege/siege_rt_flip.tga"), */
+    /*   CUBEMAP("ame_siege/siege_lf_flip.tga"), */
+    /*   CUBEMAP("ame_siege/siege_ft_flip.tga"), */
+    /*   CUBEMAP("ame_siege/siege_bk.tga"), */
+    /*   CUBEMAP("ame_siege/siege_up_flip.tga"), */
+    /*   CUBEMAP("ame_siege/siege_dn_flip.tga"), */
+    /* }; */
+
     skybox->model.texture = create_cubemap(faces);
 
     make_shader(GL_VERTEX_SHADER, SHADER("skybox.v.glsl"), &vertex);

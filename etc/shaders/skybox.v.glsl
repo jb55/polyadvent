@@ -1,7 +1,6 @@
 #include profile
 
 in vec3 position;
-in vec3 tex_coord;
 out vec3 tex_coords;
 
 uniform mat4 mvp;
