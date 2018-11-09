@@ -19,11 +19,21 @@ vec3 gamma_correct(vec3 color) {
     return pow(color, vec3(1.0/2.2));
 }
 
+vec3 uncharted_tonemap(const vec3 x) {
+	const float A = 0.15;
+	const float B = 0.50;
+	const float C = 0.10;
+	const float D = 0.20;
+	const float E = 0.02;
+	const float F = 0.30;
+	return ((x * (A * x + C * B) + D * E) / (x * (A * x + B) + D * F)) - E / F;
+}
+
 vec3 standard_light(vec3 color, vec4 position, vec4 normal) {
     // vec3 light_dir = vec3()
     const float pi = 3.14159265;
     const float shiny = 14.0;
-    const float exposure = 0.2;
+    const float exposure = 0.3;
     float ambient_str = 0.2;
     float spec_str = 0.8 * light_intensity;
 
@@ -70,6 +80,7 @@ vec3 standard_light(vec3 color, vec4 position, vec4 normal) {
     // tone mapping
     // final = final / (vec3(1.0) - final * exposure);
     // final = final / (vec3(1.0) + color);
+    final = uncharted_tonemap(final);
 
     return final;
 }
