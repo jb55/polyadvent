@@ -304,11 +304,12 @@ static void gravity(struct game *game) {
 void orbit_update_from_mouse(struct orbit *camera, struct input *input,
                              float mouse_sens, struct entity *player,
                              float dt) {
-    float *target;
+    float target[3];
     struct node *target_node = &player->node;
 
     node_recalc(target_node);
-    target = node_world(target_node);
+    vec3_copy(node_world(target_node), target);
+    vec3_add(target, V3(0.0, 0.0, 100.0), target);
 
     float mx = 0.0, my = 0.0;
     if (input_is_dragging(input, SDL_BUTTON_LEFT) ||

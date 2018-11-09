@@ -273,6 +273,17 @@ void render (struct game *game, struct render_config *config) {
     struct gpu_program *default_program =
         &game->test_resources.programs[DEFAULT_PROGRAM];
 
+    /* mat4_multiply(view_proj, res->skybox.node.mat, mvp); */
+    if (!config->is_depth_pass) {
+        mat4_inverse(camera, view);
+        mat4_remove_translations(view);
+        mat4_multiply(projection, view, view_proj);
+        render_skybox(&res->skybox, view_proj);
+    }
+
+    mat4_inverse(camera, view);
+    mat4_multiply(projection, view, view_proj);
+
     if (config->is_depth_pass) {
         glDisable(GL_CULL_FACE);
         mat4_multiply(bias_matrix, view_proj, config->depth_vp);
@@ -280,12 +291,6 @@ void render (struct game *game, struct render_config *config) {
     else {
         glCullFace(GL_BACK);
     }
-
-    mat4_inverse(camera, view);
-    mat4_remove_translations(view);
-    mat4_multiply(projection, view, view_proj);
-    /* mat4_multiply(view_proj, res->skybox.node.mat, mvp); */
-    render_skybox(&res->skybox, view_proj);
 
     mat4_inverse(camera, view);
     mat4_multiply(projection, view, view_proj);
