@@ -96,16 +96,19 @@ int node_recalc(struct node *node) {
 
   node->needs_recalc = 0;
 
-  quat_to_mat3(node->orientation, rot);
-  mat4_create_transform(node->pos, node->scale, rot, node->mat);
+  if (!node->custom_update) {
+      quat_to_mat3(node->orientation, rot);
+      mat4_create_transform(node->pos, node->scale, rot, node->mat);
 
-  if (node->parent) {
-    assert(!node->parent->needs_recalc);
-    mat4_multiply(node->parent->mat, node->mat, node->mat);
+      if (node->parent) {
+          assert(!node->parent->needs_recalc);
+          mat4_multiply(node->parent->mat, node->mat, node->mat);
+      }
+
   }
-
-  if (node->custom_update)
-    node->custom_update(node);
+  else {
+      node->custom_update(node);
+  }
 
   node_recalc_children(node);
 

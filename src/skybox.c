@@ -48,13 +48,18 @@ static float skybox_vertices[] = {
     0.0f, -1.0f,  1.0f
 };
 
-void create_skybox(struct skybox *skybox) {
+void create_skybox(struct skybox *skybox, struct gpu_program *program) {
     struct shader vertex, frag;
     struct shader *shaders[] = {&vertex, &frag};
+    int ok;
 
+    node_init(&skybox->node);
     init_model(&skybox->model);
+
+    skybox->program = program;
     skybox->model.geom.vertices = skybox_vertices;
     skybox->model.geom.num_verts = ARRAY_SIZE(skybox_vertices);
+
     make_buffer_geometry(&skybox->model.geom);
 
     static const char *faces[6] = {
@@ -72,14 +77,15 @@ void create_skybox(struct skybox *skybox) {
     make_shader(GL_FRAGMENT_SHADER, SHADER("skybox.f.glsl"), &frag);
     check_gl();
 
-    make_program_from_shaders(shaders, 2, &skybox->program);
+    ok = make_program_from_shaders(shaders, 2, skybox->program);
+    assert(ok);
     check_gl();
 
     skybox->uniforms.mvp =
-        glGetUniformLocation(skybox->program.handle, "mvp");
+        glGetUniformLocation(skybox->program->handle, "mvp");
 
     skybox->attrs.position = (gpu_addr)
-        glGetAttribLocation(skybox->program.handle, "position");
+        glGetAttribLocation(skybox->program->handle, "position");
 }
 
 
@@ -87,7 +93,7 @@ void render_skybox(struct skybox *skybox, mat4 *camera) {
     glDepthMask(GL_FALSE);
     check_gl();
 
-    glUseProgram(skybox->program.handle);
+    glUseProgram(skybox->program->handle);
     check_gl();
 
     glUniformMatrix4fv(skybox->uniforms.mvp, 1, 0, camera);
@@ -96,7 +102,7 @@ void render_skybox(struct skybox *skybox, mat4 *camera) {
     glBindTexture(GL_TEXTURE_CUBE_MAP, skybox->model.texture);
     check_gl();
 
-    render_geometry(&skybox->model.geom, &skybox->attrs, &skybox->program);
+    render_geometry(&skybox->model.geom, &skybox->attrs, skybox->program);
     check_gl();
 
     glDepthMask(GL_TRUE);

@@ -69,7 +69,8 @@ void render_geometry(struct geometry *geom, struct attributes *attrs,
         check_gl();
     }
     else {
-        glDrawArrays(type, 0, geom->num_verts);
+        /* printf("nverts %d\n", geom->num_verts); */
+        glDrawArrays(type, 0, geom->num_verts / 3);
         check_gl();
     }
 }

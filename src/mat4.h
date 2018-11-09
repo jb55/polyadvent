@@ -27,3 +27,6 @@ void mat4_print(const mat4 *a);
 
 mat4 *mat4_rotate(const mat4 *mat, const float angle,
                   const float *v3_axis, mat4 *dest);
+
+
+mat4 *mat4_remove_translations(mat4 *mat);

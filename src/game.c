@@ -75,7 +75,9 @@ void game_init(struct game *game, int width, int height) {
     check_gl();
 
     init_terrain(terrain, size);
-    create_skybox(&res->skybox);
+    create_skybox(&res->skybox, &res->programs[SKYBOX_PROGRAM]);
+    /* node_translate(&res->skybox.node, V3(-100.0, -100.0, 0.0)); */
+    /* node_scale(&res->skybox.node, size/4.0); */
 
     mat4_id(mvp);
 
@@ -98,8 +100,8 @@ void game_init(struct game *game, int width, int height) {
     game->test_resources.diffuse_on = 0;
 
     node_init(root);
-    node_init(camera);
     node_init(sun_camera);
+    init_orbit(&res->camera);
 
     // ENTITIES
 
@@ -109,6 +111,8 @@ void game_init(struct game *game, int width, int height) {
     assert(ok);
     player->node.label = "player";
     node_attach(&player->node, root);
+    node_attach(&res->skybox.node, &player->node);
+    /* node_attach(&res->camera.node, &player->node); */
     node_translate(&player->node, V3(terrain->size/2.,terrain->size/2.,0.0));
 
     res->camera.coords.azimuth = -quat_yaw(player->node.orientation) - RAD(90.0);

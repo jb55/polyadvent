@@ -23,6 +23,7 @@ enum program_type {
   DEFAULT_PROGRAM,
   TERRAIN_PROGRAM,
   UI_PROGRAM,
+  SKYBOX_PROGRAM,
   NUM_PROGRAMS,
 };
 

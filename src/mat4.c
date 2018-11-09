@@ -229,6 +229,13 @@ mat4 *mat4_inverse(mat4 *src, mat4 *dest) {
 	return dest;
 }
 
+mat4 *mat4_remove_translations(mat4 *dest) {
+    dest[12] = 0.0;
+    dest[13] = 0.0;
+    dest[14] = 0.0;
+    dest[15] = 1.0;
+    return dest;
+}
 
 mat4 *mat4_multiply(const mat4 *a, const mat4 *b, mat4 *dst) {
   float a00 = a[0],  a01 = a[1],  a02 = a[2],  a03 = a[3];

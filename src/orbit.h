@@ -17,6 +17,8 @@ struct orbit {
     struct node node;
 };
 
+void init_orbit(struct orbit *orbit);
+
 vec3 *spherical_dir(struct spherical s, vec3 *dir);
 vec3 *spherical_pos(struct spherical *s, vec3 *from, vec3 *to);
 vec3 *spherical_look_at(struct spherical *s, vec3 *target, mat4 *mat);
