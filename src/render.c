@@ -274,12 +274,6 @@ void render (struct game *game, struct render_config *config) {
         &game->test_resources.programs[DEFAULT_PROGRAM];
 
     /* mat4_multiply(view_proj, res->skybox.node.mat, mvp); */
-    if (!config->is_depth_pass) {
-        mat4_inverse(camera, view);
-        mat4_remove_translations(view);
-        mat4_multiply(projection, view, view_proj);
-        render_skybox(&res->skybox, view_proj);
-    }
 
     mat4_inverse(camera, view);
     mat4_multiply(projection, view, view_proj);
@@ -295,7 +289,7 @@ void render (struct game *game, struct render_config *config) {
     mat4_inverse(camera, view);
     mat4_multiply(projection, view, view_proj);
 
-    for (u32 i = 0; i < num_entities; ++i) {
+    for (u32 i = 1; i < num_entities; ++i) {
         struct entity *entity = &entities[i];
         if (config->is_depth_pass && !entity->casts_shadows)
             continue;
@@ -352,6 +346,16 @@ void render (struct game *game, struct render_config *config) {
 
         render_geometry(&entity->model.geom, &res->attributes, current_program);
         check_gl();
+    }
+
+    if (!config->is_depth_pass) {
+        mat4_inverse(camera, view);
+        mat4_remove_translations(view);
+        mat4_multiply(projection, view, view_proj);
+
+        glDepthFunc(GL_LEQUAL);
+        render_skybox(&res->skybox, view_proj);
+        glDepthFunc(GL_LESS);
     }
 
     if (config->draw_ui)

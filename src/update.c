@@ -309,7 +309,7 @@ void orbit_update_from_mouse(struct orbit *camera, struct input *input,
 
     node_recalc(target_node);
     vec3_copy(node_world(target_node), target);
-    vec3_add(target, V3(0.0, 0.0, 100.0), target);
+    /* vec3_add(target, V3(0.0, 0.0, 100.0), target); */
 
     float mx = 0.0, my = 0.0;
     if (input_is_dragging(input, SDL_BUTTON_LEFT) ||
