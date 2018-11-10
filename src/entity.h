@@ -6,7 +6,8 @@
 #include "model.h"
 
 enum entity_flags {
-  ENT_FLAG_PLAYER = 1 << 0,
+  ENT_IS_PLAYER = 1 << 0,
+  ENT_INVISIBLE = 1 << 1,
 };
 
 struct entity {

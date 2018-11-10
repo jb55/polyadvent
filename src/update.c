@@ -176,14 +176,16 @@ static void player_terrain_collision(struct terrain *terrain, struct entity *pla
 static void player_movement(struct game *game, struct entity *player) {
     movement(game, &player->node, 2.0);
 
-    vec3 *camera_world = node_world(&game->test_resources.camera.node);
-    float cam_terrain_z =
-        game->terrain.fn(&game->terrain, camera_world[0], camera_world[1]);
+    if (!(get_entity(&game->terrain.entity_id)->flags & ENT_INVISIBLE)) {
+        vec3 *camera_world = node_world(&game->test_resources.camera.node);
+        float cam_terrain_z =
+            game->terrain.fn(&game->terrain, camera_world[0], camera_world[1]);
 
-    const float bias = 20.0;
+        const float bias = 20.0;
 
-    if (camera_world[2] < cam_terrain_z + bias)
-        camera_world[2] = cam_terrain_z + bias;
+        if (camera_world[2] < cam_terrain_z + bias)
+            camera_world[2] = cam_terrain_z + bias;
+    }
 }
 
 
@@ -309,7 +311,7 @@ void orbit_update_from_mouse(struct orbit *camera, struct input *input,
 
     node_recalc(target_node);
     vec3_copy(node_world(target_node), target);
-    /* vec3_add(target, V3(0.0, 0.0, 100.0), target); */
+    vec3_add(target, V3(0.0, 0.0, player->model.geom.max[2]), target);
 
     float mx = 0.0, my = 0.0;
     if (input_is_dragging(input, SDL_BUTTON_LEFT) ||

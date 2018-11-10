@@ -75,6 +75,8 @@ void game_init(struct game *game, int width, int height) {
     check_gl();
 
     init_terrain(terrain, size);
+    get_entity(&terrain->entity_id)->flags |= ENT_INVISIBLE;
+
     create_skybox(&res->skybox, &res->programs[SKYBOX_PROGRAM]);
     /* node_translate(&res->skybox.node, V3(-100.0, -100.0, 0.0)); */
     /* node_scale(&res->skybox.node, size/4.0); */
@@ -107,7 +109,7 @@ void game_init(struct game *game, int width, int height) {
 
     // player entity
     player = new_entity(&res->player_id);
-    ok = load_model(&player->model, "pirate-officer");
+    ok = load_model(&player->model, "ico-sphere");
     assert(ok);
     player->node.label = "player";
     node_attach(&player->node, root);
@@ -117,7 +119,7 @@ void game_init(struct game *game, int width, int height) {
 
     res->camera.coords.azimuth = -quat_yaw(player->node.orientation) - RAD(90.0);
     res->camera.coords.inclination = RAD(60);
-    res->camera.coords.radius = 100.0;
+    res->camera.coords.radius = 2.0;
 
     struct entity *tower = new_entity(NULL);
     ok = load_model(&tower->model, "tower");

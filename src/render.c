@@ -175,10 +175,6 @@ check_gl();
             glGetUniformLocation(handle, "sun_color");
         check_gl();
 
-        resources->uniforms.world =
-            glGetUniformLocation(handle, "world");
-        check_gl();
-
         resources->uniforms.fog_on =
             glGetUniformLocation(handle, "fog_on");
         check_gl();
@@ -186,6 +182,10 @@ check_gl();
         /* resources->uniforms.diffuse_on = */
         /*     glGetUniformLocation(handle, "diffuse_on"); */
         /* check_gl(); */
+
+        resources->uniforms.model =
+            glGetUniformLocation(handle, "model");
+        check_gl();
 
         resources->uniforms.mvp =
             glGetUniformLocation(handle, "mvp");
@@ -212,6 +212,7 @@ check_gl();
 	resources->attributes.color =
         (gpu_addr)glGetAttribLocation(resources->programs[DEFAULT_PROGRAM]
                                         .handle, "color");
+    /* assert(resources->attributes.color != 0xFFFFFFFF); */
     check_gl();
 }
 
@@ -289,8 +290,14 @@ void render (struct game *game, struct render_config *config) {
     mat4_inverse(camera, view);
     mat4_multiply(projection, view, view_proj);
 
-    for (u32 i = 1; i < num_entities; ++i) {
+    glBindTexture(GL_TEXTURE_CUBE_MAP, res->skybox.model.texture);
+
+    for (u32 i = 0; i < num_entities; ++i) {
         struct entity *entity = &entities[i];
+
+        if (entity->flags & ENT_INVISIBLE)
+            continue;
+
         if (config->is_depth_pass && !entity->casts_shadows)
             continue;
 
@@ -307,16 +314,16 @@ void render (struct game *game, struct render_config *config) {
 
         glUniform1i(res->uniforms.fog_on, res->fog_on);
         check_gl();
-        /* glUniform1i(res->uniforms.diffuse_on, res->diffuse_on); */
-        /* check_gl(); */
+
         glUniform3f(res->uniforms.light_dir, light[0], light[1], light[2]);
         check_gl();
+
         glUniform1f(res->uniforms.light_intensity, res->light_intensity);
         check_gl();
-        /* glUniform1f(res->uniforms.time, res->time); */
-        check_gl();
+
         glUniform1f(res->uniforms.sky_intensity, sky_intensity);
         check_gl();
+
         glUniform3f(res->uniforms.sun_color,
                     res->sun_color[0],
                     res->sun_color[1],
@@ -325,20 +332,14 @@ void render (struct game *game, struct render_config *config) {
 
         mat4_multiply(view_proj, entity->node.mat, mvp);
         mat4_copy(entity->node.mat, model_view);
-
-        /* if (i == 1) */
-        /*     mat4_multiply(bias_matrix, mvp, config->depth_mvp); */
         mat4_multiply(config->depth_vp, model_view, depth_mvp);
+        glUniformMatrix4fv(res->uniforms.depth_mvp, 1, 0, depth_mvp);
+        check_gl();
 
         glUniformMatrix4fv(res->uniforms.mvp, 1, 0, mvp);
         check_gl();
-        glUniformMatrix4fv(res->uniforms.depth_mvp, 1, 0, depth_mvp);
-        check_gl();
-        /* glUniformMatrix4fv(res->uniforms.depth_vp, 1, 0, config->depth_vp); */
-        /* check_gl(); */
-        /* glUniformMatrix4fv(res->uniforms.model_view, 1, 0, model_view); */
-        /* check_gl(); */
-        glUniformMatrix4fv(res->uniforms.world, 1, 0, entity->node.mat);
+
+        glUniformMatrix4fv(res->uniforms.model, 1, 0, entity->node.mat);
         check_gl();
 
         recalc_normals(res->uniforms.normal_matrix, model_view, normal_matrix);

@@ -27,15 +27,15 @@ destroy_buffer_geometry(struct geometry *geom) {
 void bind_geometry(struct geometry *geom, struct attributes *attrs) {
     bind_vbo(&geom->vbos.vertex, attrs->position);
     check_gl();
-    if (geom->vbos.normal.handle) {
+    if (geom->vbos.normal.handle && attrs->normal != 0xFFFFFFFF) {
         bind_vbo(&geom->vbos.normal, attrs->normal);
         check_gl();
     }
-    if (geom->vbos.color.handle) {
+    if (geom->vbos.color.handle && attrs->color != 0xFFFFFFFF) {
         bind_vbo(&geom->vbos.color, attrs->color);
         check_gl();
     }
-    if (geom->vbos.tex_coord.handle) {
+    if (geom->vbos.tex_coord.handle && attrs->tex_coord != 0xFFFFFFFF) {
         bind_vbo(&geom->vbos.tex_coord, attrs->tex_coord);
         check_gl();
     }

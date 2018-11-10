@@ -9,6 +9,7 @@ in shader_data {
 } vertex;
 
 uniform sampler2D shadow_map;
+uniform samplerCube skybox;
 
 #include lighting.glsl
 #include shadows.glsl
@@ -21,15 +22,18 @@ void main() {
 
   // vec3 color = vertex.color * (1.0-smoothness)
   //     + color_smooth * smoothness;
-  vec3 color = standard_light(vertex.color, v4_pos, v4_normal);
+  // vec3 color = standard_light(vertex.color, v4_pos, v4_normal);
 
-  if (fog_on) {
-    vec3 fog = apply_fog(color, length(v_ray), camera_position, v_ray);
-    // vec3 fog = depth_fog(color, shadow_sample);
-    color = fog;
-  }
+  // if (fog_on) {
+  //   vec3 fog = apply_fog(color, length(v_ray), camera_position, v_ray);
+  //   // vec3 fog = depth_fog(color, shadow_sample);
+  //   color = fog;
+  // }
 
-  color *= shadow_strength(v4_pos, v4_normal, vertex.shadow_coord);
+  // color *= shadow_strength(v4_pos, v4_normal, vertex.shadow_coord);
+  vec3 I = normalize(vertex.position - camera_position);
+  vec3 R = reflect(I, normalize(vertex.normal));
+  vec3 color = texture(skybox, R).rgb;
 
   frag_color = vec4(gamma_correct(color), 1.0);
 }

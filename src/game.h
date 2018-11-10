@@ -38,22 +38,22 @@ struct resources {
     struct gpu_program programs[NUM_PROGRAMS];
 
 	struct uniforms {
-		GLint camera_position;
-		GLint light_dir;
-		GLint light_intensity;
-		GLint sky_intensity;
 		GLint ambient_str;
-		GLint sun_color;
-		GLint mvp;
+		GLint camera_position;
 		GLint depth_mvp;
 		GLint depth_vp;
-		GLint normal_matrix;
-		GLint view;
-		GLint time;
-		GLint fog_on;
 		GLint diffuse_on;
+		GLint fog_on;
+		GLint light_dir;
+		GLint light_intensity;
+		GLint model;
 		GLint model_view;
-		GLint world;
+		GLint mvp;
+		GLint normal_matrix;
+		GLint sky_intensity;
+		GLint sun_color;
+		GLint time;
+		GLint view_proj;
 	} uniforms;
 
 	struct attributes attributes;
