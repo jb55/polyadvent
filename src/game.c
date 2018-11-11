@@ -119,14 +119,14 @@ void game_init(struct game *game, int width, int height) {
 
     res->camera.coords.azimuth = -quat_yaw(player->node.orientation) - RAD(90.0);
     res->camera.coords.inclination = RAD(60);
-    res->camera.coords.radius = 2.0;
+    res->camera.coords.radius = 5.0;
 
     struct entity *tower = new_entity(NULL);
     ok = load_model(&tower->model, "tower");
     assert(ok);
     tower->node.label = "tower";
     node_attach(&tower->node, &player->node);
-    node_translate(&tower->node, V3(0.0, 100.0, 0.0));
+    node_translate(&tower->node, V3(0.0, 50.0, 0.0));
     // END ENTITIES
 
 

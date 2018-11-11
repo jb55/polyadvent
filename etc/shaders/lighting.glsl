@@ -14,6 +14,7 @@
 
 //     return clouds;
 // }
+const float pi = 3.14159265;
 
 vec3 gamma_correct(vec3 color) {
     return pow(color, vec3(1.0/2.2));
@@ -31,7 +32,6 @@ vec3 uncharted_tonemap(const vec3 x) {
 
 vec3 standard_light(vec3 color, vec4 position, vec4 normal) {
     // vec3 light_dir = vec3()
-    const float pi = 3.14159265;
     const float shiny = 14.0;
     const float exposure = 0.3;
     float ambient_str = 0.2;
@@ -85,4 +85,52 @@ vec3 standard_light(vec3 color, vec4 position, vec4 normal) {
     return final;
 }
 
+float dist_ggx(vec3 N, vec3 H, float a)
+{
+    float a2     = a*a;
+    float NdotH  = max(dot(N, H), 0.0);
+    float NdotH2 = NdotH*NdotH;
 
+    float nom    = a2;
+    float denom  = (NdotH2 * (a2 - 1.0) + 1.0);
+    denom        = pi * denom * denom;
+
+    return nom / denom;
+}
+
+
+float geom_schlick_ggx(float NdotV, float k)
+{
+    float nom   = NdotV;
+    float denom = NdotV * (1.0 - k) + k;
+
+    return nom / denom;
+}
+
+float geom_smith(vec3 N, vec3 V, vec3 L, float k)
+{
+    float NdotV = max(dot(N, V), 0.0);
+    float NdotL = max(dot(N, L), 0.0);
+    float ggx1 = geom_schlick_ggx(NdotV, k);
+    float ggx2 = geom_schlick_ggx(NdotL, k);
+
+    return ggx1 * ggx2;
+}
+
+vec3 fresnel_schlick(float cos_theta, vec3 F0)
+{
+    return F0 + (1.0 - F0) * pow(1.0 - cos_theta, 5.0);
+}
+
+vec3 pbr(vec3 V, vec3 normal) {
+    const float albedo = 0.2;
+    const float metallic = 0.8;
+    vec3 N = normalize(normal);
+    vec3 L = normalize(light_dir);
+    vec3 H = normalize(V + L);
+    vec3 F0 = vec3(0.04);
+    F0 = mix(F0, albedo, metallic);
+    float cos_theta = max(dot(H, V))
+    vec3 F = fresnel_schlick(cos_theta, )
+
+}
