@@ -75,7 +75,7 @@ void game_init(struct game *game, int width, int height) {
     check_gl();
 
     init_terrain(terrain, size);
-    get_entity(&terrain->entity_id)->flags |= ENT_INVISIBLE;
+    /* get_entity(&terrain->entity_id)->flags |= ENT_INVISIBLE; */
 
     create_skybox(&res->skybox, &res->programs[SKYBOX_PROGRAM]);
     /* node_translate(&res->skybox.node, V3(-100.0, -100.0, 0.0)); */
@@ -119,7 +119,7 @@ void game_init(struct game *game, int width, int height) {
 
     res->camera.coords.azimuth = -quat_yaw(player->node.orientation) - RAD(90.0);
     res->camera.coords.inclination = RAD(60);
-    res->camera.coords.radius = 5.0;
+    res->camera.coords.radius = 100.0;
 
     struct entity *tower = new_entity(NULL);
     ok = load_model(&tower->model, "tower");

@@ -37,14 +37,14 @@ void main() {
   vec4 v4_normal = vec4(vertex.normal, 1.0);
 
   // vec3 color = standard_light(vertex.color, v4_pos, v4_normal);
-  vec3 color = pbr(normalize(V));
+  vec3 color = pbr(vertex.color, normalize(V), vertex.normal);
 
-  // if (fog_on) {
-  //   vec3 fog = apply_fog(color, length(v_ray), camera_position, v_ray);
-  //   color = fog;
-  // }
+  if (fog_on) {
+    vec3 fog = apply_fog(color, length(V), camera_position, V);
+    color = fog;
+  }
 
-  // color *= shadow_strength(v4_pos, v4_normal, vertex.shadow_coord);
+  color *= shadow_strength(v4_pos, v4_normal, vertex.shadow_coord);
   // vec3 color = reflect_env(vertex.position);
 
   frag_color = vec4(gamma_correct(color), 1.0);
