@@ -191,14 +191,14 @@ void resize_fbos(struct entity *player, struct fbo *shadow_buffer,
     }
 
     // TODO: compute better bounds based
-    const float factor = 80.0;
+    const float factor = 1.5;
     float left   = player->model.geom.min[0] - factor;
     float right  = player->model.geom.max[0] + factor;
     float bottom = player->model.geom.min[1] - factor;
-    float top    = player->model.geom.max[1] + factor;
+    float top    = player->model.geom.max[1] + factor/2.0;
 
-    const float near = -80.0;
-    const float far = 80.0;
+    const float near = -1.0;
+    const float far = 5.0;
 
     // default ortho screenspace projection
     mat4_ortho(left, right, bottom, top, near, far, m4_ortho);
@@ -220,7 +220,7 @@ void resize_fbos(struct entity *player, struct fbo *shadow_buffer,
 // TODO: match based on some real concept of time
 static void day_night_cycle(float time, struct resources *res) {
     float val = time * 0.0001;
-    float intensity = max(0.0, vec3_dot(res->light_dir, V3(0.0, 0.0, 0.8)));
+    float intensity = 1.0;//max(0.0, vec3_dot(res->light_dir, V3(0.0, 0.0, 1.0))); */
     struct entity *player = get_player(res);
 
     float light_pos[3];
@@ -246,8 +246,10 @@ static void day_night_cycle(float time, struct resources *res) {
     /* vec3_normalize(res->light_intensity, res->light_intensity); */
 
     res->light_dir[0] = 0.0;
-    res->light_dir[1] = sin(val);
-    res->light_dir[2] = cos(val) + 1.0;
+    /* res->light_dir[1] = sin(val); */
+    /* res->light_dir[2] = cos(val) + 1.0; */
+    res->light_dir[1] = 0.8;
+    res->light_dir[2] = 0.8;
 
     vec3_normalize(res->light_dir, res->light_dir);
 
@@ -320,7 +322,7 @@ static void orbit_keep_above_ground(struct game *game) {
         float cam_terrain_z =
             game->terrain.fn(&game->terrain, camera_world[0], camera_world[1]);
 
-        const float bias = 5.0;
+        const float bias = 2.0;
 
         if (camera_world[2] < cam_terrain_z + bias)
             camera_world[2] = cam_terrain_z + bias;
