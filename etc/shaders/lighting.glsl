@@ -80,7 +80,7 @@ vec3 standard_light(vec3 color, vec4 position, vec4 normal) {
     // tone mapping
     // final = final / (vec3(1.0) - final * exposure);
     // final = final / (vec3(1.0) + color);
-    final = uncharted_tonemap(final);
+    // final = uncharted_tonemap(final);
 
     return final;
 }
@@ -126,10 +126,11 @@ vec3 fresnel_schlick(float cos_theta, vec3 F0)
 }
 
 vec3 pbr(vec3 albedo, vec3 V, vec3 normal) {
-    const float ao = 2.0;
-    const float metallic = 0.8;
-    const float roughness = 0.2;
+    const float ao = 5.0;
+    const float metallic = 0.6;
+    const float roughness = 0.4;
     vec3 radiance = sun_color * light_intensity;
+    // radiance += texture(skybox, vec3(0.0, 0.0, 1.0)).rgb;
     vec3 N = normalize(normal);
     vec3 L = normalize(light_dir);
     vec3 H = normalize(V + L);
@@ -167,6 +168,8 @@ vec3 pbr(vec3 albedo, vec3 V, vec3 normal) {
 
     vec3 ambient = vec3(0.03) * albedo * ao;
     vec3 color   = ambient + Lo;
+    // color = uncharted_tonemap(color);
+    //color = color / (vec3(1.0) + color);
 
     return color;
 }

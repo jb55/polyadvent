@@ -24,7 +24,7 @@ void main() {
         vertex.color_smooth = vertices[i].color_smooth;
         vertex.normal = vertices[i].normal;
         // vertex.shadow_coord = depth_mvp * v4_pos;
-        vertex.frag_pos = (world * v4_pos).xyz;
+        vertex.world_pos = (world * v4_pos).xyz;
         vertex.shadow_coord = vertices[i].shadow_coord;
         // vertex.frag_pos = vertices[i].frag_pos;
 

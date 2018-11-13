@@ -33,13 +33,12 @@ void main()
 			    smoothstep(land[i].w, land[i+1].w, position.z));
 	}
 
-	// vec3 color = vec3(position.z*0.05, position.z*0.0095, position.z*0.0001) * 0.5;
+	// vec3 color = vec3(position.z*0.05, position.z*0.0055, position.z*0.0001) * 0.5;
 
 
-     // v_color = vec3(position.z, position.z, position.z) * 0.005;
+     // vec3 color = vec3(position.z, position.z, position.z) * 0.005;
 
 #include standard_vtxos.glsl
 
     gl_Position = mvp * v4_pos;
-    data_out.position = gl_Position.xyz;
 }

@@ -1,12 +1,17 @@
 
-vec3 apply_fog(in vec3 rgb, in float distance, in vec3 ray_orig, in vec3 ray_dir) {
+
+vec3 apply_fog(in vec3 rgb, in vec3 vert_pos, in float distance,
+               in vec3 ray_orig, in vec3 ray_dir)
+{
     const float b = 0.00035;
 
-    float draw_dist = 1.4;
+    float draw_dist = 1.2;
     float fog_amount = 1.0-exp(-pow(distance * (1.0/draw_dist) * b, 6.0));
     // float sun_amount = max( dot( ray_dir, -light_dir ), 0.0 ) * b;
     // sun_amount = pow(sun_amount, 0.0);
 
+    // vec3 I = normalize(vert_pos - camera_position);
+    // vec3 R = refract(I, vertex.normal, 1.0/2.0);
     vec3 fog_color = sun_color * sky_intensity;
     // vec3 fog_color = sun_color;
 

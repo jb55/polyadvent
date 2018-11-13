@@ -3,4 +3,3 @@ vec3 color_smooth;
 vec3 normal;
 vec3 position;
 vec4 shadow_coord;
-vec3 frag_pos;

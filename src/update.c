@@ -175,17 +175,6 @@ static void player_terrain_collision(struct terrain *terrain, struct entity *pla
 
 static void player_movement(struct game *game, struct entity *player) {
     movement(game, &player->node, 2.0);
-
-    if (!(get_entity(&game->terrain.entity_id)->flags & ENT_INVISIBLE)) {
-        vec3 *camera_world = node_world(&game->test_resources.camera.node);
-        float cam_terrain_z =
-            game->terrain.fn(&game->terrain, camera_world[0], camera_world[1]);
-
-        const float bias = 20.0;
-
-        if (camera_world[2] < cam_terrain_z + bias)
-            camera_world[2] = cam_terrain_z + bias;
-    }
 }
 
 
@@ -311,13 +300,23 @@ void orbit_update_from_mouse(struct orbit *camera, struct input *input,
 
     node_recalc(target_node);
     vec3_copy(node_world(target_node), target);
-    vec3_add(target, V3(0.0, 0.0, player->model.geom.max[2]), target);
+    /* vec3_add(target, V3(0.0, 0.0, player->model.geom.max[2]), target); */
 
     float mx = 0.0, my = 0.0;
     if (input_is_dragging(input, SDL_BUTTON_LEFT) ||
         input_is_dragging(input, SDL_BUTTON_RIGHT)) {
         mx = -input->mdx * mouse_sens * dt;
         my = -input->mdy * mouse_sens * dt;
+    }
+
+    // zoom
+    if (input->keystates[SDL_SCANCODE_V]) {
+        if (input->modifiers & KMOD_SHIFT)
+            camera->coords.radius += dt * 100.0;
+        else
+            camera->coords.radius -= dt * 100.0;
+
+        camera->coords.radius = max(5.0, camera->coords.radius);
     }
 
     camera->coords.azimuth     += mx;
@@ -328,18 +327,41 @@ void orbit_update_from_mouse(struct orbit *camera, struct input *input,
     /*        camera->coords.radius); */
 
     spherical_look_at(&camera->coords, target, camera->node.mat);
+
+}
+
+static void orbit_keep_above_ground(struct game *game) {
+    struct resources *res = &game->test_resources;
+
+    if (!(get_entity(&game->terrain.entity_id)->flags & ENT_INVISIBLE)) {
+        float *camera_world = node_world(&res->camera.node);
+        /* float *target = node_world(&get_player(res)->node); */
+        /* spherical_pos(&res->camera.coords, target, camera_world); */
+        float cam_terrain_z =
+            game->terrain.fn(&game->terrain, camera_world[0], camera_world[1]);
+
+        const float bias = 5.0;
+
+        if (camera_world[2] < cam_terrain_z + bias)
+            camera_world[2] = cam_terrain_z + bias;
+    }
 }
 
 static void player_update(struct game *game, struct entity *player) {
-    orbit_update_from_mouse(&game->test_resources.camera, &game->input,
-                            game->user_settings.mouse_sens, player, game->dt);
+
+    struct orbit *camera = &game->test_resources.camera;
+    orbit_update_from_mouse(camera, &game->input, game->user_settings.mouse_sens,
+                            player, game->dt);
+
+    orbit_keep_above_ground(game);
+
     // move player camera toward camera orientation
     if (input_is_dragging(&game->input, SDL_BUTTON_RIGHT)) {
         float yaw = game->test_resources.camera.coords.azimuth;
         quat_axis_angle(V3(0.0, 0.0, 1.0), -yaw - RAD(90), player->node.orientation);
-        node_recalc(&player->node);
     }
     player_terrain_collision(&game->terrain, player);
+    node_recalc(&player->node);
 }
 
 
@@ -361,7 +383,6 @@ void update (struct game *game) {
 		first = 0;
 	}
 
-    player_update(game, player);
     /* spherical_dir(game->test_resources.camera.coords, camera_dir); */
     /* vec3_scale(camera_dir, -1, camera_dir); */
 
@@ -371,6 +392,7 @@ void update (struct game *game) {
 	else {
 		player_movement(game, player);
 	}
+    player_update(game, player);
 
 
 #ifdef DEBUG

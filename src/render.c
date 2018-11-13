@@ -291,6 +291,7 @@ void render (struct game *game, struct render_config *config) {
     mat4_multiply(projection, view, view_proj);
 
     glBindTexture(GL_TEXTURE_CUBE_MAP, res->skybox.model.texture);
+    check_gl();
 
     for (u32 i = 0; i < num_entities; ++i) {
         struct entity *entity = &entities[i];
