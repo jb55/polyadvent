@@ -116,6 +116,18 @@ int node_recalc(struct node *node) {
 }
 
 
+int node_detach(struct node *node, struct node *from) {
+    for (int i = 0; i < from->n_children; i++) {
+        if (from->children[i] == node) {
+            memmove(from->children[i], from->children[i+1],
+                    from->n_children - i - 1);
+            from->n_children--;
+            return 1;
+        }
+    }
+    return 0;
+}
+
 void node_attach(struct node *node, struct node *to) {
   assert(to->n_children <= MAX_NODE_CHILDREN);
 

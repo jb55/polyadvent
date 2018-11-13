@@ -73,11 +73,36 @@ double offset_fn(struct terrain* terrain, double x, double y) {
     return old_noisy_boi(terrain, ox+x, oy+y);
 }
 
-void create_terrain(struct terrain *terrain) {
+void gen_terrain_samples(struct terrain *terrain, float scale) {
+    if (terrain->samples)
+        free(terrain->samples);
+
+    int n_samples =
+        (terrain->size * terrain->size) / (scale * scale);
+
+    /* struct point *samples = */
+    /*   uniform_samples(n_samples, game->terrain.size); */
+
+    static const double pdist = 24.0;
+
+    struct point *samples =
+        poisson_disk_samples(pdist, terrain->size, 30, &n_samples);
+
+    /* remap_samples(samples, n_samples, game->terrain.size); */
+
+    /* draw_samples(samples, pdist, n_samples, game->terrain.size); */
+
+    terrain->samples = samples;
+    terrain->n_samples = n_samples;
+}
+
+void create_terrain(struct terrain *terrain, float scale) {
     u32 i;
     const double size = terrain->size;
 
     float tmp1[3], tmp2[3];
+    if (!terrain->n_samples)
+        gen_terrain_samples(terrain, scale);
     assert(terrain->n_samples > 0);
     del_point2d_t *points = calloc(terrain->n_samples, sizeof(*points));
 

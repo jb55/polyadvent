@@ -126,32 +126,11 @@ void update_terrain(struct terrain *terrain) {
     /* printf("pdist %f\n", pdist); */
 
     if (last_scale == -1.0 || fabs(scale - last_scale) > 0.00001) {
-        printf("generating new samples\n");
-
-        if (terrain->samples)
-        free(terrain->samples);
-
-        int n_samples =
-        (terrain->size * terrain->size) / (scale * scale);
-
-        /* struct point *samples = */
-        /*   uniform_samples(n_samples, game->terrain.size); */
-
-        static const double pdist = 24.0;
-
-        struct point *samples =
-        poisson_disk_samples(pdist, terrain->size, 30, &n_samples);
-
-        /* remap_samples(samples, n_samples, game->terrain.size); */
-
-        /* draw_samples(samples, pdist, n_samples, game->terrain.size); */
-
-        terrain->samples = samples;
-        terrain->n_samples = n_samples;
+        gen_terrain_samples(terrain, scale);
     }
 
     last_scale = scale;
-    create_terrain(terrain);
+    create_terrain(terrain, scale);
 }
 
 static void player_terrain_collision(struct terrain *terrain, struct entity *player) {
@@ -301,6 +280,7 @@ void orbit_update_from_mouse(struct orbit *camera, struct input *input,
     node_recalc(target_node);
     vec3_copy(node_world(target_node), target);
     /* vec3_add(target, V3(0.0, 0.0, player->model.geom.max[2]), target); */
+    /* vec3_add(target, V3(0.0, 0.0, 10.0), target); */
 
     float mx = 0.0, my = 0.0;
     if (input_is_dragging(input, SDL_BUTTON_LEFT) ||

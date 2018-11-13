@@ -47,5 +47,5 @@ void main() {
 
   color *= shadow_strength(v4_pos, v4_normal, vertex.shadow_coord);
 
-  frag_color = vec4(gamma_correct(color), 1.0);
+  frag_color = vec4(color, 1.0);
 }

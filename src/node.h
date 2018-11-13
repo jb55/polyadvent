@@ -26,6 +26,7 @@ struct node {
 
 int node_recalc(struct node *root);
 void node_attach(struct node *node, struct node *to);
+int node_detach(struct node *node, struct node *from);
 void node_mark_for_recalc(struct node *node);
 struct node *node_init(struct node *node);
 void node_translate(struct node *node, float *p);
