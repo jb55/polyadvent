@@ -40,10 +40,10 @@ vec3 fresnel_schlick(float cos_theta, vec3 F0)
 }
 
 vec3 pbr(vec3 albedo, vec3 V, vec3 normal) {
-    const float ao = 5.0;
+    const float ao = 12.0;
     const float metallic = 0.6;
-    const float roughness = 0.4;
-    vec3 radiance = sun_color * light_intensity;
+    const float roughness = 0.6;
+    vec3 radiance = sun_color * light_intensity * 2.0;
     // radiance += texture(skybox, vec3(0.0, 0.0, 1.0)).rgb;
     vec3 N = normalize(normal);
     vec3 L = normalize(light_dir);
@@ -78,12 +78,13 @@ vec3 pbr(vec3 albedo, vec3 V, vec3 normal) {
 
     // Lo = outgoing radiance
     // the result of the reflectance equation's integral ∫ over Ω
+
     vec3 Lo = (kD * albedo / PI + specular) * radiance * NdotL;
 
     vec3 ambient = vec3(0.03) * albedo * ao;
     vec3 color   = ambient + Lo;
     // color = uncharted_tonemap(color);
-    //color = color / (vec3(1.0) + color);
+    // color = color / (vec3(1.0) + color);
 
     return color;
 }

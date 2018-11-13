@@ -337,6 +337,9 @@ static void player_update(struct game *game, struct entity *player) {
 
     orbit_keep_above_ground(game);
 
+    /* look_at(node_world(&camera->node), node_world(&player->node), UP_VEC, */
+    /*         camera->node.mat); */
+
     // move player camera toward camera orientation
     if (input_is_dragging(&game->input, SDL_BUTTON_RIGHT)) {
         float yaw = game->test_resources.camera.coords.azimuth;
