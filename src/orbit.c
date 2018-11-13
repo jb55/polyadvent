@@ -73,6 +73,7 @@ static void orbit_node_update(struct node *node) {
 
 void init_orbit(struct orbit *orbit) {
     node_init(&orbit->node);
+    orbit->node.label = "orbit_camera";
     /* orbit->node.custom_update = orbit_node_update; */
     /* orbit->node.custom_update_data = orbit; */
 }

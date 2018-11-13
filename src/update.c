@@ -8,6 +8,7 @@
 #include "camera.h"
 #include "poisson.h"
 #include "uniform.h"
+#include "game.h"
 #include "mat_util.h"
 #include "shader.h"
 #include "file.h"
@@ -55,7 +56,7 @@ static void movement(struct game *game, struct node *node, float speed_mult) {
     /* if (game->input.keystates[SDL_SCANCODE_DOWN]) */
     /*   node_translate(node, V3(0, 0, -amt)); */
 
-    if (game->input.keystates[SDL_SCANCODE_P]) {
+    if (was_key_pressed_this_frame(game, SDL_SCANCODE_P)) {
         printf("%f %f %f\n",
                 node->pos[0],
                 node->pos[1],
@@ -312,15 +313,14 @@ void orbit_update_from_mouse(struct orbit *camera, struct input *input,
 
 }
 
-static void orbit_keep_above_ground(struct game *game) {
-    struct resources *res = &game->test_resources;
-
-    if (!(get_entity(&game->terrain.entity_id)->flags & ENT_INVISIBLE)) {
-        float *camera_world = node_world(&res->camera.node);
+static void camera_keep_above_ground(struct terrain *terrain,
+                                     const struct node *camera) {
+    if (!(get_entity(&terrain->entity_id)->flags & ENT_INVISIBLE)) {
+        float *camera_world = node_world((struct node*)camera);
         /* float *target = node_world(&get_player(res)->node); */
         /* spherical_pos(&res->camera.coords, target, camera_world); */
         float cam_terrain_z =
-            game->terrain.fn(&game->terrain, camera_world[0], camera_world[1]);
+            terrain->fn(terrain, camera_world[0], camera_world[1]);
 
         const float bias = 2.0;
 
@@ -331,18 +331,17 @@ static void orbit_keep_above_ground(struct game *game) {
 
 static void player_update(struct game *game, struct entity *player) {
 
-    struct orbit *camera = &game->test_resources.camera;
+    struct resources *res = &game->test_resources;
+    struct orbit *camera = &res->orbit_camera;
+
     orbit_update_from_mouse(camera, &game->input, game->user_settings.mouse_sens,
                             player, game->dt);
 
-    orbit_keep_above_ground(game);
-
-    /* look_at(node_world(&camera->node), node_world(&player->node), UP_VEC, */
-    /*         camera->node.mat); */
+    camera_keep_above_ground(&game->terrain, res->camera_node);
 
     // move player camera toward camera orientation
     if (input_is_dragging(&game->input, SDL_BUTTON_RIGHT)) {
-        float yaw = game->test_resources.camera.coords.azimuth;
+        float yaw = game->test_resources.orbit_camera.coords.azimuth;
         quat_axis_angle(V3(0.0, 0.0, 1.0), -yaw - RAD(90), player->node.orientation);
     }
     player_terrain_collision(&game->terrain, player);
@@ -372,24 +371,29 @@ void update (struct game *game) {
     /* vec3_scale(camera_dir, -1, camera_dir); */
 
 	if (game->input.modifiers & KMOD_LALT) {
-		movement(game, &res->camera.node, 1.0);
+        if (res->camera_node == &res->free_camera)
+            movement(game, &res->free_camera, 1.0);
 	}
 	else {
 		player_movement(game, player);
 	}
     player_update(game, player);
 
-
-#ifdef DEBUG
-	if (game->input.keystates[SDL_SCANCODE_R])
+	if (was_key_pressed_this_frame(game, SDL_SCANCODE_R))
 		try_reload_shaders(res);
-#endif
 
-	if (game->input.keystates[SDL_SCANCODE_C])
+	if (was_key_pressed_this_frame(game, SDL_SCANCODE_C))
 		printf("light_dir %f %f %f\n", light[0], light[1], light[2]);
 
-	if (game->input.keystates[SDL_SCANCODE_F])
+	if (was_key_pressed_this_frame(game, SDL_SCANCODE_F))
 		toggle_fog = 1;
+
+	if (was_key_pressed_this_frame(game, SDL_SCANCODE_EQUALS)) {
+        if (res->camera_node != &res->free_camera)
+            res->camera_node = &res->free_camera;
+        else
+            res->camera_node = &res->orbit_camera.node;
+    }
 
 	if (toggle_fog) {
 		res->fog_on = !res->fog_on;

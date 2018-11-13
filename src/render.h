@@ -8,7 +8,7 @@ struct game;
 struct render_config {
     int draw_ui;
     int is_depth_pass;
-    float *camera;
+    const float *camera;
     float *projection;
     float *depth_vp;
 };

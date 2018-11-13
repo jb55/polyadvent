@@ -60,7 +60,9 @@ struct resources {
 
 	struct node root;
 	struct entity_id player_id;
-	struct orbit camera;
+	struct orbit orbit_camera;
+	struct node free_camera;
+    const struct node *camera_node;
 	struct node sun_camera;
 
     u32 test_cubemap;
@@ -84,6 +86,7 @@ struct game {
     int counter;
     int seed;
     float dt;
+    u64 frame;
     struct user_settings user_settings;
     struct ui ui;
     struct resources test_resources;
@@ -92,7 +95,10 @@ struct game {
 };
 
 struct entity *get_player(struct resources *);
+struct entity *get_terrain_entity(struct terrain *);
 void game_init(struct game *game, int width, int height);
 void should_update(struct game *game);
+int was_key_pressed_this_frame(struct game *game, int scancode);
+int is_free_camera(struct game *game);
 
 #endif /* PA_GAME_H */

@@ -73,13 +73,20 @@ int main(void)
     struct render_config default_config = {
       .draw_ui = 0,
       .is_depth_pass = 0,
-      .camera = game.test_resources.camera.node.mat,
+      .camera = game.test_resources.camera_node->mat,
       .projection = game.test_resources.proj_persp,
       .depth_vp = depth_vp
     };
 
     while (1) {
-        process_events(&game, game.test_resources.proj_persp);
+        game.frame++;
+        process_events(&game.input, game.frame);
+        if (game.input.resized_height) {
+            printf("handling resize %d %d\n", game.input.resized_width,
+                   game.input.resized_height);
+            handle_resize(&game, game.input.resized_width, game.input.resized_height);
+        }
+        default_config.camera = game.test_resources.camera_node->mat;
         double new_time = hires_time_in_seconds();
         double frame_time = new_time - last;
         game.dt = frame_time;

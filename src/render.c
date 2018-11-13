@@ -260,7 +260,7 @@ void render (struct game *game, struct render_config *config) {
     mat4 *projection = config->projection;
     mat4 *light = res->light_dir;
 
-    float *camera = config->camera;
+    const mat4 *camera = config->camera;
     u32 num_entities;
 
     struct entity *entities =
@@ -276,7 +276,7 @@ void render (struct game *game, struct render_config *config) {
 
     /* mat4_multiply(view_proj, res->skybox.node.mat, mvp); */
 
-    mat4_inverse(camera, view);
+    mat4_inverse((float*)camera, view);
     mat4_multiply(projection, view, view_proj);
 
     if (config->is_depth_pass) {
@@ -287,7 +287,7 @@ void render (struct game *game, struct render_config *config) {
         glCullFace(GL_BACK);
     }
 
-    mat4_inverse(camera, view);
+    mat4_inverse((float *)camera, view);
     mat4_multiply(projection, view, view_proj);
 
     glBindTexture(GL_TEXTURE_CUBE_MAP, res->skybox.model.texture);
@@ -351,7 +351,7 @@ void render (struct game *game, struct render_config *config) {
     }
 
     if (!config->is_depth_pass) {
-        mat4_inverse(camera, view);
+        mat4_inverse((float*)camera, view);
         mat4_remove_translations(view);
         mat4_multiply(projection, view, view_proj);
 

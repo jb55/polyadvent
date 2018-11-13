@@ -17,7 +17,6 @@ OBJS += $(SRC)/camera.o
 OBJS += $(SRC)/debug.o
 OBJS += $(SRC)/delaunay.o
 OBJS += $(SRC)/entity.o
-OBJS += $(SRC)/event.o
 OBJS += $(SRC)/fbo.o
 OBJS += $(SRC)/file.o
 OBJS += $(SRC)/game.o
