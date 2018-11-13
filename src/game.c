@@ -114,7 +114,6 @@ void game_init(struct game *game, int width, int height) {
     assert(ok);
     player->node.label = "player";
     node_attach(&player->node, root);
-    node_attach(&res->skybox.node, &player->node);
     /* node_attach(&res->camera.node, &player->node); */
     node_translate(&player->node, V3(terrain->size/2.,terrain->size/2.,0.0));
 
