@@ -355,9 +355,7 @@ void render (struct game *game, struct render_config *config) {
         mat4_remove_translations(view);
         mat4_multiply(projection, view, view_proj);
 
-        glDepthFunc(GL_LEQUAL);
         render_skybox(&res->skybox, view_proj);
-        glDepthFunc(GL_LESS);
     }
 
     if (config->draw_ui)

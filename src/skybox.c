@@ -96,6 +96,7 @@ void create_skybox(struct skybox *skybox, struct gpu_program *program) {
 
 
 void render_skybox(struct skybox *skybox, mat4 *camera) {
+    glDepthFunc(GL_LEQUAL);
     glDepthMask(GL_FALSE);
     check_gl();
 
@@ -113,4 +114,5 @@ void render_skybox(struct skybox *skybox, mat4 *camera) {
 
     glDepthMask(GL_TRUE);
     check_gl();
+    glDepthFunc(GL_LESS);
 }
