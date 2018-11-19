@@ -32,10 +32,10 @@ vec3 uncharted_tonemap(const vec3 x) {
 
 vec3 standard_light(vec3 color, vec4 position, vec4 normal) {
     // vec3 light_dir = vec3()
-    const float shiny = 14.0;
-    const float exposure = 0.3;
+    const float shiny = 10.0;
+    const float exposure = 0.2;
     float ambient_str = 0.2;
-    float spec_str = 0.8 * light_intensity;
+    float spec_str = 0.7 * light_intensity;
 
     vec4 trans_normal = normal_matrix * normal;
     vec3 L = light_dir;

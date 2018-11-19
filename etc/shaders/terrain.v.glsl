@@ -13,17 +13,25 @@ out shader_data {
 
 void main()
 {
-    const int nlands = 6;
-
+    const int nlands = 2;
 
     const vec4 land[nlands] = vec4[](
-      vec4(0.0, 0.5, 0.79, 0.0),          // 0 - water
+      // vec4(0.0, 0.5, 0.79, 0.0),          // 0 - water
       vec4(0.9176, 0.8156, 0.6588, 1.0),  // 1 - sand
-      vec4(0.7, 0.7, 0.156, 2.0),    // 2 - grass
-      vec4(0.4627, 0.3333, 0.1686, 20.0), // 3 - dirt
-      vec4(0.5, 0.5, 0.5, 80.0),         // 4 - stone
-      vec4(1.0, 1.0, 1.0, 380.0)          // 5 - snow
+      // vec4(0.7, 0.7, 0.156, 2.0),    // 2 - grass
+      vec4(0.4627, 0.3333, 0.1686, 20.0)  // 3 - dirt
+      // vec4(0.5, 0.5, 0.5, 80.0),         // 4 - stone
+      // vec4(1.0, 1.0, 1.0, 380.0)          // 5 - snow
     );
+
+    // const vec4 land[nlands] = vec4[](
+    //   vec4(0.0, 0.5, 0.79, 0.0),          // 0 - water
+    //   vec4(0.9176, 0.8156, 0.6588, 1.0),  // 1 - sand
+    //   vec4(0.7, 0.7, 0.156, 2.0),    // 2 - grass
+    //   vec4(0.4627, 0.3333, 0.1686, 20.0), // 3 - dirt
+    //   vec4(0.5, 0.5, 0.5, 80.0),         // 4 - stone
+    //   vec4(1.0, 1.0, 1.0, 380.0)          // 5 - snow
+    // );
 
     vec3 color = land[0].xyz;
     for (int i = 0; i < nlands-1; i++) {
