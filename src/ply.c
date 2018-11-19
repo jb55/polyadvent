@@ -228,6 +228,10 @@ int parse_ply(const char *filename, struct geometry *geom) {
         geom->num_verts = nverts * 3;
 
         make_buffer_geometry(geom);
+        free(geom->vertices);
+        free(geom->normals);
+        free(geom->colors);
+        free(geom->indices);
     }
 
     return success;

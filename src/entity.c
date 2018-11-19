@@ -88,6 +88,9 @@ struct entity *add_entity(struct entity *e, struct entity_id *id) {
     return new;
 }
 
+void destroy_entity(struct entity *ent) {
+
+}
 
 void destroy_entity_system() {
     free(esys.entities);

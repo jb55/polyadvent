@@ -117,6 +117,8 @@ void game_init(struct game *game, int width, int height) {
     node_init(sun_camera);
     init_orbit(&res->orbit_camera);
 
+    root->label = "root";
+
 
     // ENTITIES
 
@@ -129,30 +131,11 @@ void game_init(struct game *game, int width, int height) {
     node_attach(&player->node, root);
     node_translate(&player->node, V3(terrain->size/2.,terrain->size/2.,0.0));
 
+    // orbit camera
     res->orbit_camera.coords.azimuth = -quat_yaw(player->node.orientation) - RAD(90.0);
     res->orbit_camera.coords.inclination = RAD(60);
     res->orbit_camera.coords.radius = 5.0;
-
     res->camera_node = &res->orbit_camera.node;
-
-    struct entity *tower = new_entity(NULL);
-    ok = load_model(&tower->model, "tower");
-    assert(ok);
-    tower->node.label = "tower";
-    node_attach(&tower->node, &player->node);
-    node_translate(&tower->node, V3(0.0, 50.0, 0.0));
-    node_recalc(&tower->node);
-    float z = terrain->fn(terrain, tower->node.mat[M_X], tower->node.mat[M_Y]);
-    node_detach(&tower->node, &player->node);
-    tower->node.mat[M_Z] = z;
-    // END ENTITIES
-
-
-    // player init
-
-    root->label = "root";
-
-    input_init(&game->input);
 
     // free camera
     node_init(&res->free_camera);
@@ -162,6 +145,7 @@ void game_init(struct game *game, int width, int height) {
     node_rotate(&res->free_camera, V3(100, 0, 0));
     node_translate(&res->free_camera, V3(0,-40,20));
 
+    input_init(&game->input);
 
     // FBO STUFF
     init_fbo(&res->shadow_buffer);

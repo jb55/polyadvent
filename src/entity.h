@@ -26,7 +26,8 @@ struct entity_id {
 };
 
 struct entity *init_entity(struct entity *);
-struct entity *delete_entities();
+void delete_entities();
+void destroy_entity(struct entity *);
 void init_entity_system();
 struct entity *get_entity(struct entity_id *);
 struct entity *get_all_entities(u32 *count, struct entity_id **ids);
