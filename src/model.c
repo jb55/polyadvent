@@ -11,6 +11,9 @@ void init_model(struct model *model) {
 int load_model(struct model *model, const char *name) {
     static char path[128] = {0};
 
+    if (model->geom.has_vbos)
+        return 2;
+
     int ok = 0;
 
     // Load mesh

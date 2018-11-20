@@ -22,6 +22,8 @@ destroy_buffer_geometry(struct geometry *geom) {
     check_gl();
     glDeleteBuffers(ARRAY_SIZE(buffers), buffers);
     check_gl();
+
+    geom->has_vbos = 0;
 }
 
 void bind_geometry(struct geometry *geom, struct attributes *attrs) {
@@ -83,6 +85,7 @@ void init_geometry(struct geometry *geom) {
     geom->vertices = NULL;
     geom->tex_coords = NULL;
     geom->num_uv_components = 2;
+    geom->has_vbos = 0;
 
     geom->vbos.color.handle = 0;
     geom->vbos.normal.handle = 0;
@@ -149,6 +152,8 @@ make_buffer_geometry(struct geometry *geom) {
                         geom->num_indices * (int)sizeof(*geom->indices),
                         &geom->vbos.index
                         );
+
+    geom->has_vbos = 1;
 }
 
 

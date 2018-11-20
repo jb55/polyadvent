@@ -44,6 +44,7 @@ OBJS += $(SRC)/uniform.o
 OBJS += $(SRC)/update.o
 OBJS += $(SRC)/util.o
 OBJS += $(SRC)/vec3.o
+OBJS += $(SRC)/scene.o
 
 SRCS=$(OBJS:.o=.c)
 

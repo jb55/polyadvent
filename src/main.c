@@ -1,24 +1,26 @@
 
-#include "gl.h"
-#include "game.h"
-#include "slab.h"
-#include "file.h"
-#include "update.h"
-#include "window.h"
-#include "slab_geom.h"
-#include "slab.h"
-#include "geometry.h"
 #include "event.h"
+#include "fbo.h"
+#include "file.h"
+#include "game.h"
+#include "geometry.h"
+#include "gl.h"
+#include "hires.h"
+#include "ply.h"
+#include "poisson.h"
 #include "render.h"
+#include "scene.h"
+#include "slab.h"
+#include "slab.h"
+#include "slab_geom.h"
 #include "terrain.h"
+#include "uniform.h"
+#include "update.h"
 #include "util.h"
+#include "window.h"
+
 #include <assert.h>
 #include <time.h>
-#include "poisson.h"
-#include "uniform.h"
-#include "ply.h"
-#include "fbo.h"
-#include "hires.h"
 
 
 int main(void)
@@ -56,6 +58,7 @@ int main(void)
 
     SDL_GL_CreateContext(window);
     game_init(&game, width, height);
+    default_scene(&game);
 
     check_gl();
     double last = hires_time_in_seconds();
@@ -99,7 +102,6 @@ int main(void)
 
         last = new_time;
 
-        GLuint texture = game.test_resources.shadow_buffer.attachments[0];
         struct fbo *fbo = &game.test_resources.shadow_buffer;
         check_fbo(fbo);
         bind_fbo(fbo);

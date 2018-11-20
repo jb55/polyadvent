@@ -16,6 +16,7 @@ struct buffer_geometry {
 
 struct geometry {
     struct buffer_geometry vbos;
+    int has_vbos;
     float min[3];
     float max[3];
     int num_uv_components;

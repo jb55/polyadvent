@@ -8,6 +8,8 @@
 #include "geometry.h"
 #include "common.h"
 
+#define MAX_MODELS 128
+
 enum shading {
     SHADING_TERRAIN,
     SHADING_VERT_COLOR,
