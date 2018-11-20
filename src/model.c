@@ -16,7 +16,6 @@ static int static_models_initialized = 0;
 void init_model(struct model *model) {
     model->shading = SHADING_VERT_COLOR;
     model->texture = 0;
-    init_geometry_id(&model->geom_id);
 }
 
 static void initialize_static_models() {

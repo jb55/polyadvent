@@ -52,6 +52,7 @@ static void init_user_settings(struct user_settings *settings) {
 void game_init(struct game *game, int width, int height) {
     init_gl(&game->test_resources, width, height);
     init_entity_system();
+    init_geometry_manager();
     init_user_settings(&game->user_settings);
     check_gl();
 
@@ -125,8 +126,7 @@ void game_init(struct game *game, int width, int height) {
     // player entity
     player = new_entity(&res->player_id);
     assert(res->player_id.index == 1);
-    ok = load_model(&player->model, "pirate-officer");
-    assert(ok);
+    player->model = get_model(model_pirateofficer);
     player->node.label = "player";
     node_attach(&player->node, root);
     node_translate(&player->node, V3(terrain->size/2.,terrain->size/2.,0.0));

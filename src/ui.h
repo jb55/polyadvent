@@ -8,7 +8,7 @@
 
 struct ui {
     struct gpu_program *shader;
-    struct geometry quad;
+    geometry_id_t quad_geom_id;
     struct attributes attrs;
 
     struct ui_uniforms {

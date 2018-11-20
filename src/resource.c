@@ -2,6 +2,7 @@
 #include "resource.h"
 #include <stdlib.h>
 #include <string.h>
+#include <assert.h>
 
 static u64 resource_uuids = 0;
 
@@ -15,6 +16,12 @@ void *get_all_resources(struct resource_manager *r, u32 *count, struct resource_
     if (ids != 0)
         *ids = r->ids;
     return r->resources;
+}
+
+void init_resource_id(struct resource_id *id) {
+    id->index = -1;
+    id->generation = -1;
+    id->uuid = -1;
 }
 
 void init_resource_manager(struct resource_manager *r, u32 elem_size,
@@ -74,8 +81,9 @@ void destroy_resource(struct resource_manager *r, struct resource_id *id) {
     // generation 0 means destroyed
     id->generation = 0;
 
-    memmove(index_resource(r, id->index),
-            index_resource(r, id->index+1), r->resource_count -)
+    assert(!"implement destroy resource");
+    /* memmove(index_resource(r, id->index), */
+    /*         index_resource(r, id->index+1), r->resource_count -) */
 }
 
 struct resource_id new_id(struct resource_manager *r) {

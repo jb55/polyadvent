@@ -70,7 +70,7 @@ void render_ui(struct ui *ui, float *view) {
     check_gl();
 
     // render quad
-    render_geometry(&ui->quad, &ui->attrs, ui->shader);
+    render_geometry(get_geometry(&ui->quad_geom_id), &ui->attrs, ui->shader);
     check_gl();
 }
 
@@ -93,7 +93,7 @@ void create_ui(struct ui *ui, int width, int height, struct gpu_program *shader)
     int ok = 0;
 
     ui->shader = shader;
-    create_quad(&ui->quad);
+    create_quad(&ui->quad_geom_id);
     check_gl();
 
     ok = make_shader(GL_VERTEX_SHADER, SHADER("ui.v.glsl"), &vertex);

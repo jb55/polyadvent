@@ -55,7 +55,7 @@ void init_terrain(struct terrain *terrain, float size) {
     struct entity *ent;
 
     ent = new_entity(&terrain->entity_id);
-    assert(terrain->entity_id.uuid == 0);
+    assert(terrain->entity_id.index == 0);
     terrain->model.shading = SHADING_TERRAIN;
     ent->model = &terrain->model;
     ent->node.label = "terrain_node";

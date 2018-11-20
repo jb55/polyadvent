@@ -1,9 +1,11 @@
 
 #include "geometry.h"
 #include "util.h"
+#include "resource.h"
 #include <assert.h>
 
-static struct geometry_manager geom_manager;
+
+static struct resource_manager geom_manager;
 
 void
 destroy_buffer_geometry(geometry_id_t *geom_id) {
@@ -186,31 +188,19 @@ void geometry_centroid(struct geometry *geom, float *dest) {
 };
 
 void init_geometry_manager() {
-    geom_manager.num_geometry = 0;
+    init_resource_manager(&geom_manager, sizeof(struct geometry),
+                          DEF_NUM_GEOMETRY, MAX_GEOMETRY);
 }
 
 struct geometry *get_geometry(geometry_id_t *geom_id) {
-    assert(geom_id->index != -1);
-    assert(geom_id->index < geom_manager.num_geometry);
-    return &geom_manager.geoms[geom_id->index];
+    return get_resource(&geom_manager, geom_id);
 }
 
 
 struct geometry *new_geometry(geometry_id_t *geom_id) {
-    u32 index = geom_manager.num_geometry++;
-    struct geometry *g = &geom_manager.geoms[index];
-    init_geometry(g);
-    if (geom_id)
-        geom_id->index = index;
-
-    return g;
+    return new_resource(&geom_manager, geom_id);
 }
 
-void init_geometry_id(struct geometry_id *id) {
-    id->index = -1;
-}
-
-struct geometry *get_all_geometry(u32 *count) {
-    *count = geom_manager.num_geometry;
-    return &geom_manager.geoms[0];
+struct geometry *get_all_geometry(u32 *count, geometry_id_t **ids) {
+    return get_all_resources(&geom_manager, count, ids);
 }

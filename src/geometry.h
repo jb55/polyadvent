@@ -7,7 +7,8 @@
 #include "shader.h"
 #include "resource.h"
 
-#define MAX_GEOMETRY 64
+#define DEF_NUM_GEOMETRY 32
+#define MAX_GEOMETRY 1024
 
 // -1 is uninitialized
 typedef struct resource_id geometry_id_t;
@@ -58,6 +59,6 @@ void init_geometry_manager();
 void init_geometry_id(geometry_id_t *);
 struct geometry *new_geometry(geometry_id_t *);
 struct geometry *get_geometry(geometry_id_t *);
-struct geometry *get_all_geometry(u32 *count);
+struct geometry *get_all_geometry(u32 *count, geometry_id_t **ids);
 
 #endif /* GEOMETRY_H */

@@ -19,6 +19,7 @@ struct resource_manager {
     u32 max_elements;
 };
 
+void init_resource_id(struct resource_id *id);
 void *get_resource(struct resource_manager *r, struct resource_id *id);
 void *get_all_resources(struct resource_manager *, u32 *count, struct resource_id **ids);
 void destroy_resource(struct resource_manager *, struct resource_id *id);
