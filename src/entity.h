@@ -4,6 +4,9 @@
 
 #include "node.h"
 #include "model.h"
+#include "id.h"
+
+#define RESERVED_ENTITIES 2
 
 enum entity_flags {
   ENT_IS_PLAYER = 1 << 0,
@@ -12,7 +15,7 @@ enum entity_flags {
 
 struct entity {
     struct node node;
-    struct model model;
+    struct model *model;
     u32 flags;
     float velocity[3];
     float accel[3];
@@ -20,13 +23,11 @@ struct entity {
 };
 
 struct entity_id {
-    u64 uuid;
-    u32 index;
-    u32 generation;
+    struct id id;
 };
 
 struct entity *init_entity(struct entity *);
-void delete_entities();
+void destroy_entities();
 void destroy_entity(struct entity *);
 void init_entity_system();
 struct entity *get_entity(struct entity_id *);

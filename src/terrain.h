@@ -24,6 +24,7 @@ struct terrain {
     struct entity_id entity_id;
     struct perlin_settings settings;
     struct point *samples;
+    struct model model;
     double (*fn)(struct terrain *, double, double);
     int n_samples;
     double size;

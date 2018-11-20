@@ -58,7 +58,8 @@ int main(void)
 
     SDL_GL_CreateContext(window);
     game_init(&game, width, height);
-    default_scene(&game);
+    /* reset_scene(&game); */
+    /* pbr_scene(&game); */
 
     check_gl();
     double last = hires_time_in_seconds();

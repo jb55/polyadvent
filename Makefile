@@ -12,7 +12,7 @@ LDFLAGS = -lSDL2 -lGL -lm
 SRC=src
 
 OBJS  = $(SRC)/window.o
-OBJS += $(SRC)/buffer.o
+OBJS += $(SRC)/vbo.o
 OBJS += $(SRC)/camera.o
 OBJS += $(SRC)/debug.o
 OBJS += $(SRC)/delaunay.o

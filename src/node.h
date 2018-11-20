@@ -27,6 +27,7 @@ struct node {
 int node_recalc(struct node *root);
 void node_attach(struct node *node, struct node *to);
 int node_detach(struct node *node, struct node *from);
+void node_detach_from_parent(struct node *node);
 void node_mark_for_recalc(struct node *node);
 struct node *node_init(struct node *node);
 void node_translate(struct node *node, float *p);
@@ -34,6 +35,7 @@ void node_forward(struct node *node, float *p);
 void node_forward_dir(struct node *node, float *orientation, float *p);
 void node_rotate(struct node *node, float *p);
 void node_scale(struct node *node, float val);
+int node_count(struct node *node);
 float *node_world(struct node *node);
 
 #endif /* POLYADVENT_NODE_H */

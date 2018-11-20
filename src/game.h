@@ -2,7 +2,7 @@
 #ifndef PA_GAME_H
 #define PA_GAME_H
 
-#include "buffer.h"
+#include "vbo.h"
 #include "entity.h"
 #include "fbo.h"
 #include "input.h"

@@ -27,7 +27,6 @@ struct entity *get_all_entities(u32 *count, struct entity_id **ids) {
 
 struct entity *init_entity(struct entity *ent) {
     node_init(&ent->node);
-    init_model(&ent->model);
     ent->casts_shadows = 1;
     return ent;
 }
@@ -39,16 +38,18 @@ struct entity *get_entity_pure(struct entity_id id) {
     return get_entity(&pure_id);
 }
 
-struct entity *get_entity(struct entity_id *id) {
+struct entity *get_entity(struct entity_id *ent_id) {
     struct entity_id *new_id;
+    struct id *id = &ent_id->id;
+
     // rollover is ok
     /* assert(->generation <= esys.generation); */
     if (id->generation != esys.generation) {
         // try to find uuid in new memory layout
         for (u32 i = 0; i < esys.entity_count; i++) {
             new_id = &esys.ids[i];
-            if (new_id->uuid == id->uuid) {
-                id->index = new_id->index;
+            if (new_id->id.uuid == id->uuid) {
+                id->index = new_id->id.index;
                 id->generation = esys.generation;
                 return &esys.entities[id->index];
             }
@@ -62,9 +63,11 @@ struct entity *get_entity(struct entity_id *id) {
 
 static inline struct entity_id new_id() {
     return (struct entity_id){
-        .index = esys.entity_count,
-        .uuid  = entity_uuids++,
-        .generation = esys.generation,
+        .id = (struct id) {
+            .index      = esys.entity_count,
+            .uuid       = entity_uuids++,
+            .generation = esys.generation,
+        }
     };
 }
 
@@ -88,8 +91,15 @@ struct entity *add_entity(struct entity *e, struct entity_id *id) {
     return new;
 }
 
-void destroy_entity(struct entity *ent) {
+void destroy_entities() {
+    for (u32 i = RESERVED_ENTITIES; i < esys.entity_count; i++) {
+        destroy_entity(&esys.entities[i]);
+    }
+    esys.entity_count = RESERVED_ENTITIES;
+};
 
+void destroy_entity(struct entity *ent) {
+    node_detach_from_parent(&ent->node);
 }
 
 void destroy_entity_system() {

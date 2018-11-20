@@ -1,5 +1,5 @@
 
-#include "buffer.h"
+#include "vbo.h"
 #include "util.h"
 #include <assert.h>
 #include "gl.h"
@@ -50,6 +50,13 @@ make_uv_buffer(GLenum target, const void *data,
 
 void bind_ibo(struct vbo *vbo) {
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbo->handle);
+}
+
+struct vbo* init_vbo(struct vbo *vbo) {
+    vbo->type = 0;
+    vbo->handle = 0;
+    vbo->components = 0;
+    return vbo;
 }
 
 static void bind_vbo_internal(struct vbo *vbo, gpu_addr slot) {

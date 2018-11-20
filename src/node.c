@@ -115,7 +115,6 @@ int node_recalc(struct node *node) {
   return 1;
 }
 
-
 int node_detach(struct node *node, struct node *from) {
     for (int i = 0; i < from->n_children; i++) {
         if (from->children[i] == node) {
@@ -126,6 +125,20 @@ int node_detach(struct node *node, struct node *from) {
         }
     }
     return 0;
+}
+
+void node_detach_from_parent(struct node *node) {
+    if (node->parent)
+        node_detach(node, node->parent);
+}
+
+// count the total number of nodes
+int node_count(struct node *node) {
+    int c = 1;
+    for (int i = 0; i < node->n_children; i++) {
+        c += node_count(node->children[i]);
+    }
+    return c;
 }
 
 void node_attach(struct node *node, struct node *to) {

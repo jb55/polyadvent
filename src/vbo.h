@@ -24,6 +24,8 @@ struct vbo {
 gpu_addr make_buffer(GLenum target, const void *buffer_data,
                      GLsizei buffer_size);
 
+struct vbo *init_vbo(struct vbo *);
+
 struct vbo *
 make_vertex_buffer(GLenum target, const void *buffer_data,
                    GLsizei buffer_size, struct vbo *vbo);

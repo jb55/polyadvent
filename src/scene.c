@@ -7,6 +7,8 @@ void reset_scene(struct game *game) {
     struct entity *terrain_ent = get_terrain_entity(&game->terrain);
     struct entity *player_ent = get_player(&game->test_resources);
 
+    destroy_entities();
+
     // hide terrain and player by default
     terrain_ent->flags |= ENT_INVISIBLE;
     player_ent->flags |= ENT_INVISIBLE;
@@ -24,8 +26,7 @@ void default_scene(struct game *game) {
     player->flags &= ~ENT_INVISIBLE;
 
     struct entity *tower = new_entity(NULL);
-    int ok = load_model(&tower->model, "tower");
-    assert(ok);
+    tower->model = get_model(model_tower);
     tower->node.label = "tower";
     node_attach(&tower->node, &player->node);
     node_translate(&tower->node, V3(0.0, 50.0, 0.0));
@@ -39,5 +40,5 @@ void default_scene(struct game *game) {
 }
 
 void pbr_scene(struct game *game) {
-
+    struct model *sphere = get_model(model_icosphere);
 }

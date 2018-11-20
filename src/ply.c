@@ -105,7 +105,7 @@ static int parse_magic(const char **cursor) {
 }
 
 
-int parse_ply(const char *filename, struct geometry *geom) {
+int parse_ply(const char *filename, struct geometry_id *geom_id) {
     size_t len;
     int success = 0;
     int nverts = 0;
@@ -118,8 +118,10 @@ int parse_ply(const char *filename, struct geometry *geom) {
     enum ply_state state = PLY_MAGIC;
     const char *data = file_contents(filename, &len);
     const char *p = data;
+    struct make_geometry mkgeom;
+    init_make_geometry(&mkgeom);
 
-    float vert[3], norm[3];
+    float vert[3], norm[3], min[3], max[3];
     int inds[3];
     u8 color[3];
 
@@ -144,10 +146,10 @@ int parse_ply(const char *filename, struct geometry *geom) {
                     break;
                 }
 
-                geom->vertices = calloc(nverts * 3, sizeof(*geom->vertices));
-                geom->normals  = calloc(nverts * 3, sizeof(*geom->normals));
-                geom->colors   = calloc(nverts * 3, sizeof(*geom->colors));
-                geom->indices  = calloc(ninds * 3, sizeof(*geom->indices));
+                mkgeom.vertices = calloc(nverts * 3, sizeof(*mkgeom.vertices));
+                mkgeom.normals  = calloc(nverts * 3, sizeof(*mkgeom.normals));
+                mkgeom.colors   = calloc(nverts * 3, sizeof(*mkgeom.colors));
+                mkgeom.indices  = calloc(ninds * 3, sizeof(*mkgeom.indices));
 
                 state = PLY_VERTICES;
             }
@@ -162,25 +164,25 @@ int parse_ply(const char *filename, struct geometry *geom) {
 
             // compute bounding box as we go
             if (cvert == 0) {
-                vec3_copy(vert, geom->min);
-                vec3_copy(vert, geom->max);
+                vec3_copy(vert, min);
+                vec3_copy(vert, max);
             }
             else {
-                vec3_min(vert, geom->min, geom->min);
-                vec3_max(vert, geom->max, geom->max);
+                vec3_min(vert, min, min);
+                vec3_max(vert, max, max);
             }
 
-            geom->vertices[cvert * 3]     = vert[0];
-            geom->vertices[cvert * 3 + 1] = vert[1];
-            geom->vertices[cvert * 3 + 2] = vert[2];
+            mkgeom.vertices[cvert * 3]     = vert[0];
+            mkgeom.vertices[cvert * 3 + 1] = vert[1];
+            mkgeom.vertices[cvert * 3 + 2] = vert[2];
 
-            geom->normals[cvert * 3]     = norm[0];
-            geom->normals[cvert * 3 + 1] = norm[1];
-            geom->normals[cvert * 3 + 2] = norm[2];
+            mkgeom.normals[cvert * 3]     = norm[0];
+            mkgeom.normals[cvert * 3 + 1] = norm[1];
+            mkgeom.normals[cvert * 3 + 2] = norm[2];
 
-            geom->colors[cvert * 3]     = color[0] / 255.0;
-            geom->colors[cvert * 3 + 1] = color[1] / 255.0;
-            geom->colors[cvert * 3 + 2] = color[2] / 255.0;
+            mkgeom.colors[cvert * 3]     = color[0] / 255.0;
+            mkgeom.colors[cvert * 3 + 1] = color[1] / 255.0;
+            mkgeom.colors[cvert * 3 + 2] = color[2] / 255.0;
 
             cvert++;
 
@@ -196,9 +198,9 @@ int parse_ply(const char *filename, struct geometry *geom) {
                 break;
             }
 
-            geom->indices[cind * 3]     = inds[0];
-            geom->indices[cind * 3 + 1] = inds[1];
-            geom->indices[cind * 3 + 2] = inds[2];
+            mkgeom.indices[cind * 3]     = inds[0];
+            mkgeom.indices[cind * 3 + 1] = inds[1];
+            mkgeom.indices[cind * 3 + 2] = inds[2];
 
             cind++;
 
@@ -224,14 +226,19 @@ int parse_ply(const char *filename, struct geometry *geom) {
     free((void*)data);
 
     if (success) {
+        *geom_id = make_buffer_geometry(&mkgeom);
+        struct geometry *geom =
+            get_geometry(*geom_id);
+
+        vec3_copy(min, geom->min);
+        vec3_copy(max, geom->max);
         geom->num_indices = ninds * 3;
         geom->num_verts = nverts * 3;
 
-        make_buffer_geometry(geom);
-        free(geom->vertices);
-        free(geom->normals);
-        free(geom->colors);
-        free(geom->indices);
+        free(mkgeom.vertices);
+        free(mkgeom.normals);
+        free(mkgeom.colors);
+        free(mkgeom.indices);
     }
 
     return success;

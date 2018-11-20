@@ -1,7 +1,7 @@
 
 #include "ui.h"
 #include "mat4.h"
-#include "buffer.h"
+#include "vbo.h"
 #include "geometry.h"
 #include "util.h"
 #include "common.h"
@@ -34,18 +34,21 @@ static GLfloat quad_uvs[] =
 };
 
 
-static void create_quad(struct geometry *geom)
+static struct geometry_id create_quad()
 {
-    init_geometry(geom);
-    geom->indices = quad_indices;
-    geom->vertices = quad_vertices;
-    geom->colors = quad_normals;
-    geom->tex_coords = quad_uvs;
-    geom->num_indices = ARRAY_SIZE(quad_indices);
-    geom->num_verts = ARRAY_SIZE(quad_vertices);
-    geom->num_uv_components = 2;
-    make_buffer_geometry(geom);
+    struct make_geometry mkgeom = {
+        .indices = quad_indices,
+        .vertices = quad_vertices,
+        .normals = quad_normals,
+        .tex_coords = quad_uvs,
+        .num_indices = ARRAY_SIZE(quad_indices),
+        .num_verts = ARRAY_SIZE(quad_vertices),
+        .num_uv_components = 2
+    };
+    struct geometry_id id = make_buffer_geometry(&mkgeom);
     check_gl();
+
+    return id; 
 }
 
 void render_ui(struct ui *ui, float *view) {

@@ -8,7 +8,14 @@
 #include "geometry.h"
 #include "common.h"
 
-#define MAX_MODELS 128
+#define MAX_STATIC_MODELS 128
+
+enum static_model {
+  model_tower,
+  model_icosphere,
+  model_pirateofficer,
+  NUM_STATIC_MODELS
+};
 
 enum shading {
     SHADING_TERRAIN,
@@ -17,14 +24,21 @@ enum shading {
 };
 
 struct model {
-    struct geometry geom;
+    struct geometry_id geom_id;
     enum shading shading;
     u32 texture;
 };
 
+struct model_def {
+    u16 id;
+    int loaded;
+    char *file;
+    struct model model;
+};
+
 
 void init_model(struct model *model);
-int load_model(struct model *model, const char *name);
+struct model *get_model(enum static_model);
 
 
 #endif /* MODEL_H */
