@@ -193,10 +193,11 @@ void resize_fbos(struct entity *player, struct fbo *shadow_buffer,
 
     // TODO: compute better bounds based
     const float factor = 1.5;
-    float left   = player->model.geom.min[0] - factor;
-    float right  = player->model.geom.max[0] + factor;
-    float bottom = player->model.geom.min[1] - factor;
-    float top    = player->model.geom.max[1] + factor/2.0;
+    struct geometry *geom = get_geometry(&player->model->geom_id);
+    float left   = geom->min[0] - factor;
+    float right  = geom->max[0] + factor;
+    float bottom = geom->min[1] - factor;
+    float top    = geom->max[1] + factor/2.0;
 
     const float near = -1.0;
     const float far = 5.0;
@@ -279,10 +280,11 @@ void orbit_update_from_mouse(struct orbit *camera, struct input *input,
                              float dt) {
     float target[3];
     struct node *target_node = &player->node;
+    struct geometry *player_geom = get_geometry(&player->model->geom_id);
 
     node_recalc(target_node);
     vec3_copy(node_world(target_node), target);
-    vec3_add(target, V3(0.0, 0.0, player->model.geom.max[2] * 2.0), target);
+    vec3_add(target, V3(0.0, 0.0, player_geom->max[2] * 2.0), target);
     /* vec3_add(target, V3(0.0, 0.0, 10.0), target); */
 
     float mx = 0.0, my = 0.0;

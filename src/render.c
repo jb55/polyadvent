@@ -7,7 +7,7 @@
 #include "game.h"
 #include "mat4.h"
 #include "vec3.h"
-#include "buffer.h"
+#include "vbo.h"
 #include "shader.h"
 #include "geometry.h"
 #include "debug.h"
@@ -346,7 +346,7 @@ void render (struct game *game, struct render_config *config) {
         recalc_normals(res->uniforms.normal_matrix, model_view, normal_matrix);
         check_gl();
 
-        render_geometry(&entity->model.geom, &res->attributes, current_program);
+        render_geometry(get_geometry(&entity->model->geom_id), &res->attributes, current_program);
         check_gl();
     }
 
