@@ -214,8 +214,7 @@ void create_terrain(struct terrain *terrain, float scale) {
     mkgeom.indices = (u32*)del_indices;
     mkgeom.num_indices = num_verts;
 
-    terrain->model.geom_id =
-        make_buffer_geometry(&mkgeom);
+    make_buffer_geometry(&mkgeom, &terrain->model.geom_id);
 
     delaunay2d_release(del);
     tri_delaunay2d_release(tri);

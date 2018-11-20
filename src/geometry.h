@@ -5,14 +5,12 @@
 #include "common.h"
 #include "vbo.h"
 #include "shader.h"
-#include "id.h"
+#include "resource.h"
 
 #define MAX_GEOMETRY 64
 
 // -1 is uninitialized
-struct geometry_id {
-    struct id id;
-};
+typedef struct resource_id geometry_id_t;
 
 struct geometry {
     struct vbo vertex;
@@ -53,13 +51,13 @@ void render_geometry(struct geometry *geom, struct attributes *,
 void bind_geometry(struct geometry *geom, struct attributes *);
 void init_geometry(struct geometry *geom);
 void init_make_geometry(struct make_geometry *mkgeom);
-struct geometry_id make_buffer_geometry(struct make_geometry *mkgeom);
-void destroy_buffer_geometry(struct geometry *geom);
+void make_buffer_geometry(struct make_geometry *mkgeom, geometry_id_t *);
+void destroy_buffer_geometry(geometry_id_t *geom);
 void geometry_centroid(struct geometry *geom, float *v3);
 void init_geometry_manager();
-void init_geometry_id(struct geometry_id *);
-struct geometry *new_geometry(struct geometry_id *);
-struct geometry *get_geometry(struct geometry_id);
+void init_geometry_id(geometry_id_t *);
+struct geometry *new_geometry(geometry_id_t *);
+struct geometry *get_geometry(geometry_id_t *);
 struct geometry *get_all_geometry(u32 *count);
 
 #endif /* GEOMETRY_H */

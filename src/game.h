@@ -59,7 +59,7 @@ struct resources {
 	struct attributes attributes;
 
 	struct node root;
-	struct entity_id player_id;
+	entity_id_t player_id;
 	struct orbit orbit_camera;
 	struct node free_camera;
     const struct node *camera_node;

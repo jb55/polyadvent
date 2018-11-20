@@ -36,7 +36,7 @@ struct model *get_model(enum static_model m) {
 
     struct model *model = &static_models[m].model;
 
-    if (model->geom_id.index >= 0)
+    if (get_geometry(&model->geom_id))
         return model;
 
     int ok = 0;

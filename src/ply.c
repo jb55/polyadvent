@@ -105,7 +105,7 @@ static int parse_magic(const char **cursor) {
 }
 
 
-int parse_ply(const char *filename, struct geometry_id *geom_id) {
+int parse_ply(const char *filename, geometry_id_t *geom_id) {
     size_t len;
     int success = 0;
     int nverts = 0;

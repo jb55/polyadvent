@@ -22,17 +22,15 @@ struct entity {
     int casts_shadows;
 };
 
-struct entity_id {
-    struct id id;
-};
+typedef struct resource_id entity_id_t;
 
 struct entity *init_entity(struct entity *);
 void destroy_entities();
 void destroy_entity(struct entity *);
 void init_entity_system();
-struct entity *get_entity(struct entity_id *);
-struct entity *get_all_entities(u32 *count, struct entity_id **ids);
-struct entity *new_entity(struct entity_id *id);
+struct entity *get_entity(entity_id_t *);
+struct entity *get_all_entities(u32 *count, entity_id_t **ids);
+struct entity *new_entity(entity_id_t *id);
 
 
 #endif /* ENTITY_H */

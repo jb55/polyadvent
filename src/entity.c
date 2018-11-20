@@ -2,27 +2,17 @@
 #include "entity.h"
 #include "node.h"
 #include "model.h"
+#include "resource.h"
 #include <assert.h>
 
 #define DEF_NUM_ENTITIES 1024
 
-struct entity_system {
-    struct entity *entities;
-    struct entity_id *ids;
-    u32 entity_count;
-    u32 generation;
-};
+static struct resource_manager esys;
 
 static u64 entity_uuids = 0;
 
-static struct entity_system esys;
-
-struct entity *get_all_entities(u32 *count, struct entity_id **ids) {
-    if (count != NULL)
-        *count = esys.entity_count;
-    if (ids != NULL)
-        *ids = esys.ids;
-    return esys.entities;
+struct entity *get_all_entities(u32 *count, entity_id_t **ids) {
+    return (struct entity*)get_all_resources(count, ids);
 }
 
 struct entity *init_entity(struct entity *ent) {
@@ -64,7 +54,7 @@ struct entity *get_entity(struct entity_id *ent_id) {
 static inline struct entity_id new_id() {
     return (struct entity_id){
         .id = (struct id) {
-            .index      = esys.entity_count,
+            .index      = esys.resource_count,
             .uuid       = entity_uuids++,
             .generation = esys.generation,
         }
@@ -98,12 +88,13 @@ void destroy_entities() {
     esys.entity_count = RESERVED_ENTITIES;
 };
 
-void destroy_entity(struct entity *ent) {
+void destroy_entity(entity_id_t id) {
     node_detach_from_parent(&ent->node);
+    destroy_resource(&esys, id);
 }
 
 void destroy_entity_system() {
-    free(esys.entities);
+    destroy_resource_manager(&esys);
 }
 
 void init_entity_system() {

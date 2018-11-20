@@ -21,7 +21,7 @@ struct perlin_settings {
 
 
 struct terrain {
-    struct entity_id entity_id;
+    entity_id_t entity_id;
     struct perlin_settings settings;
     struct point *samples;
     struct model model;

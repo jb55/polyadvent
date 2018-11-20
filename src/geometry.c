@@ -6,7 +6,7 @@
 static struct geometry_manager geom_manager;
 
 void
-destroy_buffer_geometry(struct geometry_id geom_id) {
+destroy_buffer_geometry(geometry_id_t *geom_id) {
     struct geometry *geom = get_geometry(geom_id);
 
     gpu_addr buffers[] = {
@@ -26,7 +26,6 @@ destroy_buffer_geometry(struct geometry_id geom_id) {
     check_gl();
     glDeleteBuffers(ARRAY_SIZE(buffers), buffers);
     check_gl();
-
 
 
     geom->has_vbos = 0;
@@ -172,13 +171,11 @@ make_buffer_geometry_(struct make_geometry *mkgeom, struct geometry *geom) {
     geom->has_vbos = 1;
 }
 
-struct geometry_id
-make_buffer_geometry(struct make_geometry *mkgeom) {
-    struct geometry_id geom_id;
-    struct geometry *geom = new_geometry(&geom_id);
+void
+make_buffer_geometry(struct make_geometry *mkgeom, geometry_id_t *geom_id) {
+    struct geometry *geom = new_geometry(geom_id);
 
     make_buffer_geometry_(mkgeom, geom);
-    return geom_id;
 }
 
 
