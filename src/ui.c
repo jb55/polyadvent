@@ -34,7 +34,7 @@ static GLfloat quad_uvs[] =
 };
 
 
-static geometry_id_t create_quad()
+static void create_quad(geometry_id_t *id)
 {
     struct make_geometry mkgeom = {
         .indices = quad_indices,
@@ -45,10 +45,8 @@ static geometry_id_t create_quad()
         .num_verts = ARRAY_SIZE(quad_vertices),
         .num_uv_components = 2
     };
-    geometry_id_t id = make_buffer_geometry(&mkgeom);
+    make_buffer_geometry(&mkgeom, id);
     check_gl();
-
-    return id; 
 }
 
 void render_ui(struct ui *ui, float *view) {

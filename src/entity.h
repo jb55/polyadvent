@@ -7,6 +7,7 @@
 #include "id.h"
 
 #define RESERVED_ENTITIES 2
+#define MAX_ENTITIES 2048
 
 enum entity_flags {
   ENT_IS_PLAYER = 1 << 0,
@@ -26,7 +27,7 @@ typedef struct resource_id entity_id_t;
 
 struct entity *init_entity(struct entity *);
 void destroy_entities();
-void destroy_entity(struct entity *);
+void destroy_entity(entity_id_t *);
 void init_entity_system();
 struct entity *get_entity(entity_id_t *);
 struct entity *get_all_entities(u32 *count, entity_id_t **ids);

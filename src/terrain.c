@@ -230,5 +230,5 @@ void create_terrain(struct terrain *terrain, float scale) {
 void destroy_terrain(struct terrain *terrain) {
     struct entity *ent = get_entity(&terrain->entity_id);
     assert(ent);
-    destroy_buffer_geometry(get_geometry(terrain->model.geom_id));
+    destroy_buffer_geometry(&terrain->model.geom_id);
 }

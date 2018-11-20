@@ -54,8 +54,7 @@ void create_skybox(struct skybox *skybox, struct gpu_program *program) {
     mkgeom.num_verts = ARRAY_SIZE(skybox_vertices);
     mkgeom.num_indices = ARRAY_SIZE(skybox_indices);
 
-    skybox->model.geom_id =
-        make_buffer_geometry(&mkgeom);
+    make_buffer_geometry(&mkgeom, &skybox->model.geom_id);
 
     static const char *faces[6] = {
       CUBEMAP("hw_sahara/sahara_rt_flip.tga"),
@@ -112,7 +111,7 @@ void render_skybox(struct skybox *skybox, mat4 *camera) {
     glBindTexture(GL_TEXTURE_CUBE_MAP, skybox->model.texture);
     check_gl();
 
-    render_geometry(get_geometry(skybox->model.geom_id), &skybox->attrs, skybox->program);
+    render_geometry(get_geometry(&skybox->model.geom_id), &skybox->attrs, skybox->program);
     check_gl();
 
     glDepthMask(GL_TRUE);

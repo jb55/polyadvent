@@ -226,9 +226,8 @@ int parse_ply(const char *filename, geometry_id_t *geom_id) {
     free((void*)data);
 
     if (success) {
-        *geom_id = make_buffer_geometry(&mkgeom);
-        struct geometry *geom =
-            get_geometry(*geom_id);
+        make_buffer_geometry(&mkgeom, geom_id);
+        struct geometry *geom = get_geometry(geom_id);
 
         vec3_copy(min, geom->min);
         vec3_copy(max, geom->max);

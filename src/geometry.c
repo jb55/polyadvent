@@ -189,14 +189,14 @@ void init_geometry_manager() {
     geom_manager.num_geometry = 0;
 }
 
-struct geometry *get_geometry(struct geometry_id geom_id) {
-    assert(geom_id.index != -1);
-    assert(geom_id.index < geom_manager.num_geometry);
-    return &geom_manager.geoms[geom_id.index];
+struct geometry *get_geometry(geometry_id_t *geom_id) {
+    assert(geom_id->index != -1);
+    assert(geom_id->index < geom_manager.num_geometry);
+    return &geom_manager.geoms[geom_id->index];
 }
 
 
-struct geometry *new_geometry(struct geometry_id *geom_id) {
+struct geometry *new_geometry(geometry_id_t *geom_id) {
     u32 index = geom_manager.num_geometry++;
     struct geometry *g = &geom_manager.geoms[index];
     init_geometry(g);

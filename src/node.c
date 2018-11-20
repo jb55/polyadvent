@@ -120,6 +120,7 @@ int node_detach(struct node *node, struct node *from) {
         if (from->children[i] == node) {
             memmove(from->children[i], from->children[i+1],
                     from->n_children - i - 1);
+            assert(!"fixme, this should be times the size of *children");
             from->n_children--;
             return 1;
         }

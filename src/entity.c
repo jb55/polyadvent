@@ -9,10 +9,8 @@
 
 static struct resource_manager esys;
 
-static u64 entity_uuids = 0;
-
 struct entity *get_all_entities(u32 *count, entity_id_t **ids) {
-    return (struct entity*)get_all_resources(count, ids);
+    return get_all_resources(&esys, count, ids);
 }
 
 struct entity *init_entity(struct entity *ent) {
@@ -21,74 +19,35 @@ struct entity *init_entity(struct entity *ent) {
     return ent;
 }
 
-struct entity *get_entity_pure(struct entity_id id) {
-    struct entity_id pure_id;
-    pure_id = id;
-
-    return get_entity(&pure_id);
+struct entity *get_entity(entity_id_t *ent_id) {
+    return get_resource(&esys, ent_id);
 }
 
-struct entity *get_entity(struct entity_id *ent_id) {
-    struct entity_id *new_id;
-    struct id *id = &ent_id->id;
-
-    // rollover is ok
-    /* assert(->generation <= esys.generation); */
-    if (id->generation != esys.generation) {
-        // try to find uuid in new memory layout
-        for (u32 i = 0; i < esys.entity_count; i++) {
-            new_id = &esys.ids[i];
-            if (new_id->id.uuid == id->uuid) {
-                id->index = new_id->id.index;
-                id->generation = esys.generation;
-                return &esys.entities[id->index];
-            }
-        }
-
-        // entity was deleted
-        return NULL;
-    }
-    return &esys.entities[id->index];
+static inline struct entity *new_uninitialized_entity(entity_id_t *id) {
+    return new_resource(&esys, id);
 }
 
-static inline struct entity_id new_id() {
-    return (struct entity_id){
-        .id = (struct id) {
-            .index      = esys.resource_count,
-            .uuid       = entity_uuids++,
-            .generation = esys.generation,
-        }
-    };
-}
-
-static inline struct entity *new_uninitialized_entity(struct entity_id *id) {
-    struct entity_id fresh_id;
-    fresh_id = new_id();
-
-    if (id)
-        *id = fresh_id;
-
-    return &esys.entities[esys.entity_count++];
-}
-
-struct entity *new_entity(struct entity_id *id) {
+struct entity *new_entity(entity_id_t *id) {
     return init_entity(new_uninitialized_entity(id));
 }
 
-struct entity *add_entity(struct entity *e, struct entity_id *id) {
+struct entity *add_entity(struct entity *e, entity_id_t *id) {
     struct entity *new = new_uninitialized_entity(id);
     *new = *e;
     return new;
 }
 
 void destroy_entities() {
-    for (u32 i = RESERVED_ENTITIES; i < esys.entity_count; i++) {
-        destroy_entity(&esys.entities[i]);
+    entity_id_t *ids;
+    u32 count;
+    get_all_resources(&esys, &count, &ids);
+    for (u32 i = RESERVED_ENTITIES; i < count; i++) {
+        destroy_entity(&ids[i]);
     }
-    esys.entity_count = RESERVED_ENTITIES;
 };
 
-void destroy_entity(entity_id_t id) {
+void destroy_entity(entity_id_t *id) {
+    struct entity *ent = get_entity(id);
     node_detach_from_parent(&ent->node);
     destroy_resource(&esys, id);
 }
@@ -98,11 +57,8 @@ void destroy_entity_system() {
 }
 
 void init_entity_system() {
-    esys.generation = 0;
-    esys.entities = calloc(DEF_NUM_ENTITIES, sizeof(*esys.entities));
-
-    esys.ids =
-        calloc(DEF_NUM_ENTITIES, sizeof(*esys.ids));
+    init_resource_manager(&esys, sizeof(struct entity), DEF_NUM_ENTITIES,
+                          MAX_ENTITIES);
 }
 
 
