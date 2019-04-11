@@ -45,8 +45,9 @@ OBJS += $(SRC)/update.o
 OBJS += $(SRC)/util.o
 OBJS += $(SRC)/vec3.o
 
-SRCS=$(OBJS:.o=.c)
+TESTS = test/test-half-edge
 
+SRCS=$(OBJS:.o=.c)
 
 all: $(BIN)
 
@@ -57,6 +58,12 @@ include $(OBJS:.o=.d)
 	$(CC) -MM $(CFLAGS) $< > $@.$$$$; \
 	sed 's,\(.*\)\.o[ :]*,src/\1.o $@ : ,g' < $@.$$$$ > $@; \
 	rm -f $@.$$$$
+
+test/%: %.c
+	$(CC) $(CFLAGS) -c $< -o $@
+	@./$@
+
+check: $(TESTS)
 
 $(BIN): $(OBJS)
 	$(CC) $(CFLAGS) $^ $(LDFLAGS) -o $@

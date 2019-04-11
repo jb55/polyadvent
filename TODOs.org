@@ -1,0 +1,9 @@
+
+* Procedural
+
+** Initial half-edge data structure
+
+* Terrain
+
+** TODO Infinite terrain
+
