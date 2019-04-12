@@ -174,9 +174,9 @@ void game_init(struct game *game, int width, int height) {
     // player entity
     player = new_entity(&res->player_id);
     assert(res->player_id.index == 1);
-    proc_sphere(&player->model.geom);
-    /* /\* ok = load_model(&player->model, "pirate-officer"); *\/ */
-    /* assert(ok); */
+    /* proc_sphere(&player->model.geom); */
+    ok = load_model(&player->model, "pirate-officer");
+    assert(ok);
     player->node.label = "player";
     node_attach(&player->node, root);
     node_translate(&player->node, V3(terrain->size/2.,terrain->size/2.,0.0));
