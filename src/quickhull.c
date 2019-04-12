@@ -873,31 +873,31 @@ void qh__build_hull(qh_context_t* context, float epsilon)
     }
 }
 
-void qh_mesh_export(qh_mesh_t const* mesh, char const* filename)
-{
-    FILE* objfile = fopen(filename, "wt");
-    fprintf(objfile, "o\n");
-    unsigned int i, j;
-
-    for (i = 0; i < mesh->nvertices; ++i) {
-        qh_vertex_t v = mesh->vertices[i];
-        fprintf(objfile, "v %f %f %f\n", v.x, v.y, v.z);
-    }
-
-    for (i = 0; i < mesh->nnormals; ++i) {
-        qh_vec3_t n = mesh->normals[i];
-        fprintf(objfile, "vn %f %f %f\n", n.x, n.y, n.z);
-    }
-
-    for (i = 0, j = 0; i < mesh->nindices; i += 3, j++) {
-        fprintf(objfile, "f %u/%u %u/%u %u/%u\n",
-            mesh->indices[i+0] + 1, mesh->normalindices[j] + 1,
-            mesh->indices[i+1] + 1, mesh->normalindices[j] + 1,
-            mesh->indices[i+2] + 1, mesh->normalindices[j] + 1);
-    }
-
-    fclose(objfile);
-}
+//void qh_mesh_export(qh_mesh_t const* mesh, char const* filename)
+//{
+//    FILE* objfile = fopen(filename, "wt");
+//    fprintf(objfile, "o\n");
+//    unsigned int i, j;
+//
+//    for (i = 0; i < mesh->nvertices; ++i) {
+//        qh_vertex_t v = mesh->vertices[i];
+//        fprintf(objfile, "v %f %f %f\n", v.x, v.y, v.z);
+//    }
+//
+//    for (i = 0; i < mesh->nnormals; ++i) {
+//        qh_vec3_t n = mesh->normals[i];
+//        fprintf(objfile, "vn %f %f %f\n", n.x, n.y, n.z);
+//    }
+//
+//    for (i = 0, j = 0; i < mesh->nindices; i += 3, j++) {
+//        fprintf(objfile, "f %u/%u %u/%u %u/%u\n",
+//            mesh->indices[i+0] + 1, mesh->normalindices[j] + 1,
+//            mesh->indices[i+1] + 1, mesh->normalindices[j] + 1,
+//            mesh->indices[i+2] + 1, mesh->normalindices[j] + 1);
+//    }
+//
+//    fclose(objfile);
+//}
 
 qh_face_t* qh__build_tetrahedron(qh_context_t* context, float epsilon)
 {

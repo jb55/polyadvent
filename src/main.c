@@ -19,6 +19,7 @@
 #include "ply.h"
 #include "fbo.h"
 #include "hires.h"
+#include "quickhull.h"
 
 
 int main(void)
@@ -77,6 +78,7 @@ int main(void)
       .projection = game.test_resources.proj_persp,
       .depth_vp = depth_vp
     };
+
 
     while (1) {
         game.frame++;

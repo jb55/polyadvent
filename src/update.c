@@ -192,13 +192,13 @@ void resize_fbos(struct entity *player, struct fbo *shadow_buffer,
     }
 
     // TODO: compute better bounds based
-    const float factor = 1.5;
+    const float factor = 2.5;
     float left   = player->model.geom.min[0] - factor;
     float right  = player->model.geom.max[0] + factor;
     float bottom = player->model.geom.min[1] - factor;
     float top    = player->model.geom.max[1] + factor/2.0;
 
-    const float near = -1.0;
+    const float near = -5.0;
     const float far = 5.0;
 
     // default ortho screenspace projection

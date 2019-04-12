@@ -94,6 +94,7 @@ make_buffer_geometry(struct geometry *geom) {
     // VBOs
 
     assert(geom->vertices);
+
     /* assert(geom->normals); */
     /* assert(geom->indices); */
     /* assert(geom->num_indices >= 1); */

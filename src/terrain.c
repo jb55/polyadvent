@@ -191,7 +191,7 @@ void create_terrain(struct terrain *terrain, float scale) {
         vec3_normalize(tmp2, tmp2);
 
         for (int j = 0; j < 9; ++j) {
-        del_norms[ndv+j] = tmp2[j%3];
+            del_norms[ndv+j] = tmp2[j%3];
         }
 
         del_indices[nv+0] = nv+0;

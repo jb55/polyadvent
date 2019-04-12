@@ -59,6 +59,7 @@ struct resources {
 	struct attributes attributes;
 
 	struct node root;
+    struct geometry qh_test;
 	struct entity_id player_id;
 	struct orbit orbit_camera;
 	struct node free_camera;
