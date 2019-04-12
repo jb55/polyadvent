@@ -11,7 +11,7 @@ vec3 shadow_strength(vec4 position, vec4 normal, vec4 v_shadow_coord) {
     vec4 shadow_sample = texture(shadow_map, v_shadow_coord.xy);
 
     float light_angle = dot(light_dir, normal.xyz);
-    float bias = 0.002 * 1.0/light_angle;
+    float bias = 0.0002;
 
     bool in_shadow =
         shadow_sample.z < v_shadow_coord.z - bias
