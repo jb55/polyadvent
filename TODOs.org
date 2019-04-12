@@ -1,7 +1,29 @@
 
+* Multicore
+
+** TODO Simple pthreads job system
+
+* Animation
+
+** TODO Simple animation test
+
+** TODO Procedural animation?
+
+* Physics
+
+** TODO Initial physics system
+
+* Entity
+
+** TODO Entity loading stress test
+
 * Procedural
 
-** Initial half-edge data structure
+** TODO Trees
+** TODO 
+
+** DONE quickhull tests
+CLOSED: [2019-04-12 Fri 09:37]
 
 * Terrain
 
