@@ -1,12 +1,26 @@
 
+* Rendering
+
+** TODO Debris on ground
+
+To create a sense of movement
+
+** TODO Half edge subdivision for tessellation
+
 * Multicore
 
 ** TODO Simple pthreads job system
 
 * Animation
 
-** TODO Simple animation test
+** TODO Run pose
+** TODO Load poses in engine
+** TODO Surveyor wheel
+** TODO 
+** DONE Rig character in blender
+CLOSED: [2019-04-12 Fri 13:12]
 
+** TODO Simple animation test
 ** TODO Procedural animation?
 
 * Physics
