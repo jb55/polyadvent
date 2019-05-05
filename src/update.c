@@ -301,7 +301,7 @@ void orbit_update_from_mouse(struct orbit *camera, struct input *input,
 
     }
     else if (input->wheel_y) {
-        camera->coords.radius -= input->wheel_y * dt * 100.0;
+        camera->coords.radius += input->wheel_y * dt * 100.0;
     }
 
     camera->coords.radius = max(5.0, camera->coords.radius);
