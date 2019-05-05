@@ -11,6 +11,8 @@ struct attributes {
     gpu_addr normal;
     gpu_addr color;
     gpu_addr tex_coord;
+    gpu_addr joint_ids;
+    gpu_addr weights;
 };
 
 struct vbo {
