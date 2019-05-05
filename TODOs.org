@@ -13,20 +13,18 @@ To create a sense of movement
 
 * Animation
 
-** TODO Run pose
-** TODO Load poses in engine
-** TODO Surveyor wheel
-** TODO 
-** DONE Rig character in blender
-CLOSED: [2019-04-12 Fri 13:12]
 
+** TODO Initial animation system
+** TODO Load poses in engine
+** TODO Run pose
+** TODO Surveyor wheel
 ** TODO Simple animation test
 ** TODO Procedural animation?
+
 
 * Physics
 
 ** TODO Initial physics system
-
 * Entity
 
 ** TODO Entity loading stress test
@@ -34,8 +32,6 @@ CLOSED: [2019-04-12 Fri 13:12]
 * Procedural
 
 ** TODO Trees
-** TODO 
-
 ** DONE quickhull tests
 CLOSED: [2019-04-12 Fri 09:37]
 
