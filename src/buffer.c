@@ -48,7 +48,7 @@ make_uv_buffer(GLenum target, const void *data,
     return vbo;
 }
 
-void bind_ibo(struct vbo *vbo) {
+static void bind_ibo(struct vbo *vbo) {
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbo->handle);
 }
 
@@ -67,5 +67,7 @@ static void bind_vbo_internal(struct vbo *vbo, gpu_addr slot) {
 }
 
 void bind_vbo(struct vbo *vbo, gpu_addr slot) {
+    if (vbo->type == GL_ELEMENT_ARRAY_BUFFER)
+        return bind_ibo(vbo);
     bind_vbo_internal(vbo, slot);
 }

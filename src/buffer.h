@@ -6,13 +6,17 @@
 
 typedef GLuint gpu_addr;
 
-struct attributes {
-    gpu_addr position;
-    gpu_addr normal;
-    gpu_addr color;
-    gpu_addr tex_coord;
-    gpu_addr joint_ids;
-    gpu_addr weights;
+#define VERT_ATTRS 6
+
+enum vertex_attr {
+    va_position,
+    va_normal,
+    va_color,
+    va_index,
+    va_tex_coord,
+    va_joint_ids,
+    va_joint_weights,
+    n_vertex_attrs
 };
 
 struct vbo {
@@ -40,6 +44,5 @@ make_uv_buffer(GLenum target, const void *data,
 
 void bind_uv_vbo(struct vbo *vbo, gpu_addr slot);
 void bind_vbo(struct vbo *vbo, gpu_addr slot);
-void bind_ibo(struct vbo *vbo);
 
 #endif /* POLYADVENT_BUFFER_H */

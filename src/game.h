@@ -56,7 +56,7 @@ struct resources {
 		GLint view_proj;
 	} uniforms;
 
-	struct attributes attributes;
+	gpu_addr vertex_attrs[n_vertex_attrs];
 
 	struct node root;
     struct geometry qh_test;

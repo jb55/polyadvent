@@ -5,13 +5,11 @@
 
 void
 destroy_buffer_geometry(struct geometry *geom) {
-    gpu_addr buffers[] = {
-        geom->vbos.vertex.handle,
-        geom->vbos.normal.handle,
-        geom->vbos.color.handle,
-        geom->vbos.index.handle,
-        geom->vbos.tex_coord.handle
-    };
+    gpu_addr buffers[n_vertex_attrs];
+
+    for (int i = 0; i < n_vertex_attrs; i++)
+        buffers[i] = geom->vbos[i].handle;
+
     /* void glDeleteVertexArrays(GLsizei n, const GLuint *arrays); */
     /* glDisableVertexAttribArray(geom->buffer.vertex_buffer.handle); */
     /* check_gl(); */
@@ -24,23 +22,14 @@ destroy_buffer_geometry(struct geometry *geom) {
     check_gl();
 }
 
-void bind_geometry(struct geometry *geom, struct attributes *attrs) {
-    bind_vbo(&geom->vbos.vertex, attrs->position);
-    check_gl();
-    if (geom->vbos.normal.handle && attrs->normal != 0xFFFFFFFF) {
-        bind_vbo(&geom->vbos.normal, attrs->normal);
+void bind_geometry(struct geometry *geom, gpu_addr *vertex_attrs) {
+    struct vbo *vbo;
+    for (int i = 0; i < n_vertex_attrs; i++) {
+        vbo = &geom->vbos[i];
+        if (vbo->handle && vertex_attrs[i] != 0xFFFFFFFF)
+            bind_vbo(vbo, vertex_attrs[i]);
         check_gl();
     }
-    if (geom->vbos.color.handle && attrs->color != 0xFFFFFFFF) {
-        bind_vbo(&geom->vbos.color, attrs->color);
-        check_gl();
-    }
-    if (geom->vbos.tex_coord.handle && attrs->tex_coord != 0xFFFFFFFF) {
-        bind_vbo(&geom->vbos.tex_coord, attrs->tex_coord);
-        check_gl();
-    }
-    bind_ibo(&geom->vbos.index);
-    check_gl();
 }
 
 static void check_for_patches(struct gpu_program *program, int *type) {
@@ -54,12 +43,12 @@ static void check_for_patches(struct gpu_program *program, int *type) {
 }
 
 
-void render_geometry(struct geometry *geom, struct attributes *attrs,
+void render_geometry(struct geometry *geom, gpu_addr *vertex_attrs,
                      struct gpu_program *program)
 {
     int type = GL_TRIANGLES;
     //check_for_patches(program, &type);
-    bind_geometry(geom, attrs);
+    bind_geometry(geom, vertex_attrs);
     if (geom->indices) {
         glDrawElements(type,
                        geom->num_indices, /* count */
@@ -84,9 +73,9 @@ void init_geometry(struct geometry *geom) {
     geom->tex_coords = NULL;
     geom->num_uv_components = 2;
 
-    geom->vbos.color.handle = 0;
-    geom->vbos.normal.handle = 0;
-    geom->vbos.tex_coord.handle = 0;
+    geom->vbos[va_color].handle = 0;
+    geom->vbos[va_normal].handle = 0;
+    geom->vbos[va_tex_coord].handle = 0;
 }
 
 void
@@ -104,7 +93,7 @@ make_buffer_geometry(struct geometry *geom) {
                         GL_ARRAY_BUFFER,
                         geom->vertices,
                         geom->num_verts * 3 * (int)sizeof(*geom->vertices),
-                        &geom->vbos.vertex
+                        &geom->vbos[va_position]
                         );
 
     /* printf("making normal buffer\n"); */
@@ -114,7 +103,7 @@ make_buffer_geometry(struct geometry *geom) {
                             GL_ARRAY_BUFFER,
                             geom->normals,
                             geom->num_verts * 3 * (int)sizeof(*geom->normals),
-                            &geom->vbos.normal
+                            &geom->vbos[va_normal]
                             );
 
     // vertex colors
@@ -123,7 +112,7 @@ make_buffer_geometry(struct geometry *geom) {
                         GL_ARRAY_BUFFER,
                         geom->colors,
                         geom->num_verts * 3 * (int)sizeof(*geom->colors),
-                        &geom->vbos.color
+                        &geom->vbos[va_color]
                         );
 
     if (geom->tex_coords != NULL) {
@@ -138,7 +127,7 @@ make_buffer_geometry(struct geometry *geom) {
         make_uv_buffer(GL_ARRAY_BUFFER,
                        geom->tex_coords,
                        geom->num_verts * geom->num_uv_components * (int)sizeof(*geom->tex_coords),
-                       &geom->vbos.tex_coord, geom->num_uv_components);
+                       &geom->vbos[va_tex_coord], geom->num_uv_components);
     }
 
     /* printf("making index buffer\n"); */
@@ -148,7 +137,7 @@ make_buffer_geometry(struct geometry *geom) {
                         GL_ELEMENT_ARRAY_BUFFER,
                         geom->indices,
                         geom->num_indices * (int)sizeof(*geom->indices),
-                        &geom->vbos.index
+                        &geom->vbos[va_index]
                         );
 }
 
