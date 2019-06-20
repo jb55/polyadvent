@@ -1,4 +1,9 @@
 
+#ifndef MAT4_H
+#define MAT4_H
+
+
+
 typedef float mat4;
 
 #define M_X 12
@@ -30,3 +35,6 @@ mat4 *mat4_rotate(const mat4 *mat, const float angle,
 
 
 mat4 *mat4_remove_translations(mat4 *mat);
+
+
+#endif /* MAT4_H */
