@@ -34,9 +34,17 @@ void init_pose(struct pose *pose)
 
 static void parse_joint(const char *t, int id, struct joint *joint)
 {
+    float *m = joint->mat;
     init_joint(joint);
     joint->id = id;
-    printf("parsing joint %d: %s\n", id, t);
+    printf(" parsing joint %d: %s\n", id, t);
+
+    sscanf(t, "%f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f",
+           &m[0],  &m[1],  &m[2],  &m[3],
+           &m[4],  &m[5],  &m[6],  &m[7],
+           &m[8],  &m[9],  &m[10], &m[11],
+           &m[12], &m[13], &m[14], &m[15]
+           );
 }
 
 static void dae_tag_start(struct xmlparser *x, const char *t, size_t tl)
@@ -71,10 +79,14 @@ static void dae_tag_end(struct xmlparser *x, const char *t, size_t tl, int what)
 static void dae_tagbody(struct xmlparser *x, const char *d, size_t dl)
 {
     struct dae_data *data = (struct dae_data*)x->user_data;
-    struct pose *pose = &data->poses[*data->nposes];
 
     if (data->state == PARSING_JOINT_MATRIX) {
-        /* parse_joint(x, d) */
+        assert(*data->nposes);
+        struct pose *pose = &data->poses[*data->nposes - 1];
+        struct joint *joint = &pose->joints[pose->njoints];
+        parse_joint(d, pose->njoints, joint);
+        pose->njoints++;
+        data->state = PARSING_POSE;
     }
 }
 
@@ -88,14 +100,13 @@ void dae_attr(struct xmlparser *x, const char *t, size_t tl,
               const char *a, size_t al, const char *v, size_t vl)
 {
     struct dae_data *data = (struct dae_data*)x->user_data;
-    struct pose *pose = &data->poses[(*data->nposes)++];
 
     if (data->state == PARSING_NODE
         && streq(a, "id")
         && streq(v, "Armature"))
     {
+        struct pose *pose = &data->poses[(*data->nposes)++];
         data->state = PARSING_POSE;
-        printf("parsing pose");
         init_pose(pose);
     }
     else if (data->state == PARSING_NODE

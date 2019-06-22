@@ -2,10 +2,11 @@ NAME ?= polyadvent
 BIN ?= $(NAME)
 PREFIX ?= /usr/local
 DEFS= -DGLFW_INCLUDE_NONE -DDEBUG
-CFLAGS = $(DEFS) -g -O2 -I src -Wall -Werror -Wextra -std=c99 \
+CFLAGS = $(DEFS) -ggdb -O0 -I src -Wall -Werror -Wextra -std=c99 \
 						-Wno-unused-function \
 						-Wno-unused-parameter \
 						-Wno-unused-variable \
+						-Wno-error=cpp \
 						-Wno-cast-align \
 						-Wno-padded
 LDFLAGS = -lSDL2 -lGL -lm
@@ -54,6 +55,8 @@ SRCS=$(OBJS:.o=.c)
 all: $(BIN)
 
 include $(OBJS:.o=.d)
+include src/main.d
+include test/test_animation.d
 
 %.d: %.c
 	@rm -f $@; \
@@ -61,11 +64,11 @@ include $(OBJS:.o=.d)
 	sed 's,\(.*\)\.o[ :]*,src/\1.o $@ : ,g' < $@.$$$$ > $@; \
 	rm -f $@.$$$$
 
-test/%: test/%.c $(OBJS)
+test/%: test/%.o $(OBJS)
 	$(CC) $(CFLAGS) $^ $(LDFLAGS) -o $@
-	@./$@
 
 check: $(TESTS)
+	./$(TESTS)
 
 $(BIN): main.o $(OBJS)
 	$(CC) $(CFLAGS) $^ $(LDFLAGS) -o $@
