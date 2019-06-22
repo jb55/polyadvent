@@ -20,10 +20,14 @@
 #include "fbo.h"
 #include "hires.h"
 #include "quickhull.h"
+#include "animation.h"
 
 
 int main(void)
 {
+    collada_test();
+    exit(0);
+
     int nsamples;
 
     int seed = time(NULL);

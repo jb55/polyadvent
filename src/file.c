@@ -13,7 +13,7 @@ time_t file_mtime(const char *filename) {
 	return stats.st_mtime;
 }
 
-void *file_contents(const char *filename, size_t *length) {
+char *file_contents(const char *filename, size_t *length) {
   FILE *f = fopen(filename, "r");
   char *buffer;
 

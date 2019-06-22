@@ -2,7 +2,7 @@ NAME ?= polyadvent
 BIN ?= $(NAME)
 PREFIX ?= /usr/local
 DEFS= -DGLFW_INCLUDE_NONE -DDEBUG
-CFLAGS = $(DEFS) -ggdb -Ofast -I src -Wall -Werror -Wextra -std=c99 \
+CFLAGS = $(DEFS) -g -O2 -I src -Wall -Werror -Wextra -std=c99 \
 						-Wno-unused-function \
 						-Wno-unused-parameter \
 						-Wno-unused-variable \
@@ -14,6 +14,8 @@ SRC=src
 OBJS  = $(SRC)/window.o
 OBJS += $(SRC)/buffer.o
 OBJS += $(SRC)/camera.o
+OBJS += $(SRC)/xml.o
+OBJS += $(SRC)/animation.o
 OBJS += $(SRC)/debug.o
 OBJS += $(SRC)/delaunay.o
 OBJS += $(SRC)/entity.o
