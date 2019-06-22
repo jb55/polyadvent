@@ -69,7 +69,7 @@ test/%: test/%.o $(OBJS)
 check: $(TESTS)
 	./$(TESTS)
 
-$(BIN): main.o $(OBJS)
+$(BIN): src/main.o $(OBJS)
 	$(CC) $(CFLAGS) $^ $(LDFLAGS) -o $@
 
 install: $(BIN)
