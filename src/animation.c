@@ -13,11 +13,12 @@ enum dae_state {
 };
 
 struct dae_data {
-    int opened;
+    int node_level;
     int state;
     FILE *dae_file;
     struct pose *poses;
     int *nposes;
+    char current_name[JOINT_LABEL_SIZE];
 };
 
 void init_joint(struct joint *joint)
@@ -37,7 +38,7 @@ static void parse_joint(const char *t, int id, struct joint *joint)
     float *m = joint->mat;
     init_joint(joint);
     joint->id = id;
-    printf(" parsing joint %d: %s\n", id, t);
+    /* printf(" parsing joint %d: %s\n", id, t); */
 
     sscanf(t, "%f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f",
            &m[0],  &m[1],  &m[2],  &m[3],
@@ -50,30 +51,33 @@ static void parse_joint(const char *t, int id, struct joint *joint)
 static void dae_tag_start(struct xmlparser *x, const char *t, size_t tl)
 {
     struct dae_data *data = (struct dae_data*)x->user_data;
-    data->opened++;
 
-    if (streq(t, "node"))
+    if (streq(t, "node")) {
         data->state = PARSING_NODE;
+        data->node_level++;
+    }
     else if (data->state == PARSING_JOINT && streq(t, "matrix"))
         data->state = PARSING_JOINT_MATRIX;
     else
         return;
 
-    printf("\n");
-    for (int i = 0; i < data->opened; i++) {
-        putchar(' ');
-    }
-    printf("%s", t);
+    /* printf("\n"); */
+    /* for (int i = 0; i < data->opened; i++) { */
+    /*     putchar(' '); */
+    /* } */
+    /* printf("%s", t); */
 }
 
 static void dae_tag_end(struct xmlparser *x, const char *t, size_t tl, int what)
 {
     struct dae_data *data = (struct dae_data*)x->user_data;
 
-    if (data->state == PARSING_NODE)
-        data->state = PARSING_START;
+    if (streq(t, "node"))
+        data->node_level--;
 
-    data->opened--;
+    if (data->state == PARSING_NODE) {
+        data->state = PARSING_START;
+    }
 }
 
 static void dae_tagbody(struct xmlparser *x, const char *d, size_t dl)
@@ -85,6 +89,8 @@ static void dae_tagbody(struct xmlparser *x, const char *d, size_t dl)
         struct pose *pose = &data->poses[*data->nposes - 1];
         struct joint *joint = &pose->joints[pose->njoints];
         parse_joint(d, pose->njoints, joint);
+        strncpy(joint->name, data->current_name, sizeof(data->current_name));
+        joint->children[0] = data->node_level;
         pose->njoints++;
         data->state = PARSING_POSE;
     }
@@ -110,10 +116,39 @@ void dae_attr(struct xmlparser *x, const char *t, size_t tl,
         init_pose(pose);
     }
     else if (data->state == PARSING_NODE
+             && streq(a, "name"))
+    {
+        strncpy(data->current_name, v, sizeof(data->current_name));
+    }
+    else if (data->state == PARSING_NODE
              && streq(a, "type")
              && streq(v, "JOINT"))
     {
         data->state = PARSING_JOINT;
+    }
+}
+
+static void process_joint_children(struct joint *joints, int njoints)
+{
+    struct joint *joint, *j2;
+    for (int i = 0; i < njoints; i++) {
+        joint = &joints[i];
+
+        // node level is stored in here on the first parser pass
+        int level = joint->children[0];
+
+        for (int j = i+1; j < njoints; j++) {
+            j2 = &joints[j];
+            if (j2->children[0] == level + 1) {
+                /* printf("%s(%d) assigning child %s(%d)\n", */
+                /*        joint->name, level, j2->name, j2->children[0]); */
+
+                assert(joint->nchildren+1 < MAX_JOINT_CHILDREN);
+                joint->children[joint->nchildren++] = j;
+            }
+            else if (j2->children[0] <= level)
+                break;
+        }
     }
 }
 
@@ -123,7 +158,7 @@ void load_poses(const char *filename, struct pose *poses, int *nposes)
 
     struct xmlparser x = {0};
     struct dae_data data = {
-      .opened = 0,
+      .node_level = 0,
       .state  = PARSING_START,
       .poses  = poses,
       .nposes = nposes,
@@ -142,6 +177,11 @@ void load_poses(const char *filename, struct pose *poses, int *nposes)
     x.getnext     = dae_getc;
 
     xml_parse(&x);
+
+    for (int i = 0; i < *nposes; i++) {
+        struct pose *pose = &poses[i];
+        process_joint_children(pose->joints, pose->njoints);
+    }
 
     fclose(data.dae_file);
 }

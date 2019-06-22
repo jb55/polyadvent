@@ -2,11 +2,10 @@ NAME ?= polyadvent
 BIN ?= $(NAME)
 PREFIX ?= /usr/local
 DEFS= -DGLFW_INCLUDE_NONE -DDEBUG
-CFLAGS = $(DEFS) -ggdb -O0 -I src -Wall -Werror -Wextra -std=c99 \
+CFLAGS = $(DEFS) -ggdb -O2 -I src -Wall -Werror -Wextra -std=c99 \
 						-Wno-unused-function \
 						-Wno-unused-parameter \
 						-Wno-unused-variable \
-						-Wno-error=cpp \
 						-Wno-cast-align \
 						-Wno-padded
 LDFLAGS = -lSDL2 -lGL -lm

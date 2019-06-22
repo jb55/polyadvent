@@ -4,13 +4,16 @@
 
 #include "common.h"
 
-#define MAX_JOINT_CHILDREN 3
+#define MAX_JOINT_CHILDREN 4
 #define MAX_JOINTS 16
+#define JOINT_LABEL_SIZE 8
 
 struct joint
 {
     int children[MAX_JOINT_CHILDREN];
+    int nchildren;
     int id;
+    char name[JOINT_LABEL_SIZE];
     float mat[MAT4_ELEMS];
 };
 
