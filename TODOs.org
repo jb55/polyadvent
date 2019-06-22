@@ -13,11 +13,12 @@ To create a sense of movement
 
 * Animation
 
-
-** TODO Initial animation system
-** TODO Load poses in engine
+** DONE Initial animation system
+CLOSED: [2019-06-22 Sat 12:52]
+** DONE Load poses in engine
+CLOSED: [2019-06-22 Sat 12:52]
+** TODO Load bone weights
 ** TODO Run pose
-** TODO Surveyor wheel
 ** TODO Simple animation test
 ** TODO Procedural animation?
 
