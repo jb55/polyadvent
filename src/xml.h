@@ -50,3 +50,24 @@ struct xmlparser {
 int xml_entitytostr(const char *, char *, size_t);
 void xml_parse(struct xmlparser *);
 #endif
+
+/*
+void xmlattr(struct xmlparser *x, const char *t, size_t tl, const char *a, size_t al, const char *v, size_t vl)
+void xmlattrentity(struct xmlparser *x, const char *t, size_t tl, const char *a, size_t al, const char *v, size_t vl)
+void xmlattrend(struct xmlparser *x, const char *t, size_t tl, const char *a, size_t al)
+void xmlattrstart(struct xmlparser *x, const char *t, size_t tl, const char *a, size_t al)
+void xmlcdatastart(struct xmlparser *x)
+void xmlcdata(struct xmlparser *x, const char *d, size_t dl)
+void xmlcdataend(struct xmlparser *x)
+void xmlcommentstart(struct xmlparser *x)
+void xmlcomment(struct xmlparser *x, const char *c, size_t cl)
+void xmlcommentend(struct xmlparser *x)
+void xmldata(struct xmlparser *x, const char *d, size_t dl)
+void xmldataend(struct xmlparser *x)
+void xmldataentity(struct xmlparser *x, const char *d, size_t dl)
+void xmldatastart(struct xmlparser *x)
+void xmltagend(struct xmlparser *x, const char *t, size_t tl, int isshort)
+void xmltagstart(struct xmlparser *x, const char *t, size_t tl)
+void xmltagstartparsed(struct xmlparser *x, const char *t, size_t tl, int isshort)
+
+*/
