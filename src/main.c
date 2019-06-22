@@ -25,9 +25,6 @@
 
 int main(void)
 {
-    collada_test();
-    exit(0);
-
     int nsamples;
 
     int seed = time(NULL);

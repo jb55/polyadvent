@@ -25,7 +25,6 @@ OBJS += $(SRC)/game.o
 OBJS += $(SRC)/geometry.o
 OBJS += $(SRC)/hires.o
 OBJS += $(SRC)/input.o
-OBJS += $(SRC)/main.o
 OBJS += $(SRC)/mat4.o
 OBJS += $(SRC)/mat_util.o
 OBJS += $(SRC)/model.o
@@ -48,7 +47,7 @@ OBJS += $(SRC)/util.o
 OBJS += $(SRC)/vec3.o
 OBJS += $(SRC)/quickhull.o
 
-TESTS = test/test-half-edge
+TESTS = test/test_animation
 
 SRCS=$(OBJS:.o=.c)
 
@@ -62,13 +61,13 @@ include $(OBJS:.o=.d)
 	sed 's,\(.*\)\.o[ :]*,src/\1.o $@ : ,g' < $@.$$$$ > $@; \
 	rm -f $@.$$$$
 
-test/%: %.c
-	$(CC) $(CFLAGS) -c $< -o $@
+test/%: test/%.c $(OBJS)
+	$(CC) $(CFLAGS) $^ $(LDFLAGS) -o $@
 	@./$@
 
 check: $(TESTS)
 
-$(BIN): $(OBJS)
+$(BIN): main.o $(OBJS)
 	$(CC) $(CFLAGS) $^ $(LDFLAGS) -o $@
 
 install: $(BIN)
@@ -82,6 +81,6 @@ TAGS:
 	etags $(SRCS)
 
 clean:
-	rm -f src/main.o $(OBJS) $(SHLIB) $(BIN) $(SRC)/*.d*
+	rm -f src/main.o $(OBJS) $(TESTS) $(SHLIB) $(BIN) $(SRC)/*.d*
 
 .PHONY: TAGS
