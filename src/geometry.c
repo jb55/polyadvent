@@ -27,7 +27,7 @@ void bind_geometry(struct geometry *geom, gpu_addr *vertex_attrs) {
     for (int i = 0; i < n_vertex_attrs; i++) {
         vbo = &geom->vbos[i];
         if (vbo->handle && vertex_attrs[i] != 0xFFFFFFFF)
-            bind_vbo(vbo, vertex_attrs[i]);
+            bind_vbo(vbo, vertex_attrs[i], vbo->component_type);
         check_gl();
     }
 }
@@ -89,56 +89,55 @@ make_buffer_geometry(struct geometry *geom) {
     /* assert(geom->num_indices >= 1); */
 
     /* printf("making vertex buffer\n"); */
-    make_vertex_buffer(
-                        GL_ARRAY_BUFFER,
-                        geom->vertices,
-                        geom->num_verts * 3 * (int)sizeof(*geom->vertices),
-                        &geom->vbos[va_position]
-                        );
+    make_float_vertex_buffer(&geom->vbos[va_position],
+                             geom->vertices,
+                             mk_num_elements(geom->num_verts),
+                             mk_components(3)
+                             );
 
     /* printf("making normal buffer\n"); */
     // cube normals
-    if (geom->normals != NULL)
-        make_vertex_buffer(
-                            GL_ARRAY_BUFFER,
-                            geom->normals,
-                            geom->num_verts * 3 * (int)sizeof(*geom->normals),
-                            &geom->vbos[va_normal]
-                            );
+    if (geom->normals)
+        make_float_vertex_buffer(&geom->vbos[va_normal],
+                                 geom->normals,
+                                 mk_num_elements(geom->num_verts),
+                                 mk_components(3)
+                                 );
+
+    if (geom->joint_ids) {
+        make_int_vertex_buffer(&geom->vbos[va_joint_ids],
+                               geom->joint_ids,
+                               mk_num_elements(geom->num_verts),
+                               mk_components(3)
+                               );
+    }
 
     // vertex colors
-    if (geom->colors != NULL)
-        make_vertex_buffer(
-                        GL_ARRAY_BUFFER,
-                        geom->colors,
-                        geom->num_verts * 3 * (int)sizeof(*geom->colors),
-                        &geom->vbos[va_color]
-                        );
+    if (geom->colors) {
+        make_float_vertex_buffer(&geom->vbos[va_color],
+                                 geom->colors,
+                                 mk_num_elements(geom->num_verts),
+                                 mk_components(3)
+                                 );
+    }
 
     if (geom->tex_coords != NULL) {
         assert(geom->num_uv_components);
-        printf("%f %f %f %f\n",
-               geom->tex_coords[0],
-               geom->tex_coords[1],
-               geom->tex_coords[2],
-               geom->tex_coords[3]
-               );
 
-        make_uv_buffer(GL_ARRAY_BUFFER,
+        make_uv_buffer(&geom->vbos[va_tex_coord],
                        geom->tex_coords,
-                       geom->num_verts * geom->num_uv_components * (int)sizeof(*geom->tex_coords),
-                       &geom->vbos[va_tex_coord], geom->num_uv_components);
+                       mk_num_elements(geom->num_verts),
+                       mk_components(geom->num_uv_components)
+                       );
     }
 
     /* printf("making index buffer\n"); */
     // cube indices
     if (geom->indices)
-        make_index_buffer(
-                        GL_ELEMENT_ARRAY_BUFFER,
-                        geom->indices,
-                        geom->num_indices * (int)sizeof(*geom->indices),
-                        &geom->vbos[va_index]
-                        );
+        make_index_buffer(&geom->vbos[va_index],
+                          geom->indices,
+                          mk_num_elements(geom->num_indices)
+                         );
 }
 
 

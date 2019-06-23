@@ -18,6 +18,8 @@ struct geometry {
     u32 *indices;
     float *colors;
     float *tex_coords;
+    int *joint_ids;
+    float *joint_weights;
 };
 
 void render_geometry(struct geometry *geom, gpu_addr *vertex_attrs,
