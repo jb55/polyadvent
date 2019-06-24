@@ -107,13 +107,25 @@ static void bind_vbo_internal(struct vbo *vbo, gpu_addr slot, GLenum type) {
   glBindBuffer(vbo->type, vbo->handle);
   check_gl();
 
-  glVertexAttribPointer(slot,              // attribute
-                        vbo->components,   // size
-                        type,          // type
-                        GL_FALSE,          // normalized?
-                        0,   // stride
-                        (void*)0           // array buffer offset
-                        );
+  // should use bind_ibo instead...
+  assert(vbo->type != GL_ELEMENT_ARRAY_BUFFER);
+
+  if (vbo->component_type == GL_INT) {
+      glVertexAttribIPointer(slot,
+                             vbo->components,
+                             type,
+                             0, // stride
+                             (void*)0);
+  }
+  else {
+      glVertexAttribPointer(slot,              // attribute
+                            vbo->components,   // size
+                            type,          // type
+                            GL_FALSE,          // normalized?
+                            0,   // stride
+                            (void*)0           // array buffer offset
+                            );
+  }
 }
 
 void bind_vbo(struct vbo *vbo, gpu_addr slot, GLenum type) {
