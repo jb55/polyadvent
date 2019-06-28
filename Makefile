@@ -47,10 +47,14 @@ OBJS += $(SRC)/vec3.o
 OBJS += $(SRC)/scene.o
 OBJS += $(SRC)/resource.o
 
+
 SRCS=$(OBJS:.o=.c)
 
 
 all: $(BIN)
+
+clean:
+	rm -f src/main.o $(OBJS) $(SHLIB) $(BIN) $(SRC)/*.d*
 
 include $(OBJS:.o=.d)
 
@@ -72,8 +76,5 @@ nixbuild:
 
 TAGS:
 	etags $(SRCS)
-
-clean:
-	rm -f src/main.o $(OBJS) $(SHLIB) $(BIN) $(SRC)/*.d*
 
 .PHONY: TAGS
