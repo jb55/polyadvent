@@ -3,10 +3,7 @@
 
 #include <time.h>
 
-time_t
-file_mtime(const char *filename);
-
-void *
-file_contents(const char *filename, size_t *length);
+time_t file_mtime(const char *filename);
+char *file_contents(const char *filename, size_t *length);
 
 #endif /* POLYADVEMT_FILE_H */

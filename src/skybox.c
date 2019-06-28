@@ -89,10 +89,10 @@ void create_skybox(struct skybox *skybox, struct gpu_program *program) {
     skybox->uniforms.mvp =
         glGetUniformLocation(skybox->program->handle, "mvp");
 
-    skybox->attrs.position = (gpu_addr)
+    skybox->attrs[va_position] = (gpu_addr)
         glGetAttribLocation(skybox->program->handle, "position");
 
-    skybox->attrs.tex_coord = (gpu_addr)
+    skybox->attrs[va_tex_coord] = (gpu_addr)
         glGetAttribLocation(skybox->program->handle, "tex_coord");
 }
 
@@ -111,7 +111,7 @@ void render_skybox(struct skybox *skybox, mat4 *camera) {
     glBindTexture(GL_TEXTURE_CUBE_MAP, skybox->model.texture);
     check_gl();
 
-    render_geometry(get_geometry(&skybox->model.geom_id), &skybox->attrs, skybox->program);
+    render_geometry(get_geometry(&skybox->model.geom_id), skybox->attrs, skybox->program);
     check_gl();
 
     glDepthMask(GL_TRUE);

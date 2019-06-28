@@ -1,4 +1,5 @@
 
+#include "animation.h"
 #include "event.h"
 #include "fbo.h"
 #include "file.h"
@@ -8,20 +9,21 @@
 #include "hires.h"
 #include "ply.h"
 #include "poisson.h"
+#include "quickhull.h"
 #include "render.h"
 #include "scene.h"
-#include "slab.h"
-#include "slab.h"
 #include "slab_geom.h"
+#include "slab.h"
 #include "terrain.h"
 #include "uniform.h"
 #include "update.h"
 #include "util.h"
 #include "window.h"
 
+
+
 #include <assert.h>
 #include <time.h>
-
 
 int main(void)
 {
@@ -81,6 +83,7 @@ int main(void)
       .projection = game.test_resources.proj_persp,
       .depth_vp = depth_vp
     };
+
 
     while (1) {
         game.frame++;

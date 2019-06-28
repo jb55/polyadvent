@@ -11,6 +11,9 @@
 #include "texture.h"
 #include "stb_image.h"
 #include "skybox.h"
+#include "quickhull.h"
+#include "util.h"
+
 #include <assert.h>
 
 mat4 *cam_init = (float[16]){
@@ -44,10 +47,58 @@ struct entity *get_terrain_entity(struct terrain *t) {
     return ent;
 }
 
+
 static void init_user_settings(struct user_settings *settings) {
     SDL_SetRelativeMouseMode(SDL_TRUE);
     settings->mouse_sens = 0.1;
 }
+
+
+static void qh_mesh_to_geom(qh_mesh_t *qh, struct make_geometry *geom) {
+    assert(!geom->vertices);
+    assert(!geom->indices);
+    float *new_normals = malloc(sizeof(float) * 3 * qh->nvertices);
+
+    geom->vertices = (float*)qh->vertices;
+    geom->normals = (float*)qh->normals;
+    geom->indices = qh->indices;
+    geom->num_verts = qh->nvertices;
+    geom->num_indices = qh->nindices;
+
+    for (u32 i = 0; i < qh->nnormals; i++) {
+        int ndv = i * 9;
+
+        qh_vertex_t *n = &qh->normals[i];
+        for (int j = 0; j < 9; j++) {
+            new_normals[ndv+j] = n->v[j%3];
+        }
+    }
+
+    geom->normals = new_normals;
+}
+
+
+void proc_sphere(struct make_geometry *mkgeom, geometry_id *geom_id) {
+    const int n = 50;
+    qh_vertex_t *vertices = malloc(n*sizeof(qh_vertex_t));
+    const float radius = 2.0;
+
+
+    for (int i = 0; i < n; ++i) {
+        float a0 = (rand_0to1() * TAU);
+        float a1 = (rand_0to1() * TAU);
+        vertices[i].z = sin(a0) * radius;
+        vertices[i].x = cos(a1) * cos(a0) * rand_0to1() * radius;
+        vertices[i].y = sin(a1) * cos(a0) * rand_0to1() * radius;
+    }
+
+    qh_mesh_t mesh = qh_quickhull3d(vertices, n);
+    qh_mesh_to_geom(&mesh, mkgeom);
+    make_buffer_geometry(mkgeom, geom_id);
+
+    qh_free_mesh(mesh);
+}
+
 
 void game_init(struct game *game, int width, int height) {
     init_gl(&game->test_resources, width, height);
@@ -126,7 +177,7 @@ void game_init(struct game *game, int width, int height) {
     // player entity
     player = new_entity(&res->player_id);
     assert(res->player_id.index == 1);
-    player->model = get_model(model_pirateofficer);
+    player->model = get_model(MODEL_PIRATEOFFICER);
     player->node.label = "player";
     node_attach(&player->node, root);
     node_translate(&player->node, V3(terrain->size/2.,terrain->size/2.,0.0));

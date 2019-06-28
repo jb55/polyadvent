@@ -192,14 +192,14 @@ void resize_fbos(struct entity *player, struct fbo *shadow_buffer,
     }
 
     // TODO: compute better bounds based
-    const float factor = 1.5;
+    const float factor = 4.5;
     struct geometry *geom = get_geometry(&player->model->geom_id);
     float left   = geom->min[0] - factor;
     float right  = geom->max[0] + factor;
     float bottom = geom->min[1] - factor;
     float top    = geom->max[1] + factor/2.0;
 
-    const float near = -1.0;
+    const float near = -5.0;
     const float far = 5.0;
 
     // default ortho screenspace projection
@@ -301,8 +301,12 @@ void orbit_update_from_mouse(struct orbit *camera, struct input *input,
         else
             camera->coords.radius -= dt * 100.0;
 
-        camera->coords.radius = max(5.0, camera->coords.radius);
     }
+    else if (input->wheel_y) {
+        camera->coords.radius += input->wheel_y * dt * 100.0;
+    }
+
+    camera->coords.radius = max(5.0, camera->coords.radius);
 
     camera->coords.azimuth     += mx;
     camera->coords.inclination += my;

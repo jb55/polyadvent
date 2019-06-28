@@ -8,8 +8,8 @@
 
 struct ui {
     struct gpu_program *shader;
-    geometry_id_t quad_geom_id;
-    struct attributes attrs;
+    geometry_id quad_geom_id;
+    gpu_addr attrs[n_vertex_attrs];
 
     struct ui_uniforms {
         GLint mvp;

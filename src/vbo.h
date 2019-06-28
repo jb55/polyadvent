@@ -6,40 +6,68 @@
 
 typedef GLuint gpu_addr;
 
-struct attributes {
-    gpu_addr position;
-    gpu_addr normal;
-    gpu_addr color;
-    gpu_addr tex_coord;
+#define VERT_ATTRS 6
+
+enum vertex_attr {
+    va_position,
+    va_normal,
+    va_color,
+    va_index,
+    va_tex_coord,
+    va_joint_ids,
+    va_joint_weights,
+    n_vertex_attrs
 };
 
 struct vbo {
-  u32 type;
-  int components;
-  gpu_addr handle;
+    u32 type;
+    int component_type;
+    int components;
+    gpu_addr handle;
 };
+
+struct num_elements {
+    int num_elements;
+};
+#define mk_num_elements(x) ((struct num_elements){ .num_elements = x })
+
+struct element_size {
+    int element_size;
+};
+#define mk_element_size(x) ((struct element_size){ .element_size = x })
+
+struct components {
+    int components;
+};
+#define mk_components(c) ((struct components){ .components = c })
 
 #define NUM_VBO_SLOTS 1
 
-gpu_addr make_buffer(GLenum target, const void *buffer_data,
-                     GLsizei buffer_size);
+gpu_addr make_buffer(GLenum target, const void *buffer_data, GLsizei buffer_size);
 
 struct vbo *init_vbo(struct vbo *);
 
-struct vbo *
-make_vertex_buffer(GLenum target, const void *buffer_data,
-                   GLsizei buffer_size, struct vbo *vbo);
+struct vbo* make_float_vertex_buffer(struct vbo *vbo,
+                                     const void *data,
+                                     struct num_elements,
+                                     struct components);
+
+struct vbo* make_index_buffer(struct vbo *vbo,
+                              const void *data,
+                              struct num_elements);
+
+struct vbo * make_uv_buffer(struct vbo *vbo,
+                            const void *data,
+                            struct num_elements,
+                            struct components);
 
 struct vbo *
-make_index_buffer(GLenum target, const void *buffer_data,
-                  GLsizei buffer_size, struct vbo *vbo);
+make_int_vertex_buffer(struct vbo *vbo, const int *data,
+                       struct num_elements num_elements,
+                       struct components components);
 
-struct vbo *
-make_uv_buffer(GLenum target, const void *data,
-               GLsizei buffer_size, struct vbo *vbo, int components);
 
 void bind_uv_vbo(struct vbo *vbo, gpu_addr slot);
-void bind_vbo(struct vbo *vbo, gpu_addr slot);
-void bind_ibo(struct vbo *vbo);
+void bind_vbo(struct vbo *vbo, gpu_addr slot, GLenum type);
 
 #endif /* POLYADVENT_BUFFER_H */

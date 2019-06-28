@@ -2,7 +2,7 @@ NAME ?= polyadvent
 BIN ?= $(NAME)
 PREFIX ?= /usr/local
 DEFS= -DGLFW_INCLUDE_NONE -DDEBUG
-CFLAGS = $(DEFS) -ggdb -Ofast -I src -Wall -Werror -Wextra -std=c99 \
+CFLAGS = $(DEFS) -ggdb -O2 -I src -Wall -Werror -Wextra -std=c99 \
 						-Wno-unused-function \
 						-Wno-unused-parameter \
 						-Wno-unused-variable \
@@ -14,6 +14,8 @@ SRC=src
 OBJS  = $(SRC)/window.o
 OBJS += $(SRC)/vbo.o
 OBJS += $(SRC)/camera.o
+OBJS += $(SRC)/xml.o
+OBJS += $(SRC)/animation.o
 OBJS += $(SRC)/debug.o
 OBJS += $(SRC)/delaunay.o
 OBJS += $(SRC)/entity.o
@@ -23,7 +25,6 @@ OBJS += $(SRC)/game.o
 OBJS += $(SRC)/geometry.o
 OBJS += $(SRC)/hires.o
 OBJS += $(SRC)/input.o
-OBJS += $(SRC)/main.o
 OBJS += $(SRC)/mat4.o
 OBJS += $(SRC)/mat_util.o
 OBJS += $(SRC)/model.o
@@ -46,17 +47,20 @@ OBJS += $(SRC)/util.o
 OBJS += $(SRC)/vec3.o
 OBJS += $(SRC)/scene.o
 OBJS += $(SRC)/resource.o
+OBJS += $(SRC)/quickhull.o
 
+TESTS = test/test_animation
 
 SRCS=$(OBJS:.o=.c)
-
 
 all: $(BIN)
 
 clean:
-	rm -f src/main.o $(OBJS) $(SHLIB) $(BIN) $(SRC)/*.d*
+	rm -f src/main.o $(OBJS) $(TESTS) $(SHLIB) $(BIN) $(SRC)/*.d*
 
 include $(OBJS:.o=.d)
+include src/main.d
+include test/test_animation.d
 
 %.d: %.c
 	@rm -f $@; \
@@ -64,7 +68,13 @@ include $(OBJS:.o=.d)
 	sed 's,\(.*\)\.o[ :]*,src/\1.o $@ : ,g' < $@.$$$$ > $@; \
 	rm -f $@.$$$$
 
-$(BIN): $(OBJS)
+test/%: test/%.o $(OBJS)
+	$(CC) $(CFLAGS) $^ $(LDFLAGS) -o $@
+
+check: $(TESTS)
+	./$(TESTS)
+
+$(BIN): src/main.o $(OBJS)
 	$(CC) $(CFLAGS) $^ $(LDFLAGS) -o $@
 
 install: $(BIN)

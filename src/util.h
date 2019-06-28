@@ -6,7 +6,7 @@
 #include "vec3.h"
 #include "mat4.h"
 #include <assert.h>
-
+#include <string.h>
 
 #define check_gl() {                                    \
         unsigned int e = glGetError();                  \
@@ -22,13 +22,17 @@
 
 #define RAD(x) ((x)*TAU/360.0)
 
+#define EPSILON 0.0001
 #define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
+#define min(a,b) (a < b ? a : b)
+#define max(a,b) (a > b ? a : b)
+#define streq(a,b) (strcmp(a,b) == 0)
+#define memeq(a,b,n1,n2) (memcmp(a,b,min(n1, n2)) == 0)
+#define approxeq(a, b) (fabs(a-b) < EPSILON)
 
 void look_at(vec3 *eye, vec3 *target, vec3 *up, mat4 *dest);
 int clampi(int a, int mina, int maxa);
 double clamp(double a, double mina, double maxa);
-double max(double a, double b);
-double min(double a, double b);
 
 double rand_0to1();
 

@@ -198,18 +198,18 @@ check_gl();
             glGetUniformLocation(handle, "normal_matrix");
         check_gl();
 
-        resources->attributes.normal =
+        resources->vertex_attrs[va_normal] =
             (gpu_addr)glGetAttribLocation(handle, "normal");
         check_gl();
 
-        resources->attributes.position =
+        resources->vertex_attrs[va_position] =
             (gpu_addr)glGetAttribLocation(handle, "position");
         check_gl();
 
     }
 
     // TODO: auto-generate these somehow?
-	resources->attributes.color =
+	resources->vertex_attrs[va_color] =
         (gpu_addr)glGetAttribLocation(resources->programs[DEFAULT_PROGRAM]
                                         .handle, "color");
     /* assert(resources->attributes.color != 0xFFFFFFFF); */
@@ -346,7 +346,7 @@ void render (struct game *game, struct render_config *config) {
         recalc_normals(res->uniforms.normal_matrix, model_view, normal_matrix);
         check_gl();
 
-        render_geometry(get_geometry(&entity->model->geom_id), &res->attributes, current_program);
+        render_geometry(get_geometry(&entity->model->geom_id), res->vertex_attrs, current_program);
         check_gl();
     }
 

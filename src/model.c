@@ -1,21 +1,25 @@
 
 #include "model.h"
 #include "ply.h"
+#include "resource.h"
 #include <assert.h>
 
-#define MODELDEF(name) { .id = model_##name, .loaded = 0, .file = #name }
+#define MODELDEF(name) { .id = MODEL_##name, .loaded = 0, .file = #name }
 
 static struct model_def static_models[NUM_STATIC_MODELS] = {
-  MODELDEF(tower),
-  MODELDEF(icosphere),
-  MODELDEF(pirateofficer),
+  MODELDEF(TOWER),
+  MODELDEF(ICOSPHERE),
+  MODELDEF(PIRATEOFFICER),
 };
+
+static struct resource_manager dyn_modelman;
 
 static int static_models_initialized = 0;
 
-void init_model(struct model *model) {
+struct model *init_model(struct model *model) {
     model->shading = SHADING_VERT_COLOR;
     model->texture = 0;
+    return model;
 }
 
 static void initialize_static_models() {
@@ -25,6 +29,16 @@ static void initialize_static_models() {
         init_model(&sm->model);
     }
     static_models_initialized = 1;
+}
+
+static inline struct model *new_uninitialized_model(model_id *id) {
+    return new_resource(&dyn_modelman, id);
+}
+
+
+struct model *new_dynamic_model(model_id *id)
+{
+    return init_model(new_uninitialized_model(id));
 }
 
 struct model *get_model(enum static_model m) {

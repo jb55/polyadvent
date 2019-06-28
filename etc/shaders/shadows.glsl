@@ -10,16 +10,17 @@ vec3 shadow_strength(vec4 position, vec4 normal, vec4 v_shadow_coord) {
     // vec4 shadow_coord = depth_vp * ((world * position) + shadow_offset);
     vec4 shadow_sample = texture(shadow_map, v_shadow_coord.xy);
 
-
+    float light_angle = dot(light_dir, normal.xyz);
     float bias = 0.0002;
+
     bool in_shadow =
         shadow_sample.z < v_shadow_coord.z - bias
         && shadow_sample.y < 1.0;
 
     if (light_dir.z > 0.0 && in_shadow) {
-        float factor = 1.0/(dot(light_dir, vec3(0.0, 0.0, 1.0)));
+        float factor = 1.0-abs(light_angle);
         // float factor = 1.0;
-        visibility = vec3(clamp(0.2 * factor, 0.5, 1.0));
+        visibility = vec3(1.0)*factor;
         // visibility = shadow_sample;
     }
 

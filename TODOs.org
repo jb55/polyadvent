@@ -1,0 +1,42 @@
+
+* Rendering
+
+** TODO Debris on ground
+
+To create a sense of movement
+
+** TODO Half edge subdivision for tessellation
+
+* Multicore
+
+** TODO Simple pthreads job system
+
+* Animation
+
+** DONE Initial animation system
+CLOSED: [2019-06-22 Sat 12:52]
+** DONE Load poses in engine
+CLOSED: [2019-06-22 Sat 12:52]
+** TODO Load bone weights
+** TODO Run pose
+** TODO Simple animation test
+** TODO Procedural animation?
+
+
+* Physics
+
+** TODO Initial physics system
+* Entity
+
+** TODO Entity loading stress test
+
+* Procedural
+
+** TODO Trees
+** DONE quickhull tests
+CLOSED: [2019-04-12 Fri 09:37]
+
+* Terrain
+
+** TODO Infinite terrain
+

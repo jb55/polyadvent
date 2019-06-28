@@ -34,7 +34,7 @@ static GLfloat quad_uvs[] =
 };
 
 
-static void create_quad(geometry_id_t *id)
+static void create_quad(geometry_id *id)
 {
     struct make_geometry mkgeom = {
         .indices = quad_indices,
@@ -70,7 +70,7 @@ void render_ui(struct ui *ui, float *view) {
     check_gl();
 
     // render quad
-    render_geometry(get_geometry(&ui->quad_geom_id), &ui->attrs, ui->shader);
+    render_geometry(get_geometry(&ui->quad_geom_id), ui->attrs, ui->shader);
     check_gl();
 }
 
@@ -115,9 +115,9 @@ void create_ui(struct ui *ui, int width, int height, struct gpu_program *shader)
         glGetUniformLocation(program, "screen_texture");
 
     /* ui->attrs.normal   = (gpu_addr)glGetAttribLocation(program, "normal"); */
-    ui->attrs.position  = (gpu_addr)glGetAttribLocation(program, "position");
-    ui->attrs.color     = (gpu_addr)glGetAttribLocation(program, "color");
-    ui->attrs.tex_coord = (gpu_addr)glGetAttribLocation(program, "tex_coords");
+    ui->attrs[va_position]  = (gpu_addr)glGetAttribLocation(program, "position");
+    ui->attrs[va_color]     = (gpu_addr)glGetAttribLocation(program, "color");
+    ui->attrs[va_tex_coord] = (gpu_addr)glGetAttribLocation(program, "tex_coords");
 
     check_gl();
     resize_ui(ui, width, height);

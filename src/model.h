@@ -9,11 +9,14 @@
 #include "common.h"
 
 #define MAX_STATIC_MODELS 128
+#define MAX_DYNAMIC_MODELS 512
+
+typedef struct resource_id model_id;
 
 enum static_model {
-  model_tower,
-  model_icosphere,
-  model_pirateofficer,
+  MODEL_TOWER,
+  MODEL_ICOSPHERE,
+  MODEL_PIRATEOFFICER,
   NUM_STATIC_MODELS
 };
 
@@ -24,7 +27,7 @@ enum shading {
 };
 
 struct model {
-    geometry_id_t geom_id;
+    geometry_id geom_id;
     enum shading shading;
     u32 texture;
 };
@@ -37,8 +40,9 @@ struct model_def {
 };
 
 
-void init_model(struct model *model);
+struct model *init_model(struct model *model);
 struct model *get_model(enum static_model);
 
+struct model *new_dynamic_model(model_id *);
 
 #endif /* MODEL_H */

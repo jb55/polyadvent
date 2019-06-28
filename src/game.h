@@ -56,10 +56,11 @@ struct resources {
 		GLint view_proj;
 	} uniforms;
 
-	struct attributes attributes;
+	gpu_addr vertex_attrs[n_vertex_attrs];
 
 	struct node root;
-	entity_id_t player_id;
+	entity_id player_id;
+    struct geometry qh_test;
 	struct orbit orbit_camera;
 	struct node free_camera;
     const struct node *camera_node;
