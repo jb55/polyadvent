@@ -103,6 +103,7 @@ void proc_sphere(struct make_geometry *mkgeom, geometry_id *geom_id) {
 void game_init(struct game *game, int width, int height) {
     init_gl(&game->test_resources, width, height);
     init_entity_system();
+    init_model_manager();
     init_geometry_manager();
     init_user_settings(&game->user_settings);
     check_gl();

@@ -9,6 +9,11 @@
 
 static struct resource_manager esys;
 
+struct resource_manager *_internal_get_entity_system()
+{
+    return &esys;
+}
+
 struct entity *get_all_entities(u32 *count, entity_id **ids) {
     return get_all_resources(&esys, count, ids);
 }

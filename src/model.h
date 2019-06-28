@@ -8,8 +8,9 @@
 #include "geometry.h"
 #include "common.h"
 
+#define DEF_DYNAMIC_MODELS 128
 #define MAX_STATIC_MODELS 128
-#define MAX_DYNAMIC_MODELS 512
+#define MAX_DYNAMIC_MODELS 2048
 
 typedef struct resource_id model_id;
 
@@ -40,6 +41,7 @@ struct model_def {
 };
 
 
+void init_model_manager();
 struct model *init_model(struct model *model);
 struct model *get_model(enum static_model);
 

@@ -35,6 +35,11 @@ static inline struct model *new_uninitialized_model(model_id *id) {
     return new_resource(&dyn_modelman, id);
 }
 
+void init_model_manager() {
+    init_resource_manager(&dyn_modelman, sizeof(struct model),
+                          DEF_DYNAMIC_MODELS, MAX_DYNAMIC_MODELS);
+}
+
 
 struct model *new_dynamic_model(model_id *id)
 {

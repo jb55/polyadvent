@@ -6,6 +6,7 @@ CFLAGS = $(DEFS) -ggdb -O2 -I src -Wall -Werror -Wextra -std=c99 \
 						-Wno-unused-function \
 						-Wno-unused-parameter \
 						-Wno-unused-variable \
+						-Wmissing-field-initializers \
 						-Wno-cast-align \
 						-Wno-padded
 LDFLAGS = -lSDL2 -lGL -lm
@@ -49,14 +50,15 @@ OBJS += $(SRC)/scene.o
 OBJS += $(SRC)/resource.o
 OBJS += $(SRC)/quickhull.o
 
-TESTS = test/test_animation
+TESTS =  test/test_animation
+TESTS += test/test_resource
 
 SRCS=$(OBJS:.o=.c)
 
 all: $(BIN)
 
 clean:
-	rm -f src/main.o $(OBJS) $(TESTS) $(SHLIB) $(BIN) $(SRC)/*.d*
+	rm -f src/main.o test/*.o $(OBJS) $(TESTS) $(SHLIB) $(BIN) $(SRC)/*.d*
 
 include $(OBJS:.o=.d)
 include src/main.d
@@ -72,7 +74,8 @@ test/%: test/%.o $(OBJS)
 	$(CC) $(CFLAGS) $^ $(LDFLAGS) -o $@
 
 check: $(TESTS)
-	./$(TESTS)
+	./test/test_animation
+	./test/test_resource
 
 $(BIN): src/main.o $(OBJS)
 	$(CC) $(CFLAGS) $^ $(LDFLAGS) -o $@

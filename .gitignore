@@ -4,3 +4,4 @@ polyadvent
 /TAGS
 *.d
 /test/test_animation
+/test/test_resource

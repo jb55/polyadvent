@@ -2,7 +2,9 @@
 #ifndef POLYADVENT_COMMON_H
 #define POLYADVENT_COMMON_H
 
-#include <stdbool.h>
+typedef int bool;
+#define false 0
+#define true 1
 
 #define MAT3_ELEMS 9
 #define MAT4_ELEMS 16
