@@ -94,7 +94,7 @@ static void resize(struct resource_manager *r)
     if (new_size >= r->max_capacity)
         new_size = r->max_capacity;
 
-    debug("resizing new_size %d\n", new_size);
+    /* debug("resizing new_size %d\n", new_size); */
 
     new_mem = realloc(r->resources, (new_size+1) * r->elem_size);
     if (!new_mem) {
@@ -157,8 +157,8 @@ void destroy_resource(struct resource_manager *r, struct resource_id *id) {
 
     enum refresh_status res = refresh_id(r, id, id);
     // entity already deleted
-    debug("refresh res %d uuid %llu gen %d index %d\n", res,
-          id->uuid, id->generation, id->index);
+    /* debug("refresh res %d uuid %llu gen %d index %d\n", res, */
+    /*       id->uuid, id->generation, id->index); */
 
     if (res == RESOURCE_DELETED) {
         id->generation = 0;
