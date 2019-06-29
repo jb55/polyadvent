@@ -10,7 +10,8 @@
 static u64 resource_uuids = 0;
 
 static inline void *index_resource(struct resource_manager *r, int i) {
-    return &r->resources[i * r->elem_size];
+    unsigned char *p = r->resources;
+    return &p[i * r->elem_size];
 }
 
 void *get_all_resources(struct resource_manager *r, u32 *count, struct resource_id **ids) {
@@ -39,8 +40,8 @@ void init_resource_manager(struct resource_manager *r, u32 elem_size,
 
     assert(initial_elements != 0);
 
-    r->resources = calloc(initial_elements, elem_size);
-    r->ids = calloc(initial_elements, sizeof(*r->ids));
+    r->resources = calloc(initial_elements+1, elem_size);
+    r->ids = calloc(initial_elements+1, sizeof(*r->ids));
 }
 
 void destroy_resource_manager(struct resource_manager *r) {
@@ -54,36 +55,29 @@ static int refresh_id(struct resource_manager *r, struct resource_id *id,
     // rollover is ok
     /* assert(->generation <= esys.generation); */
     if (id->generation != r->generation) {
-        debug("id gen %d != res gen %d, refreshing\n", id->generation, r->generation);
+        /* debug("id gen %d != res gen %d, refreshing\n", id->generation, r->generation); */
         // try to find uuid in new memory layout
         for (u32 i = 0; i < r->resource_count; i++) {
-            struct resource_id *new_id = &r->ids[i];
-            if (new_id->uuid == id->uuid) {
-                new->index = new_id->index;
+            struct resource_id *newer_id = &r->ids[i];
+            if (newer_id->uuid == id->uuid) {
+                /* debug("found %llu, ind %d -> %d\n", new_id->uuid, new_id->index, new->index); */
+                new->index = newer_id->index;
                 new->generation = r->generation;
-                return 1;
+                return REFRESHED_ID;
             }
         }
 
         // entity was deleted
-        return 0;
+        return RESOURCE_DELETED;
     }
 
     // doesn't need refreshed
-    return 2;
+    return REFRESH_NOT_NEEDED;
 }
-
+ 
 int is_resource_destroyed(struct resource_id *id) {
     return id->generation == 0;
 }
-
-/* static struct resource_id new_id(struct resource_manager *r) { */
-/*     return (struct resource_id){ */
-/*         .index      = r->resource_count, */
-/*         .uuid       = ++resource_uuids, */
-/*         .generation = r->generation, */
-/*     }; */
-/* } */
 
 static void new_id(struct resource_manager *r, struct resource_id *id)
 {
@@ -99,8 +93,10 @@ static void resize(struct resource_manager *r)
     u32 new_size = r->resource_count * 1.5;
     if (new_size >= r->max_capacity)
         new_size = r->max_capacity;
+
     debug("resizing new_size %d\n", new_size);
-    new_mem = realloc(r->resources, new_size * r->elem_size);
+
+    new_mem = realloc(r->resources, (new_size+1) * r->elem_size);
     if (!new_mem) {
         // yikes, out of memory, bail
         assert(new_mem);
@@ -108,7 +104,7 @@ static void resize(struct resource_manager *r)
     }
 
     r->resources = new_mem;
-    new_mem = realloc(r->ids, sizeof(struct resource_id) * new_size);
+    new_mem = realloc(r->ids, sizeof(struct resource_id) * (new_size+1));
 
     if (!new_mem) {
         // yikes, out of memory, bail
@@ -122,70 +118,6 @@ static void resize(struct resource_manager *r)
     r->generation += 2;
 }
 
-static int compact(struct resource_manager *r)
-{
-    int free_slot = -1;
-    int fresh_elements = 0;
-    u8 *dst;
-    u8 *src = NULL;
-    u8 * const start = r->resources;
-
-    for (int i = 0; i < (int)r->resource_count; i++) {
-        if (free_slot != -1 && r->ids[i].generation != 0) {
-            debug("res: moving from %d to empty slot %d\n", i, free_slot);
-            src = index_resource(r, i);
-            dst = index_resource(r, free_slot);
-
-            if (src == dst) {
-                unusual("resource compact: trying to compact into the same location\n");
-                continue;
-            }
-
-            debug("res: src %zu dst %zu count %d cap %d\n", src - start, dst - start,
-                  r->resource_count, r->current_capacity);
-
-            // move data to free slot, clear the old slot
-            assert(dst + r->elem_size <= start + r->elem_size * r->current_capacity);
-            memcpy(dst, src, r->elem_size);
-            assert(src + r->elem_size <= start + r->elem_size * r->current_capacity);
-            memset(src, 0, r->elem_size);
-
-            // move ids to free slot, increasing generation
-            r->ids[free_slot] = r->ids[i];
-            r->ids[free_slot].generation++;
-            r->ids[free_slot].index = free_slot;
-
-            // clear the old data
-            memset(&r->ids[i], 0, sizeof(*r->ids));
-            free_slot = min(free_slot, i);
-            fresh_elements++;
-        }
-        else if (r->ids[i].generation == 0) {
-            debug("res: found deleted slot %d\n", i);
-            free_slot = free_slot == -1 ? i : min(free_slot, i);
-        }
-        else {
-            fresh_elements++;
-        }
-
-    }
-
-    if ((int)r->resource_count != fresh_elements)
-        debug("res: updated resource_count to %d\n", fresh_elements);
-    r->resource_count = fresh_elements;
-
-    return fresh_elements;
-}
-
-static void compact_or_resize(struct resource_manager *r)
-{
-    int orig = r->resource_count;
-    int compacted = compact(r);
-    debug("%d compacted to %d > %d?\n", orig, compacted, r->current_capacity);
-    if (compacted > (int)r->current_capacity)
-        resize(r);
-}
-
 void *new_resource(struct resource_manager *r, struct resource_id *id)
 {
     struct resource_id *fresh_id;
@@ -193,8 +125,8 @@ void *new_resource(struct resource_manager *r, struct resource_id *id)
     if (r->resource_count + 1 > r->max_capacity)
         return NULL;
 
-    if (r->resource_count + 1 >= r->current_capacity)
-        compact_or_resize(r);
+    if (r->resource_count + 1 > r->current_capacity)
+        resize(r);
 
     fresh_id = &r->ids[r->resource_count];
 
@@ -207,7 +139,13 @@ void *new_resource(struct resource_manager *r, struct resource_id *id)
 }
 
 void *get_resource(struct resource_manager *r, struct resource_id *id) {
-    refresh_id(r, id, id);
+    if (id->generation == 0)
+        return NULL;
+
+    enum refresh_status res = refresh_id(r, id, id);
+
+    if (res == RESOURCE_DELETED)
+        return NULL;
 
     return index_resource(r, id->index);
 }
@@ -217,23 +155,24 @@ void destroy_resource(struct resource_manager *r, struct resource_id *id) {
     if (is_resource_destroyed(id))
         return;
 
-    int res = refresh_id(r, id, id);
+    enum refresh_status res = refresh_id(r, id, id);
     // entity already deleted
-    if (res == 0) {
+    debug("refresh res %d uuid %llu gen %d index %d\n", res,
+          id->uuid, id->generation, id->index);
+
+    if (res == RESOURCE_DELETED) {
         id->generation = 0;
         return;
     }
 
-    // generation 0 means destroyed
-    r->ids[id->index].generation = 0;
-    r->ids[id->index].index = -1;
-    r->ids[id->index].uuid = -1;
+    r->resource_count--;
+    r->generation++;
 
-    // clear the user's id as well, since it's no longer valid
-    id->generation = 0;
-    id->uuid = -1;
-    id->index = -1;
+    memmove(index_resource(r, id->index),
+            index_resource(r, id->index+1),
+            r->elem_size * r->resource_count);
 
-    /* memmove(index_resource(r, id->index), */
-    /*         index_resource(r, id->index+1), r->resource_count -) */
+    memmove(&r->ids[id->index],
+            &r->ids[id->index+1],
+            sizeof(*r->ids) * r->resource_count);
 }

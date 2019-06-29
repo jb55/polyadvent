@@ -4,6 +4,12 @@
 
 #include "common.h"
 
+enum refresh_status {
+    RESOURCE_DELETED,
+    REFRESH_NOT_NEEDED,
+    REFRESHED_ID
+};
+
 struct resource_id {
     u64 uuid;
     u32 index;
@@ -16,6 +22,7 @@ struct resource_manager {
     u32 resource_count;
     u32 generation;
     u32 elem_size;
+    u32 slots_used;
     u32 max_capacity;
     u32 current_capacity;
 };
