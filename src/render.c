@@ -346,7 +346,9 @@ void render (struct game *game, struct render_config *config) {
         recalc_normals(res->uniforms.normal_matrix, model_view, normal_matrix);
         check_gl();
 
-        render_geometry(get_geometry(&entity->model->geom_id), res->vertex_attrs, current_program);
+
+        struct geometry *geo = get_geometry(&entity->model->geom_id);
+        render_geometry(geo, res->vertex_attrs, current_program);
         check_gl();
     }
 

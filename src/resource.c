@@ -11,7 +11,7 @@ static u64 resource_uuids = 0;
 
 static inline void *index_resource(struct resource_manager *r, int i) {
     unsigned char *p = r->resources;
-    return &p[i * r->elem_size];
+    return p + (i * r->elem_size);
 }
 
 void *get_all_resources(struct resource_manager *r, u32 *count, struct resource_id **ids) {

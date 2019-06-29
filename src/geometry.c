@@ -34,9 +34,10 @@ void bind_geometry(struct geometry *geom, gpu_addr *vertex_attrs) {
     struct vbo *vbo;
     for (int i = 0; i < n_vertex_attrs; i++) {
         vbo = &geom->vbos[i];
-        if (vbo->handle && vertex_attrs[i] != 0xFFFFFFFF)
+        if (vbo->handle && vertex_attrs[i] != 0xFFFFFFFF) {
             bind_vbo(vbo, vertex_attrs[i], vbo->component_type);
-        check_gl();
+            check_gl();
+        }
     }
 }
 
@@ -58,7 +59,6 @@ void render_geometry(struct geometry *geom, gpu_addr *vertex_attrs,
     //check_for_patches(program, &type);
     bind_geometry(geom, vertex_attrs);
     if (geom->num_indices) {
-        debug("geom->num_indices %d\n", geom->num_indices);
         glDrawElements(type,
                        geom->num_indices, /* count */
                        GL_UNSIGNED_INT,    /* type */
@@ -106,6 +106,7 @@ make_buffer_geometry_(struct make_geometry *mkgeom, struct geometry *geom) {
     geom->num_verts = mkgeom->num_verts;
     geom->num_indices = mkgeom->num_indices;
 
+    assert(mkgeom->num_verts);
     assert(mkgeom->vertices);
     /* assert(geom->normals); */
     /* assert(geom->indices); */
@@ -120,13 +121,13 @@ make_buffer_geometry_(struct make_geometry *mkgeom, struct geometry *geom) {
 
     /* printf("making normal buffer\n"); */
     // cube normals
-    if (mkgeom->normals)
+    if (mkgeom->normals) {
         make_float_vertex_buffer(&geom->vbos[va_normal],
                                  mkgeom->normals,
                                  mk_num_elements(mkgeom->num_verts),
                                  mk_components(3)
                                  );
-
+    }
     if (mkgeom->joint_ids) {
         make_int_vertex_buffer(&geom->vbos[va_joint_ids],
                                mkgeom->joint_ids,

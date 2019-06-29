@@ -1,6 +1,7 @@
 
 #include "vbo.h"
 #include "util.h"
+#include "debug.h"
 #include <assert.h>
 #include "gl.h"
 
@@ -13,7 +14,9 @@ make_buffer(GLenum target, const void *buffer_data, GLsizei buffer_size) {
 
   glBindBuffer(target, buffer);
   check_gl();
+  assert(buffer_size > 0);
 
+  debug("buffer data %d\n", buffer_size);
   glBufferData(target, buffer_size, buffer_data, GL_STATIC_DRAW);
   check_gl();
 
@@ -44,14 +47,12 @@ struct vbo*
 make_index_buffer(struct vbo *vbo, const void *data,
                   struct num_elements num_elements)
 {
-    return make_vertex_buffer(vbo,
+    vbo->handle = make_buffer(GL_ELEMENT_ARRAY_BUFFER,
                               data,
-                              GL_ELEMENT_ARRAY_BUFFER,
-                              GL_INT,
-                              mk_element_size(sizeof(u32)),
-                              num_elements,
-                              mk_components(3)
-                              );
+                              num_elements.num_elements * sizeof(u32));
+    vbo->type = GL_ELEMENT_ARRAY_BUFFER;
+    vbo->component_type = GL_INT;
+    return vbo;
 }
 
 struct vbo* make_float_vertex_buffer(struct vbo *vbo, const void *data,

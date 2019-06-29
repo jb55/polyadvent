@@ -226,13 +226,16 @@ int parse_ply(const char *filename, geometry_id *geom_id) {
     free((void*)data);
 
     if (success) {
+        struct geometry *geom = new_geometry(geom_id);
+        assert(geom);
+
+        mkgeom.num_indices = ninds * 3;
+        mkgeom.num_verts = nverts * 3;
+
         make_buffer_geometry(&mkgeom, geom_id);
-        struct geometry *geom = get_geometry(geom_id);
 
         vec3_copy(min, geom->min);
         vec3_copy(max, geom->max);
-        geom->num_indices = ninds * 3;
-        geom->num_verts = nverts * 3;
 
         free(mkgeom.vertices);
         free(mkgeom.normals);
