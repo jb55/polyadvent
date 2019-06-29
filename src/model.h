@@ -15,9 +15,9 @@
 typedef struct resource_id model_id;
 
 enum static_model {
-  MODEL_TOWER,
-  MODEL_ICOSPHERE,
-  MODEL_PIRATEOFFICER,
+  model_tower,
+  model_icosphere,
+  model_pirate_officer,
   NUM_STATIC_MODELS
 };
 

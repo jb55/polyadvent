@@ -40,8 +40,8 @@ void init_resource_manager(struct resource_manager *r, u32 elem_size,
 
     assert(initial_elements != 0);
 
-    r->resources = calloc(initial_elements+1, elem_size);
-    r->ids = calloc(initial_elements+1, sizeof(*r->ids));
+    r->resources = calloc(initial_elements, elem_size);
+    r->ids = calloc(initial_elements, sizeof(*r->ids));
 }
 
 void destroy_resource_manager(struct resource_manager *r) {

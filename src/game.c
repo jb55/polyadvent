@@ -178,7 +178,7 @@ void game_init(struct game *game, int width, int height) {
     // player entity
     player = new_entity(&res->player_id);
     assert(res->player_id.index == 1);
-    player->model = get_model(MODEL_PIRATEOFFICER);
+    player->model = get_model(model_pirate_officer);
     player->node.label = "player";
     node_attach(&player->node, root);
     node_translate(&player->node, V3(terrain->size/2.,terrain->size/2.,0.0));

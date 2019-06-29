@@ -2,6 +2,7 @@
 #include "geometry.h"
 #include "util.h"
 #include "resource.h"
+#include "debug.h"
 #include <assert.h>
 
 
@@ -57,6 +58,7 @@ void render_geometry(struct geometry *geom, gpu_addr *vertex_attrs,
     //check_for_patches(program, &type);
     bind_geometry(geom, vertex_attrs);
     if (geom->num_indices) {
+        debug("geom->num_indices %d\n", geom->num_indices);
         glDrawElements(type,
                        geom->num_indices, /* count */
                        GL_UNSIGNED_INT,    /* type */

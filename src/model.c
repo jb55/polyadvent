@@ -4,12 +4,12 @@
 #include "resource.h"
 #include <assert.h>
 
-#define MODELDEF(name) { .id = MODEL_##name, .loaded = 0, .file = #name }
+#define MODELDEF(name) { .id = model_##name, .loaded = 0, .file = #name }
 
 static struct model_def static_models[NUM_STATIC_MODELS] = {
-  MODELDEF(TOWER),
-  MODELDEF(ICOSPHERE),
-  MODELDEF(PIRATEOFFICER),
+  MODELDEF(tower),
+  MODELDEF(icosphere),
+  MODELDEF(pirate_officer),
 };
 
 static struct resource_manager dyn_modelman;

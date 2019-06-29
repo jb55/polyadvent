@@ -26,7 +26,7 @@ void default_scene(struct game *game) {
     player->flags &= ~ENT_INVISIBLE;
 
     struct entity *tower = new_entity(NULL);
-    tower->model = get_model(MODEL_TOWER);
+    tower->model = get_model(model_tower);
     tower->node.label = "tower";
     node_attach(&tower->node, &player->node);
     node_translate(&tower->node, V3(0.0, 50.0, 0.0));
@@ -40,5 +40,5 @@ void default_scene(struct game *game) {
 }
 
 void pbr_scene(struct game *game) {
-    struct model *sphere = get_model(MODEL_ICOSPHERE);
+    struct model *sphere = get_model(model_icosphere);
 }
