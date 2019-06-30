@@ -14,7 +14,7 @@ struct node {
   float scale[3];
   float mat[16];
   float orientation[4];
-  char *label;
+  char label[8];
   int needs_recalc;
   int flags;
   int n_children;
@@ -37,5 +37,6 @@ void node_rotate(struct node *node, float *p);
 void node_scale(struct node *node, float val);
 int node_count(struct node *node);
 float *node_world(struct node *node);
+int node_set_label(struct node *node, const char *label);
 
 #endif /* POLYADVENT_NODE_H */

@@ -17,12 +17,17 @@ struct node *node_init(struct node *node) {
     node->children[i] = NULL;
   node->flags = 0;
   node->parent = NULL;
-  node->label = "unknown";
+  node_set_label(node, "unknown");
   node->needs_recalc = 0;
   node->custom_update = 0;
   node_mark_for_recalc(node);
 
   return node;
+}
+
+int node_set_label(struct node *node, const char *label)
+{
+    strncpy(node->label, label, sizeof(node->label));
 }
 
 void node_scale(struct node *node, float val) {
