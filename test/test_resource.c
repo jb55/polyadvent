@@ -2,6 +2,7 @@
 #include "resource.h"
 #include "entity.h"
 #include "model.h"
+#include "util.h"
 #include "debug.h"
 #include <assert.h>
 
@@ -9,29 +10,34 @@ void test_compact()
 {
     printf("test_compact\n");
     struct resource_manager r;
-    struct resource_id id, first_id;
+    struct resource_id ids[3], first_id;
     int *p;
 
     init_resource_manager(&r, sizeof(int), 2, 4);
+
+    for (int i = 0; i < (int)ARRAY_SIZE(ids); i++)
+        init_id(&ids[i]);
+
+    init_id(&first_id);
 
     p = new_resource(&r, &first_id);
     assert(r.resource_count == 1);
     *p = 11;
 
-    p = new_resource(&r, &id);
+    p = new_resource(&r, &ids[0]);
     *p = 22;
     assert(r.resource_count == 2);
 
     destroy_resource(&r, &first_id);
     assert(r.resource_count == 1);
     assert(get_resource(&r, &first_id) == NULL);
-    assert(*(int*)get_resource(&r, &id) == 22);
+    assert(*(int*)get_resource(&r, &ids[0]) == 22);
 
-    new_resource(&r, &id);
+    new_resource(&r, &ids[1]);
     assert(r.resource_count == 2);
     assert(r.current_capacity == 2);
 
-    new_resource(&r, &id);
+    new_resource(&r, &ids[2]);
     assert(r.resource_count == 3);
     assert(r.current_capacity >= 3);
 }
@@ -45,6 +51,9 @@ void test_int_resource_manager()
     int *p;
     // 2 item case
     init_resource_manager(&r, sizeof(int), 1, 2);
+
+    init_id(&id);
+    init_id(&first_id);
 
     p = new_resource(&r, &first_id);
     assert(p);
@@ -73,7 +82,10 @@ void test_entity_system()
     entity_id ent_id;
     entity_id *ids;
 
+    init_node_manager();
     init_entity_system();
+
+    init_id(&ent_id);
 
     ents = get_all_entities(&count, &ids);
     assert(count == 0);

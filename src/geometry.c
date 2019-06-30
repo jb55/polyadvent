@@ -167,8 +167,9 @@ make_buffer_geometry_(struct make_geometry *mkgeom, struct geometry *geom) {
 }
 
 void
-make_buffer_geometry(struct make_geometry *mkgeom, geometry_id *geom_id) {
-
+make_buffer_geometry(struct make_geometry *mkgeom, geometry_id *geom_id)
+{
+    init_id(geom_id);
     struct geometry *geom = new_geometry(geom_id);
 
     make_buffer_geometry_(mkgeom, geom);

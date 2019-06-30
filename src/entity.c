@@ -18,8 +18,16 @@ struct entity *get_all_entities(u32 *count, entity_id **ids) {
     return get_all_resources(&esys, count, ids);
 }
 
-struct entity *init_entity(struct entity *ent) {
-    node_init(&ent->node);
+struct entity *init_entity(struct entity *ent, node_id *id) {
+    node_id new_id;
+    if (id == NULL) {
+        init_id(&new_id);
+        new_node(&new_id);
+        ent->node_id = new_id;
+    }
+    else {
+        ent->node_id = *id;
+    }
     ent->casts_shadows = 1;
     return ent;
 }
@@ -33,7 +41,12 @@ static inline struct entity *new_uninitialized_entity(entity_id *id) {
 }
 
 struct entity *new_entity(entity_id *id) {
-    return init_entity(new_uninitialized_entity(id));
+    return new_entity_with_node(id, NULL);
+}
+
+
+struct entity *new_entity_with_node(entity_id *id, node_id *node) {
+    return init_entity(new_uninitialized_entity(id), node);
 }
 
 struct entity *add_entity(struct entity *e, entity_id *id) {
@@ -53,7 +66,17 @@ void destroy_entities() {
 
 void destroy_entity(entity_id *id) {
     struct entity *ent = get_entity(id);
-    node_detach_from_parent(&ent->node);
+    assert(ent);
+    if (ent == NULL)
+        return;
+
+    struct node *node = get_node(&ent->node_id);
+    assert(node);
+    if (node == NULL)
+        return;
+
+    node_detach_from_parent(node);
+    destroy_resource(&esys, &ent->node_id);
     destroy_resource(&esys, id);
 }
 

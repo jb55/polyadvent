@@ -3,6 +3,7 @@
 #define POLYADVENT_ANIMATION_H
 
 #include "common.h"
+#include "node.h"
 
 #define MAX_JOINT_CHILDREN 4
 #define MAX_JOINTS 16
@@ -10,13 +11,11 @@
 
 struct joint
 {
-    int children[MAX_JOINT_CHILDREN];
-    int nchildren;
     int id;
-    char name[JOINT_LABEL_SIZE];
-    float mat[MAT4_ELEMS];
+    int children_ids[MAX_JOINT_CHILDREN];
+    int n_children_ids;
+    node_id node_id;
 };
-
 
 
 struct pose
@@ -29,6 +28,7 @@ struct pose
 void load_poses(const char *filename, struct pose *poses, int *nposes);
 
 void init_joint(struct joint *joint);
+void init_pose(struct pose *pose);
 
 
 #endif /* POLYADVENT_ANIMATION_H */

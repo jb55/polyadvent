@@ -58,13 +58,13 @@ struct resources {
 
 	gpu_addr vertex_attrs[n_vertex_attrs];
 
-	struct node root;
+	node_id root_id;
 	entity_id player_id;
     struct geometry qh_test;
 	struct orbit orbit_camera;
-	struct node free_camera;
-    const struct node *camera_node;
-	struct node sun_camera;
+	node_id free_camera_id;
+    node_id camera_node_id;
+	node_id sun_camera_id;
 
     u32 test_cubemap;
     float time;

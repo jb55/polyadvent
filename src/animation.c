@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include "xml.h"
 #include "util.h"
+#include "node.h"
 #include "animation.h"
 
 enum dae_state {
@@ -23,20 +24,35 @@ struct dae_data {
 
 void init_joint(struct joint *joint)
 {
-    memset(joint->children, -1, sizeof(joint->children));
     joint->id = -1;
-    mat4_id(joint->mat);
+    joint->n_children_ids = 0;
+    for (int i = 0; i < MAX_JOINT_CHILDREN; i++) {
+        joint->children_ids[i] = -1;
+    }
+    init_id(&joint->node_id);
 }
+
+void new_joint(struct joint *joint)
+{
+    init_joint(joint);
+    new_node(&joint->node_id);
+}
+
 
 void init_pose(struct pose *pose)
 {
     pose->njoints = 0;
+    for (int i = 0; i < MAX_JOINTS; i++) {
+        init_joint(&pose->joints[i]);
+    }
 }
 
 static void parse_joint(const char *t, int id, struct joint *joint)
 {
-    float *m = joint->mat;
-    init_joint(joint);
+    struct node *node = get_node(&joint->node_id);
+    assert(node);
+
+    float *m = node->mat;
     joint->id = id;
     /* printf(" parsing joint %d: %s\n", id, t); */
 
@@ -82,15 +98,27 @@ static void dae_tag_end(struct xmlparser *x, const char *t, size_t tl, int what)
 
 static void dae_tagbody(struct xmlparser *x, const char *d, size_t dl)
 {
+    static int count = 0;
     struct dae_data *data = (struct dae_data*)x->user_data;
 
     if (data->state == PARSING_JOINT_MATRIX) {
         assert(*data->nposes);
+
         struct pose *pose = &data->poses[*data->nposes - 1];
+        assert(pose);
+
         struct joint *joint = &pose->joints[pose->njoints];
+        assert(joint);
+
+        struct node *node = new_node(&joint->node_id);
+        assert(node);
+        assert((int64_t)joint->node_id.uuid != -1);
+        assert(&joint->node_id == &pose->joints[pose->njoints].node_id);
+
         parse_joint(d, pose->njoints, joint);
-        strncpy(joint->name, data->current_name, sizeof(data->current_name));
-        joint->children[0] = data->node_level;
+        print_id(&joint->node_id);
+        node_set_label(node, data->current_name);
+        joint->children_ids[0] = data->node_level;
         pose->njoints++;
         data->state = PARSING_POSE;
     }
@@ -135,18 +163,18 @@ static void process_joint_children(struct joint *joints, int njoints)
         joint = &joints[i];
 
         // node level is stored in here on the first parser pass
-        int level = joint->children[0];
+        int level = joint->children_ids[0];
 
         for (int j = i+1; j < njoints; j++) {
             j2 = &joints[j];
-            if (j2->children[0] == level + 1) {
+            if (j2->children_ids[0] == level + 1) {
                 /* printf("%s(%d) assigning child %s(%d)\n", */
                 /*        joint->name, level, j2->name, j2->children[0]); */
 
-                assert(joint->nchildren+1 < MAX_JOINT_CHILDREN);
-                joint->children[joint->nchildren++] = j;
+                assert(joint->n_children_ids+1 < MAX_JOINT_CHILDREN);
+                joint->children_ids[joint->n_children_ids++] = j;
             }
-            else if (j2->children[0] <= level)
+            else if (j2->children_ids[0] <= level)
                 break;
         }
     }
@@ -182,6 +210,7 @@ void load_poses(const char *filename, struct pose *poses, int *nposes)
         struct pose *pose = &poses[i];
         process_joint_children(pose->joints, pose->njoints);
     }
+
 
     fclose(data.dae_file);
 }

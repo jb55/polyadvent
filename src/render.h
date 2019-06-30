@@ -2,15 +2,16 @@
 #define POLYADVENT_RENDER_H
 
 #include "geometry.h"
+#include "node.h"
 
 struct game;
 
 struct render_config {
     int draw_ui;
     int is_depth_pass;
-    const float *camera;
-    float *projection;
-    float *depth_vp;
+    node_id camera;
+    float* projection;
+    float* depth_vp;
 };
 
 void init_gl(struct resources *resources, int width, int height);

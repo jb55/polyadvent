@@ -5,6 +5,36 @@
 #include <string.h>
 #include <stdio.h>
 #include <assert.h>
+#include <stdint.h>
+
+static struct resource_manager node_manager = {0};
+
+static inline struct node *new_uninitialized_node(node_id *id)
+{
+    return new_resource(&node_manager, id);
+}
+
+struct node *new_node(node_id *id)
+{
+    struct node *n = node_init(new_uninitialized_node(id));
+    assert((int64_t)id->uuid != -1);
+    return n;
+}
+
+struct node *get_node(node_id *id)
+{
+    return get_resource(&node_manager, id);
+}
+
+void destroy_node(node_id *id)
+{
+    destroy_resource(&node_manager, id);
+}
+
+void init_node_manager()
+{
+    init_resource_manager(&node_manager, sizeof(struct node), 128, 0xFFFF);
+}
 
 struct node *node_init(struct node *node) {
   mat4_id(node->mat);
@@ -14,9 +44,9 @@ struct node *node_init(struct node *node) {
   quat_id(node->orientation);
   node->n_children = 0;
   for (int i = 0; i < MAX_NODE_CHILDREN; ++i)
-    node->children[i] = NULL;
+      init_id(&node->children_ids[i]);
   node->flags = 0;
-  node->parent = NULL;
+  null_id(&node->parent_id);
   node_set_label(node, "unknown");
   node->needs_recalc = 0;
   node->custom_update = 0;
@@ -28,6 +58,11 @@ struct node *node_init(struct node *node) {
 int node_set_label(struct node *node, const char *label)
 {
     strncpy(node->label, label, sizeof(node->label));
+    // return 0 if the string is too big and that we've truncated it
+    int ok = node->label[sizeof(node->label)-1] == '\0';
+    // strncpy won't write this for large strings =/
+    node->label[sizeof(node->label)-1] = '\0';
+    return ok;
 }
 
 void node_scale(struct node *node, float val) {
@@ -61,7 +96,8 @@ void node_rotate(struct node *node, vec3 *axis_angles) {
 
 int node_needs_recalc(struct node *node)
 {
-  return (node->parent && node->parent->needs_recalc) || node->needs_recalc;
+    struct node *parent = get_node(&node->parent_id);
+    return (parent && parent->needs_recalc) || node->needs_recalc;
 }
 
 vec3 *node_world(struct node *node) {
@@ -77,13 +113,18 @@ void node_mark_for_recalc(struct node *node) {
 
   node->needs_recalc = 1;
 
-  for (int i = 0; i < node->n_children; ++i)
-    node_mark_for_recalc(node->children[i]);
+  for (int i = 0; i < node->n_children; ++i) {
+      struct node *child = get_node(&node->children_ids[i]);
+      if (child)
+          node_mark_for_recalc(child);
+  }
 }
 
 static void node_recalc_children(struct node *node) {
   for (int i = 0; i < node->n_children; ++i) {
-    node_recalc(node->children[i]);
+      struct node *child = get_node(&node->children_ids[i]);
+      if (child)
+          node_recalc(child);
   }
 }
 
@@ -91,8 +132,9 @@ int node_recalc(struct node *node) {
   assert(node);
   float rot[9] = {1.0};
 
-  if (node->parent && node_needs_recalc(node->parent))
-    node_recalc(node->parent);
+  struct node *parent = get_node(&node->parent_id);
+  if (parent && node_needs_recalc(parent))
+    node_recalc(parent);
 
   if (!node_needs_recalc(node)) {
     node_recalc_children(node);
@@ -105,9 +147,9 @@ int node_recalc(struct node *node) {
       quat_to_mat3(node->orientation, rot);
       mat4_create_transform(node->pos, node->scale, rot, node->mat);
 
-      if (node->parent) {
-          assert(!node->parent->needs_recalc);
-          mat4_multiply(node->parent->mat, node->mat, node->mat);
+      if (parent) {
+          assert(!parent->needs_recalc);
+          mat4_multiply(parent->mat, node->mat, node->mat);
       }
 
   }
@@ -122,10 +164,13 @@ int node_recalc(struct node *node) {
 
 int node_detach(struct node *node, struct node *from) {
     for (int i = 0; i < from->n_children; i++) {
-        if (from->children[i] == node) {
-            memmove(from->children[i], from->children[i+1],
-                    from->n_children - i - 1);
-            assert(!"fixme, this should be times the size of *children");
+        node_id *child_id = &from->children_ids[i];
+        struct node *child = get_node(&from->children_ids[i]);
+        if (child && child == node) {
+            destroy_node(child_id);
+            memmove(&from->children_ids[i], &from->children_ids[i+1],
+                    sizeof(*from->children_ids) * from->n_children - 1);
+            // TODO: test node_detach
             from->n_children--;
             return 1;
         }
@@ -133,25 +178,38 @@ int node_detach(struct node *node, struct node *from) {
     return 0;
 }
 
-void node_detach_from_parent(struct node *node) {
-    if (node->parent)
-        node_detach(node, node->parent);
+void node_detach_from_parent(struct node *node)
+{
+    struct node *parent = get_node(&node->parent_id);
+
+    if (parent)
+        node_detach(node, parent);
 }
 
 // count the total number of nodes
-int node_count(struct node *node) {
+int node_count(struct node *node)
+{
     int c = 1;
     for (int i = 0; i < node->n_children; i++) {
-        c += node_count(node->children[i]);
+        struct node *child = get_node(&node->children_ids[i]);
+        assert(child);
+        if (child)
+            c += node_count(child);
     }
     return c;
 }
 
-void node_attach(struct node *node, struct node *to) {
-  assert(to->n_children <= MAX_NODE_CHILDREN);
+void node_attach(struct resource_id *node_id, struct resource_id *to_id)
+{
+    struct node *node = get_node(node_id);
+    struct node *to   = get_node(to_id);
 
-  node->parent = to;
-  to->children[to->n_children++] = node;
+    assert(node);
+    assert(to && to->n_children <= MAX_NODE_CHILDREN);
+
+    node->parent_id = *to_id;
+    assert(node->parent_id.uuid == to_id->uuid);
+    to->children_ids[to->n_children++] = *node_id;
 }
 
 void node_forward(struct node *node, float *dir) {

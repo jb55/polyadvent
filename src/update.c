@@ -10,8 +10,10 @@
 #include "uniform.h"
 #include "game.h"
 #include "mat_util.h"
+#include "resource.h"
 #include "shader.h"
 #include "file.h"
+#include "debug.h"
 #include <math.h>
 
 static void movement(struct game *game, struct node *node, float speed_mult) {
@@ -93,9 +95,10 @@ void update_terrain(struct terrain *terrain) {
     struct entity *ent = get_entity(&terrain->entity_id);
     assert(ent);
     struct perlin_settings *ts = &terrain->settings;
-    struct node *tnode = &ent->node;
+    struct node *tnode = get_node(&ent->node_id);
+    assert(tnode);
 
-    printf("updating terrain\n");
+    debug("updating terrain\n");
 
     if (first) {
         reset_terrain(terrain, terrain->size);
@@ -137,24 +140,25 @@ void update_terrain(struct terrain *terrain) {
 static void player_terrain_collision(struct terrain *terrain, struct entity *player) {
     // player movement
     static vec3 last_pos[3] = {0};
+    struct node *node = get_node(&player->node_id);
 
-    if (!vec3_eq(player->node.pos, last_pos, 0.0001)) {
-        float player_z = player->node.pos[2];
+    if (!vec3_eq(node->pos, last_pos, 0.0001)) {
+        float player_z = node->pos[2];
 
         float terrain_z =
-            terrain->fn(terrain, player->node.pos[0], player->node.pos[1]);
+            terrain->fn(terrain, node->pos[0], node->pos[1]);
 
         float inset =
             min(0.0, player_z - terrain_z);
 
         if (inset <= 0)
-            node_translate(&player->node, V3(0.0, 0.0, -inset));
+            node_translate(node, V3(0.0, 0.0, -inset));
     }
 
 }
 
-static void player_movement(struct game *game, struct entity *player) {
-    movement(game, &player->node, 2.0);
+static void player_movement(struct game *game, struct node *player_node) {
+    movement(game, player_node, 2.0);
 }
 
 
@@ -224,6 +228,10 @@ static void day_night_cycle(float time, struct resources *res) {
     float val = time * 0.0001;
     float intensity = 1.0;//max(0.0, vec3_dot(res->light_dir, V3(0.0, 0.0, 1.0))); */
     struct entity *player = get_player(res);
+    struct node *pnode = get_node(&player->node_id);
+    assert(pnode);
+    struct node *suncam = get_node(&res->sun_camera_id);
+    assert(suncam);
 
     float light_pos[3];
 
@@ -258,29 +266,36 @@ static void day_night_cycle(float time, struct resources *res) {
     /* printf("intensity %f(%f) n %f light_dir %f %f\n", roots, intensity, */
     /*        n, res->light_dir[1], res->light_dir[2]); */
 
-    vec3_add(player->node.pos, res->light_dir, light_pos);
+    vec3_add(pnode->pos, res->light_dir, light_pos);
 
     /* float target[3]; */
     /* float hh = player->model.geom.max[2] / 2.0; */
     /* vec3_copy(player->node.pos, target); */
     /* target[2] += 2.0; */
 
-    look_at(light_pos, player->node.pos, V3(0, 0, 1.0), res->sun_camera.mat);
+    look_at(light_pos, pnode->pos, V3(0, 0, 1.0), suncam->mat);
     /* look_at(light_pos, player->node.pos, V3(0, 0, 1.0), res->sun_camera.mat); */
 }
 
 static void gravity(struct game *game) {
     struct entity *player = get_player(&game->test_resources);
+    struct node   *pnode  = get_node(&player->node_id);
+    assert(pnode);
 
-    node_translate(&player->node, V3(0.0, 0.0, -1.0));
+    node_translate(pnode, V3(0.0, 0.0, -1.0));
 }
 
 void orbit_update_from_mouse(struct orbit *camera, struct input *input,
                              float mouse_sens, struct entity *player,
-                             float dt) {
+                             float dt)
+{
     float target[3];
-    struct node *target_node = &player->node;
+    struct node *target_node     = get_node(&player->node_id);
+    struct node *cam_node        = get_node(&camera->node_id);
     struct geometry *player_geom = get_geometry(&player->model->geom_id);
+
+    assert(target_node);
+    assert(cam_node);
 
     node_recalc(target_node);
     vec3_copy(node_world(target_node), target);
@@ -315,7 +330,7 @@ void orbit_update_from_mouse(struct orbit *camera, struct input *input,
     /*        camera->coords.inclination, */
     /*        camera->coords.radius); */
 
-    spherical_look_at(&camera->coords, target, camera->node.mat);
+    spherical_look_at(&camera->coords, target, cam_node->mat);
 
 }
 
@@ -339,19 +354,23 @@ static void player_update(struct game *game, struct entity *player) {
 
     struct resources *res = &game->test_resources;
     struct orbit *camera = &res->orbit_camera;
+    struct node *node = get_node(&player->node_id);
+    struct node *cam_node = get_node(&res->camera_node_id);
+    assert(node);
+    assert(cam_node);
 
     orbit_update_from_mouse(camera, &game->input, game->user_settings.mouse_sens,
                             player, game->dt);
 
-    camera_keep_above_ground(&game->terrain, res->camera_node);
+    camera_keep_above_ground(&game->terrain, cam_node);
 
     // move player camera toward camera orientation
     if (input_is_dragging(&game->input, SDL_BUTTON_RIGHT)) {
         float yaw = game->test_resources.orbit_camera.coords.azimuth;
-        quat_axis_angle(V3(0.0, 0.0, 1.0), -yaw - RAD(90), player->node.orientation);
+        quat_axis_angle(V3(0.0, 0.0, 1.0), -yaw - RAD(90), node->orientation);
     }
     player_terrain_collision(&game->terrain, player);
-    node_recalc(&player->node);
+    node_recalc(node);
 }
 
 
@@ -359,10 +378,18 @@ static void player_update(struct game *game, struct entity *player) {
 void update (struct game *game) {
 	static int toggle_fog = 0;
 	static int first = 1;
-	struct resources *res = &game->test_resources;
-    struct terrain *terrain = &game->terrain;
-	struct node *root = &game->test_resources.root;
-    struct entity *player = get_player(res);
+	struct resources *res          = &game->test_resources;
+    struct terrain   *terrain      = &game->terrain;
+	struct node      *root         = get_node(&game->test_resources.root_id);
+    struct entity    *player       = get_player(res);
+    struct node      *pnode        = get_node(&player->node_id);
+    struct node      *cam_node     = get_node(&res->camera_node_id);
+    struct node      *freecam_node = get_node(&res->free_camera_id);
+
+    assert(pnode);
+    assert(cam_node);
+    assert(freecam_node);
+
     float *time = &res->time;
 	float *light = res->light_dir;
 
@@ -377,12 +404,15 @@ void update (struct game *game) {
     /* vec3_scale(camera_dir, -1, camera_dir); */
 
 	if (game->input.modifiers & KMOD_LALT) {
-        if (res->camera_node == &res->free_camera)
-            movement(game, &res->free_camera, 1.0);
+        if (ideq(&res->camera_node_id, &res->free_camera_id))
+            movement(game, freecam_node, 1.0);
 	}
 	else {
-		player_movement(game, player);
+		player_movement(game, pnode);
 	}
+
+    assert(root->parent_id.generation == 0);
+
     player_update(game, player);
 
 	if (was_key_pressed_this_frame(game, SDL_SCANCODE_R))
@@ -395,10 +425,10 @@ void update (struct game *game) {
 		toggle_fog = 1;
 
 	if (was_key_pressed_this_frame(game, SDL_SCANCODE_EQUALS)) {
-        if (res->camera_node != &res->free_camera)
-            res->camera_node = &res->free_camera;
+        if (!ideq(&res->camera_node_id, &res->free_camera_id))
+            res->camera_node_id = res->free_camera_id;
         else
-            res->camera_node = &res->orbit_camera.node;
+            res->camera_node_id = res->orbit_camera.node_id;
     }
 
 	if (toggle_fog) {

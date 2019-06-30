@@ -260,7 +260,10 @@ void render (struct game *game, struct render_config *config) {
     mat4 *projection = config->projection;
     mat4 *light = res->light_dir;
 
-    const mat4 *camera = config->camera;
+    struct node *camera_node = get_node(&config->camera);
+    assert(camera_node);
+
+    const mat4 *camera = camera_node->mat;
     u32 num_entities;
 
     struct entity *entities =
@@ -331,8 +334,13 @@ void render (struct game *game, struct render_config *config) {
                     res->sun_color[2]);
         check_gl();
 
-        mat4_multiply(view_proj, entity->node.mat, mvp);
-        mat4_copy(entity->node.mat, model_view);
+        struct node *node = get_node(&entity->node_id);
+        assert(node);
+        if (node == NULL)
+            return;
+
+        mat4_multiply(view_proj, node->mat, mvp);
+        mat4_copy(node->mat, model_view);
         mat4_multiply(config->depth_vp, model_view, depth_mvp);
         glUniformMatrix4fv(res->uniforms.depth_mvp, 1, 0, depth_mvp);
         check_gl();
@@ -340,7 +348,7 @@ void render (struct game *game, struct render_config *config) {
         glUniformMatrix4fv(res->uniforms.mvp, 1, 0, mvp);
         check_gl();
 
-        glUniformMatrix4fv(res->uniforms.model, 1, 0, entity->node.mat);
+        glUniformMatrix4fv(res->uniforms.model, 1, 0, node->mat);
         check_gl();
 
         recalc_normals(res->uniforms.normal_matrix, model_view, normal_matrix);

@@ -49,10 +49,12 @@ vec3 *spherical_look_at(struct spherical *s, vec3 *target, mat4 *mat) {
 
 
 static void orbit_node_update(struct node *node) {
-    if (!node->parent)
+    struct node *parent = get_node(&node->parent_id);
+
+    if (!parent)
         return;
 
-    float *a = node->parent->mat;
+    float *a = parent->mat;
     float *b = node->pos;
     float *dst = node->mat;
 
@@ -71,9 +73,10 @@ static void orbit_node_update(struct node *node) {
 }
 
 
-void init_orbit(struct orbit *orbit) {
-    node_init(&orbit->node);
-    orbit->node.label = "orbit_camera";
+void new_orbit(struct orbit *orbit) {
+    init_id(&orbit->node_id);
+    struct node *node = new_node(&orbit->node_id);
+    node_set_label(node, "orbcam");
     /* orbit->node.custom_update = orbit_node_update; */
     /* orbit->node.custom_update_data = orbit; */
 }

@@ -8,7 +8,7 @@
 
 struct camera {
   float frustum[16];
-  struct node node;
+  node_id node_id;
 };
 
 void

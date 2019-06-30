@@ -14,10 +14,10 @@ struct spherical {
 
 struct orbit {
     struct spherical coords;
-    struct node node;
+    node_id node_id;
 };
 
-void init_orbit(struct orbit *orbit);
+void new_orbit(struct orbit *orbit);
 
 vec3 *spherical_dir(struct spherical s, vec3 *dir);
 vec3 *spherical_pos(struct spherical *s, vec3 *from, vec3 *to);

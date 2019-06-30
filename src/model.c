@@ -17,8 +17,16 @@ static struct resource_manager dyn_modelman;
 static int static_models_initialized = 0;
 
 struct model *init_model(struct model *model) {
+    init_id(&model->geom_id);
     model->shading = SHADING_VERT_COLOR;
     model->texture = 0;
+    return model;
+}
+
+struct model *new_model(struct model *model)
+{
+    init_model(model);
+    null_id(&model->geom_id);
     return model;
 }
 
@@ -26,7 +34,7 @@ static void initialize_static_models() {
     for (int i = 0; i < NUM_STATIC_MODELS; i++) {
         struct model_def *sm = &static_models[i];
         assert(sm->id == i);
-        init_model(&sm->model);
+        new_model(&sm->model);
     }
     static_models_initialized = 1;
 }

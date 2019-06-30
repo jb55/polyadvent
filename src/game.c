@@ -104,16 +104,26 @@ void game_init(struct game *game, int width, int height) {
     init_gl(&game->test_resources, width, height);
     init_entity_system();
     init_model_manager();
+    init_node_manager();
     init_geometry_manager();
     init_user_settings(&game->user_settings);
     check_gl();
 
     struct resources *res = &game->test_resources;
     mat4 *mvp = res->test_mvp;
-    struct node *root = &res->root;
-    struct node *sun_camera = &res->sun_camera;
+
+    init_id(&res->root_id);
+    init_id(&res->sun_camera_id);
+    init_id(&res->free_camera_id);
+
+    struct node *root = new_node(&res->root_id);
+    struct node *sun_camera = new_node(&res->sun_camera_id);
     struct terrain *terrain = &game->terrain;
     struct entity *player;
+
+    assert(root->parent_id.generation == 0);
+    assert(root);
+    assert(sun_camera);
 
     mat4 *light_dir = res->light_dir;
     int ok = 0;
@@ -168,34 +178,39 @@ void game_init(struct game *game, int width, int height) {
 
     node_init(root);
     node_init(sun_camera);
-    init_orbit(&res->orbit_camera);
+    new_orbit(&res->orbit_camera);
 
-    root->label = "root";
-
+    node_set_label(root, "root");
 
     // ENTITIES
 
     // player entity
+    init_id(&res->player_id);
     player = new_entity(&res->player_id);
+    struct node *pnode = get_node(&player->node_id);
+    assert(pnode);
     assert(res->player_id.index == 1);
     player->model = get_model(model_pirate_officer);
-    player->node.label = "player";
-    node_attach(&player->node, root);
-    node_translate(&player->node, V3(terrain->size/2.,terrain->size/2.,0.0));
+    node_set_label(pnode, "player");
+    node_attach(&player->node_id, &res->root_id);
+
+    assert(ideq(&pnode->parent_id, &res->root_id));
+
+    node_translate(pnode, V3(terrain->size/2.,terrain->size/2.,0.0));
 
     // orbit camera
-    res->orbit_camera.coords.azimuth = -quat_yaw(player->node.orientation) - RAD(90.0);
+    res->orbit_camera.coords.azimuth = -quat_yaw(pnode->orientation) - RAD(90.0);
     res->orbit_camera.coords.inclination = RAD(60);
     res->orbit_camera.coords.radius = 5.0;
-    res->camera_node = &res->orbit_camera.node;
+    res->camera_node_id = res->orbit_camera.node_id;
 
     // free camera
-    node_init(&res->free_camera);
-    res->free_camera.label = "free_camera";
-    node_attach(&res->free_camera, &player->node);
-    quat_axis_angle(V3(1,0,0), -45, res->free_camera.orientation);
-    node_rotate(&res->free_camera, V3(100, 0, 0));
-    node_translate(&res->free_camera, V3(0,-40,20));
+    struct node *freecam = new_node(&res->free_camera_id);
+    node_set_label(freecam, "freecam");
+    node_attach(&res->free_camera_id, &player->node_id);
+    quat_axis_angle(V3(1,0,0), -45, freecam->orientation);
+    node_rotate(freecam, V3(100, 0, 0));
+    node_translate(freecam, V3(0,-40,20));
 
     input_init(&game->input);
 

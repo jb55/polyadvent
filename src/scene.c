@@ -26,14 +26,18 @@ void default_scene(struct game *game) {
     player->flags &= ~ENT_INVISIBLE;
 
     struct entity *tower = new_entity(NULL);
+    struct node *tnode = get_node(&tower->node_id);
+    struct node *pnode = get_node(&player->node_id);
+
+    assert(tnode);
     tower->model = get_model(model_tower);
-    tower->node.label = "tower";
-    node_attach(&tower->node, &player->node);
-    node_translate(&tower->node, V3(0.0, 50.0, 0.0));
-    node_recalc(&tower->node);
-    float z = terrain->fn(terrain, tower->node.mat[M_X], tower->node.mat[M_Y]);
-    node_detach(&tower->node, &player->node);
-    tower->node.mat[M_Z] = z;
+    node_set_label(tnode, "tower");
+    node_attach(&tower->node_id, &player->node_id);
+    node_translate(tnode, V3(0.0, 50.0, 0.0));
+    node_recalc(tnode);
+    float z = terrain->fn(terrain, tnode->mat[M_X], tnode->mat[M_Y]);
+    node_detach(tnode, pnode);
+    tnode->mat[M_Z] = z;
     // END ENTITIES
 
 

@@ -52,17 +52,20 @@ void reset_terrain(struct terrain *terrain, float size) {
 }
 
 void init_terrain(struct terrain *terrain, float size) {
-    struct entity *ent;
+    init_id(&terrain->entity_id);
+    struct entity *ent = new_entity(&terrain->entity_id);
+    struct node *node  = get_node(&ent->node_id);
 
-    ent = new_entity(&terrain->entity_id);
+    assert(node);
     assert(terrain->entity_id.index == 0);
+
     terrain->model.shading = SHADING_TERRAIN;
     ent->model = &terrain->model;
-    ent->node.label = "terrain_node";
+    node_set_label(node, "terrain");
     ent->casts_shadows = 0;
 
     // this is scale for some reason!?
-    ent->node.pos[2] = 20.0;
+    node->pos[2] = 20.0;
 
     reset_terrain(terrain, size);
 }

@@ -11,6 +11,7 @@ static u64 resource_uuids = 0;
 
 static inline void *index_resource(struct resource_manager *r, int i) {
     unsigned char *p = r->resources;
+    assert(p);
     return p + (i * r->elem_size);
 }
 
@@ -24,10 +25,17 @@ void *get_all_resources(struct resource_manager *r, u32 *count, struct resource_
     return r->resources;
 }
 
-void init_resource_id(struct resource_id *id) {
+void init_id(struct resource_id *id) {
     id->index = -1;
     id->generation = -1;
     id->uuid = -1;
+}
+
+void null_id(struct resource_id *id)
+{
+    id->generation = 0;
+    id->uuid = -1;
+    id->index = -1;
 }
 
 void init_resource_manager(struct resource_manager *r, u32 elem_size,
@@ -118,8 +126,16 @@ static void resize(struct resource_manager *r)
     r->generation += 2;
 }
 
+void print_id(struct resource_id *id)
+{
+    printf("res_id(uuid:%llu ind:%d gen:%d)\n", id->uuid, id->index, id->generation);
+}
+
 void *new_resource(struct resource_manager *r, struct resource_id *id)
 {
+    assert(id);
+    assert((int)id->index == -1 && "res_id already initialized or uninitialized");
+
     struct resource_id *fresh_id;
 
     if (r->resource_count + 1 > r->max_capacity)
@@ -139,13 +155,19 @@ void *new_resource(struct resource_manager *r, struct resource_id *id)
 }
 
 void *get_resource(struct resource_manager *r, struct resource_id *id) {
-    if (id->generation == 0)
+    assert((int64_t)id->generation != -1 && "id intialized but not allocated (needs new_ call)");
+
+    if (id->generation == 0) {
+        //unusual("getting already deleted resource %llu\n", id->uuid);
         return NULL;
+    }
 
     enum refresh_status res = refresh_id(r, id, id);
 
-    if (res == RESOURCE_DELETED)
+    if (res == RESOURCE_DELETED) {
+        unusual("getting deleted resource %llu\n", id->uuid);
         return NULL;
+    }
 
     return index_resource(r, id->index);
 }

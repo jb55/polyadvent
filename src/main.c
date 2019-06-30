@@ -71,7 +71,7 @@ int main(void)
     struct render_config fbo_render_config = {
       .draw_ui = 0,
       .is_depth_pass = 1,
-      .camera = game.test_resources.sun_camera.mat,
+      .camera = game.test_resources.sun_camera_id,
       .projection = game.test_resources.proj_ortho,
       .depth_vp = depth_vp
     };
@@ -79,7 +79,7 @@ int main(void)
     struct render_config default_config = {
       .draw_ui = 0,
       .is_depth_pass = 0,
-      .camera = game.test_resources.camera_node->mat,
+      .camera = game.test_resources.camera_node_id,
       .projection = game.test_resources.proj_persp,
       .depth_vp = depth_vp
     };
@@ -93,10 +93,11 @@ int main(void)
                    game.input.resized_height);
             handle_resize(&game, game.input.resized_width, game.input.resized_height);
         }
-        default_config.camera = game.test_resources.camera_node->mat;
+        //default_config.camera = game.test_resources.camera_node->mat;
         double new_time = hires_time_in_seconds();
         double frame_time = new_time - last;
         game.dt = frame_time;
+
         update(&game);
 
         /* while (accumulator >= dt) { */
