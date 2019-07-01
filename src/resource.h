@@ -29,6 +29,7 @@ struct resource_manager {
 
 #define ideq(a, b) ((a)->uuid == (b)->uuid)
 
+int is_id_allocated(struct resource_id *id);
 void init_id(struct resource_id *id);
 void *get_resource(struct resource_manager *r, struct resource_id *id);
 void *get_all_resources(struct resource_manager *, u32 *count, struct resource_id **ids);

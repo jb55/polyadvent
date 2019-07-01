@@ -198,3 +198,8 @@ void destroy_resource(struct resource_manager *r, struct resource_id *id) {
             &r->ids[id->index+1],
             sizeof(*r->ids) * r->resource_count);
 }
+
+int is_id_allocated(struct resource_id *id)
+{
+    return (int)id->index != -1;
+}

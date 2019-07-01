@@ -23,18 +23,11 @@ struct model *init_model(struct model *model) {
     return model;
 }
 
-struct model *new_model(struct model *model)
-{
-    init_model(model);
-    null_id(&model->geom_id);
-    return model;
-}
-
 static void initialize_static_models() {
     for (int i = 0; i < NUM_STATIC_MODELS; i++) {
         struct model_def *sm = &static_models[i];
         assert(sm->id == i);
-        new_model(&sm->model);
+        init_model(&sm->model);
     }
     static_models_initialized = 1;
 }
@@ -62,7 +55,7 @@ struct model *get_model(enum static_model m) {
 
     struct model *model = &static_models[m].model;
 
-    if (get_geometry(&model->geom_id))
+    if (is_id_allocated(&model->geom_id) && get_geometry(&model->geom_id))
         return model;
 
     int ok = 0;
