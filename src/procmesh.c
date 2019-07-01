@@ -28,8 +28,10 @@ static void qh_mesh_to_geom(qh_mesh_t *qh, struct make_geometry *geom) {
 }
 
 
-void proc_sphere(geometry_id *geom_id) {
+void proc_sphere(struct geometry *geom) {
     struct make_geometry mkgeom;
+    init_make_geometry(&mkgeom);
+
     const int n = 50;
     qh_vertex_t *vertices = malloc(n*sizeof(qh_vertex_t));
     const float radius = 2.0;
@@ -45,7 +47,7 @@ void proc_sphere(geometry_id *geom_id) {
 
     qh_mesh_t mesh = qh_quickhull3d(vertices, n);
     qh_mesh_to_geom(&mesh, &mkgeom);
-    make_buffer_geometry(&mkgeom, geom_id);
+    make_buffer_geometry(&mkgeom, geom);
 
     free(mkgeom.normals);
     qh_free_mesh(mesh);

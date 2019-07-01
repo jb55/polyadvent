@@ -232,7 +232,7 @@ int parse_ply(const char *filename, geometry_id *geom_id) {
         mkgeom.num_indices = ninds * 3;
         mkgeom.num_verts = nverts * 3;
 
-        make_buffer_geometry(&mkgeom, geom_id);
+        make_buffer_geometry(&mkgeom, geom);
 
         vec3_copy(min, geom->min);
         vec3_copy(max, geom->max);

@@ -45,7 +45,9 @@ static void create_quad(geometry_id *id)
         .num_verts = ARRAY_SIZE(quad_vertices),
         .num_uv_components = 2
     };
-    make_buffer_geometry(&mkgeom, id);
+    init_id(id);
+    struct geometry *geom = new_geometry(id);
+    make_buffer_geometry(&mkgeom, geom);
     check_gl();
 }
 

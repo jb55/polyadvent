@@ -50,7 +50,7 @@ void render_geometry(struct geometry *geom, gpu_addr *vertex_attrs,
 void bind_geometry(struct geometry *geom, gpu_addr *vertex_attrs);
 void init_geometry(struct geometry *geom);
 void init_make_geometry(struct make_geometry *mkgeom);
-void make_buffer_geometry(struct make_geometry *mkgeom, geometry_id *);
+void make_buffer_geometry(struct make_geometry *mkgeom, struct geometry *geom);
 void destroy_buffer_geometry(geometry_id *geom);
 void geometry_centroid(struct geometry *geom, float *v3);
 void init_geometry_manager();

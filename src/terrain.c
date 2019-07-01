@@ -53,15 +53,15 @@ void reset_terrain(struct terrain *terrain, float size) {
 
 void init_terrain(struct terrain *terrain, float size) {
     init_id(&terrain->entity_id);
+
     struct entity *ent  = new_entity(&terrain->entity_id); assert(ent);
     struct node *node   = get_node(&ent->node_id); assert(node);
-    struct model *model = get_model(&terrain->model_id); assert(model);
+    struct model *model = new_model(&ent->model_id); assert(model);
+    /* struct model *model = init_model(&ent->model_id); assert(model); */
 
-    assert(node);
     assert(terrain->entity_id.index == 0);
 
     model->shading = SHADING_TERRAIN;
-    ent->model_id = terrain->model_id;
     node_set_label(node, "terrain");
     ent->casts_shadows = 0;
 
@@ -212,13 +212,18 @@ void create_terrain(struct terrain *terrain, float scale) {
 
     struct make_geometry mkgeom;
     init_make_geometry(&mkgeom);
+
     mkgeom.num_verts = num_verts;
     mkgeom.vertices = (float*)del_verts;
     mkgeom.normals = (float*)del_norms;
     mkgeom.indices = (u32*)del_indices;
     mkgeom.num_indices = num_verts;
 
-    make_buffer_geometry(&mkgeom, &terrain->model.geom_id);
+    struct model *model = get_model(&ent->model_id); assert(model);
+    struct geometry *geom = get_geometry(&model->geom_id); assert(geom);
+
+    assert(mkgeom.joint_weights == 0);
+    make_buffer_geometry(&mkgeom, geom);
 
     delaunay2d_release(del);
     tri_delaunay2d_release(tri);
@@ -232,7 +237,7 @@ void create_terrain(struct terrain *terrain, float scale) {
 
 
 void destroy_terrain(struct terrain *terrain) {
-    struct entity *ent = get_entity(&terrain->entity_id);
-    assert(ent);
-    destroy_buffer_geometry(&terrain->model.geom_id);
+    struct entity *ent = get_entity(&terrain->entity_id); assert(ent);
+    struct model *model = get_model(&ent->model_id); assert(model);
+    destroy_buffer_geometry(&model->geom_id);
 }

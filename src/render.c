@@ -293,7 +293,10 @@ void render (struct game *game, struct render_config *config) {
     mat4_inverse((float *)camera, view);
     mat4_multiply(projection, view, view_proj);
 
-    glBindTexture(GL_TEXTURE_CUBE_MAP, res->skybox.model.texture);
+    struct model *skybox_model = get_model(&res->skybox.model_id);
+    assert(skybox_model);
+
+    glBindTexture(GL_TEXTURE_CUBE_MAP, skybox_model->texture);
     check_gl();
 
     for (u32 i = 0; i < num_entities; ++i) {

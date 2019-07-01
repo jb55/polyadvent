@@ -149,14 +149,13 @@ void game_init(struct game *game, int width, int height) {
     /* player->model_id = get_static_model(model_pirate_officer, NULL); */
 
     struct model *pmodel  = new_model(&player->model_id); assert(pmodel);
+    struct geometry *geom = get_geometry(&pmodel->geom_id); assert(geom);
 
     proc_sphere(geom);
+    pmodel->shading = SHADING_VERT_COLOR;
 
-    ok = load_model(&player->model, "pirate-officer");
-    assert(ok);
     node_set_label(pnode, "player");
     node_attach(&player->node_id, &res->root_id);
-
     assert(ideq(&pnode->parent_id, &res->root_id));
 
     node_translate(pnode, V3(terrain->size/2.,terrain->size/2.,0.0));

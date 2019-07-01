@@ -42,7 +42,7 @@ enum shading {
 
 struct model {
     /* geometry_id geom_id; */
-    struct geometry geom;
+    geometry_id geom_id;
     enum shading shading;
     u32 texture;
 };
@@ -56,8 +56,10 @@ struct model_def {
 
 
 void init_model_manager();
+void init_model_id(model_id *id);
 struct model *init_model(struct model *model);
 struct model *get_model(model_id *);
+struct model *get_model_geom(model_id *, struct geometry **);
 struct model *new_model(model_id *);
 struct model *new_static_model(model_id *);
 

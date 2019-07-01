@@ -9,7 +9,7 @@
 
 struct skybox {
     struct gpu_program *program;
-    struct model model;
+    model_id model_id;
     gpu_addr attrs[n_vertex_attrs];
     struct node node;
     struct {

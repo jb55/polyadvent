@@ -97,9 +97,9 @@ void init_geometry(struct geometry *geom) {
     geom->num_uv_components = 2;
 }
 
-void
-make_buffer_geometry_(struct make_geometry *mkgeom, struct geometry *geom) {
-
+void make_buffer_geometry(struct make_geometry *mkgeom, struct geometry *geom)
+{
+    init_geometry(geom);
 
     // VBOs
     geom->num_uv_components = mkgeom->num_uv_components;
@@ -164,15 +164,6 @@ make_buffer_geometry_(struct make_geometry *mkgeom, struct geometry *geom) {
                           );
 
     geom->has_vbos = 1;
-}
-
-void
-make_buffer_geometry(struct make_geometry *mkgeom, geometry_id *geom_id)
-{
-    init_id(geom_id);
-    struct geometry *geom = new_geometry(geom_id);
-
-    make_buffer_geometry_(mkgeom, geom);
 }
 
 

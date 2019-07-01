@@ -20,6 +20,7 @@ struct entity *get_all_entities(u32 *count, entity_id **ids) {
 
 struct entity *init_entity(struct entity *ent, node_id *id) {
     node_id new_id;
+    init_model_id(&ent->model_id);
     if (id == NULL) {
         init_id(&new_id);
         new_node(&new_id);

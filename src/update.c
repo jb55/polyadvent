@@ -297,7 +297,7 @@ void orbit_update_from_mouse(struct orbit *camera, struct input *input,
     struct node *target_node     = get_node(&player->node_id);
     struct node *cam_node        = get_node(&camera->node_id);
     struct model *pmodel         = get_model(&player->model_id); assert(pmodel);
-    struct geometry *player_geom = get_geometry(model->geom_id);
+    struct geometry *player_geom = get_geometry(&pmodel->geom_id); assert(player_geom);
 
     assert(target_node);
     assert(cam_node);

@@ -16,6 +16,13 @@ static struct resource_manager dyn_modelman;
 
 static int static_models_initialized = 0;
 
+void init_model_id(model_id *id)
+{
+    assert((int)id->dyn_model_id.index != -1);
+    id->type = DYNAMIC_MODEL;
+    init_id(&id->dyn_model_id);
+}
+
 struct model *init_model(struct model *model) {
     init_id(&model->geom_id);
     model->shading = SHADING_VERT_COLOR;
@@ -39,6 +46,7 @@ static inline struct model *new_uninitialized_model(struct resource_id *id) {
 static struct model *new_model_resource(model_id *model_id)
 {
     struct model *model = new_uninitialized_model(&model_id->dyn_model_id);
+    init_id(&model->geom_id);
     new_geometry(&model->geom_id);
     return model;
 }

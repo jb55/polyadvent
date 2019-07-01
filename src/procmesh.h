@@ -4,6 +4,6 @@
 
 #include "geometry.h"
 
-void proc_sphere(struct make_geometry *mkgeom, geometry_id *geom_id);
+void proc_sphere(struct geometry *geom);
 
 #endif /* PROCMESH_H */

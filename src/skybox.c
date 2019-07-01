@@ -39,7 +39,7 @@ void create_skybox(struct skybox *skybox, struct gpu_program *program) {
     int ok;
 
     node_init(&skybox->node);
-    init_model(&skybox->model);
+    init_model_id(&skybox->model_id);
 
     skybox->program = program;
 
@@ -54,7 +54,10 @@ void create_skybox(struct skybox *skybox, struct gpu_program *program) {
     mkgeom.num_verts = ARRAY_SIZE(skybox_vertices);
     mkgeom.num_indices = ARRAY_SIZE(skybox_indices);
 
-    make_buffer_geometry(&mkgeom, &skybox->model.geom_id);
+    struct model *model = new_model(&skybox->model_id); assert(model);
+    struct geometry *geom = get_geometry(&model->geom_id); assert(geom);
+
+    make_buffer_geometry(&mkgeom, geom);
 
     static const char *faces[6] = {
       CUBEMAP("hw_sahara/sahara_rt_flip.tga"),
@@ -75,7 +78,7 @@ void create_skybox(struct skybox *skybox, struct gpu_program *program) {
     /*   CUBEMAP("ame_siege/siege_dn_flip.tga"), */
     /* }; */
 
-    skybox->model.texture = create_cubemap(faces);
+    model->texture = create_cubemap(faces);
 
     make_shader(GL_VERTEX_SHADER, SHADER("skybox.v.glsl"), &vertex);
     check_gl();
@@ -98,6 +101,10 @@ void create_skybox(struct skybox *skybox, struct gpu_program *program) {
 
 
 void render_skybox(struct skybox *skybox, mat4 *camera) {
+
+    struct model *model = get_model(&skybox->model_id); assert(model);
+    struct geometry *geom = get_geometry(&model->geom_id); assert(geom);
+
     glDepthFunc(GL_LEQUAL);
     glDepthMask(GL_FALSE);
     check_gl();
@@ -108,10 +115,10 @@ void render_skybox(struct skybox *skybox, mat4 *camera) {
     glUniformMatrix4fv(skybox->uniforms.mvp, 1, 0, camera);
     check_gl();
 
-    glBindTexture(GL_TEXTURE_CUBE_MAP, skybox->model.texture);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, model->texture);
     check_gl();
 
-    render_geometry(get_geometry(&skybox->model.geom_id), skybox->attrs, skybox->program);
+    render_geometry(geom, skybox->attrs, skybox->program);
     check_gl();
 
     glDepthMask(GL_TRUE);
