@@ -16,7 +16,7 @@ enum entity_flags {
 
 struct entity {
     node_id node_id;
-    struct model *model;
+    model_id model_id;
     u32 flags;
     float velocity[3];
     float accel[3];

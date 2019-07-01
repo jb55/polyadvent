@@ -49,6 +49,7 @@ OBJS += $(SRC)/vec3.o
 OBJS += $(SRC)/scene.o
 OBJS += $(SRC)/resource.o
 OBJS += $(SRC)/quickhull.o
+OBJS += $(SRC)/procmesh.o
 
 TESTS =  test/test_animation
 TESTS += test/test_resource

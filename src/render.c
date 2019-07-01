@@ -354,8 +354,10 @@ void render (struct game *game, struct render_config *config) {
         recalc_normals(res->uniforms.normal_matrix, model_view, normal_matrix);
         check_gl();
 
-
-        struct geometry *geo = get_geometry(&entity->model->geom_id);
+        struct model *model = get_model(&entity->model_id);
+        assert(model);
+        struct geometry *geo = get_geometry(&model->geom_id);
+        assert(geo);
         render_geometry(geo, res->vertex_attrs, current_program);
         check_gl();
     }

@@ -32,8 +32,15 @@ static void initialize_static_models() {
     static_models_initialized = 1;
 }
 
-static inline struct model *new_uninitialized_model(model_id *id) {
+static inline struct model *new_uninitialized_model(struct resource_id *id) {
     return new_resource(&dyn_modelman, id);
+}
+
+static struct model *new_model_resource(model_id *model_id)
+{
+    struct model *model = new_uninitialized_model(&model_id->dyn_model_id);
+    new_geometry(&model->geom_id);
+    return model;
 }
 
 void init_model_manager() {
@@ -42,12 +49,30 @@ void init_model_manager() {
 }
 
 
-struct model *new_dynamic_model(model_id *id)
+struct model *new_model(model_id *id)
 {
-    return init_model(new_uninitialized_model(id));
+    id->type = DYNAMIC_MODEL;
+    return new_model_resource(id);
 }
 
-struct model *get_model(enum static_model m) {
+struct model *get_model(model_id *model_id)
+{
+
+    switch(model_id->type) {
+    case DYNAMIC_MODEL:
+        return get_resource(&dyn_modelman, &model_id->dyn_model_id);
+    case STATIC_MODEL: {
+        struct model *model;
+        get_static_model(model_id->static_model_id, &model);
+        return model;
+    }
+    }
+    assert(!"unhandled case in get_model");
+}
+
+
+static struct model *load_static_model(enum static_model m)
+{
     static char path[128] = {0};
 
     if (!static_models_initialized)
@@ -68,3 +93,17 @@ struct model *get_model(enum static_model m) {
 
     return model;
 }
+
+model_id get_static_model(enum static_model m, struct model **model)
+{
+    model_id model_id;
+    model_id.type = STATIC_MODEL;
+    model_id.static_model_id = m;
+
+    if (model)
+        *model = load_static_model(m);
+
+    return model_id;
+}
+
+

@@ -12,14 +12,27 @@
 #define MAX_STATIC_MODELS 128
 #define MAX_DYNAMIC_MODELS 2048
 
-typedef struct resource_id model_id;
-
 enum static_model {
   model_tower,
   model_icosphere,
   model_pirate_officer,
   NUM_STATIC_MODELS
 };
+
+enum model_type {
+  STATIC_MODEL,
+  DYNAMIC_MODEL
+};
+
+typedef struct model_id_t
+{
+    enum model_type type;
+    union {
+        struct resource_id dyn_model_id;
+        enum static_model static_model_id;
+    };
+} model_id;
+
 
 enum shading {
     SHADING_TERRAIN,
@@ -28,7 +41,8 @@ enum shading {
 };
 
 struct model {
-    geometry_id geom_id;
+    /* geometry_id geom_id; */
+    struct geometry geom;
     enum shading shading;
     u32 texture;
 };
@@ -43,8 +57,10 @@ struct model_def {
 
 void init_model_manager();
 struct model *init_model(struct model *model);
-struct model *get_model(enum static_model);
+struct model *get_model(model_id *);
+struct model *new_model(model_id *);
+struct model *new_static_model(model_id *);
 
-struct model *new_dynamic_model(model_id *);
+model_id get_static_model(enum static_model, struct model**);
 
 #endif /* MODEL_H */

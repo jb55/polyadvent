@@ -187,7 +187,8 @@ static int try_reload_shaders(struct resources *res) {
 #endif
 
 void resize_fbos(struct entity *player, struct fbo *shadow_buffer,
-                 float *m4_ortho, int width, int height) {
+                 float *m4_ortho, int width, int height)
+{
     if (shadow_buffer->handle) {
         // TODO: remove once delete_fbo deletes attachments
         glDeleteTextures(1, &shadow_buffer->attachments[1]);
@@ -197,7 +198,10 @@ void resize_fbos(struct entity *player, struct fbo *shadow_buffer,
 
     // TODO: compute better bounds based
     const float factor = 4.5;
-    struct geometry *geom = get_geometry(&player->model->geom_id);
+
+    struct model *model   = get_model(&player->model_id); assert(model);
+    struct geometry *geom = get_geometry(&model->geom_id); assert(geom);
+
     float left   = geom->min[0] - factor;
     float right  = geom->max[0] + factor;
     float bottom = geom->min[1] - factor;
@@ -292,7 +296,8 @@ void orbit_update_from_mouse(struct orbit *camera, struct input *input,
     float target[3];
     struct node *target_node     = get_node(&player->node_id);
     struct node *cam_node        = get_node(&camera->node_id);
-    struct geometry *player_geom = get_geometry(&player->model->geom_id);
+    struct model *pmodel         = get_model(&player->model_id); assert(pmodel);
+    struct geometry *player_geom = get_geometry(model->geom_id);
 
     assert(target_node);
     assert(cam_node);

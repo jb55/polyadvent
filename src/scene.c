@@ -30,7 +30,7 @@ void default_scene(struct game *game) {
     struct node *pnode = get_node(&player->node_id);
 
     assert(tnode);
-    tower->model = get_model(model_tower);
+    tower->model_id = get_static_model_id(model_tower);
     node_set_label(tnode, "tower");
     node_attach(&tower->node_id, &player->node_id);
     node_translate(tnode, V3(0.0, 50.0, 0.0));

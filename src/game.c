@@ -12,6 +12,7 @@
 #include "stb_image.h"
 #include "skybox.h"
 #include "quickhull.h"
+#include "procmesh.h"
 #include "util.h"
 
 #include <assert.h>
@@ -53,51 +54,6 @@ static void init_user_settings(struct user_settings *settings) {
     settings->mouse_sens = 0.1;
 }
 
-
-static void qh_mesh_to_geom(qh_mesh_t *qh, struct make_geometry *geom) {
-    assert(!geom->vertices);
-    assert(!geom->indices);
-    float *new_normals = malloc(sizeof(float) * 3 * qh->nvertices);
-
-    geom->vertices = (float*)qh->vertices;
-    geom->normals = (float*)qh->normals;
-    geom->indices = qh->indices;
-    geom->num_verts = qh->nvertices;
-    geom->num_indices = qh->nindices;
-
-    for (u32 i = 0; i < qh->nnormals; i++) {
-        int ndv = i * 9;
-
-        qh_vertex_t *n = &qh->normals[i];
-        for (int j = 0; j < 9; j++) {
-            new_normals[ndv+j] = n->v[j%3];
-        }
-    }
-
-    geom->normals = new_normals;
-}
-
-
-void proc_sphere(struct make_geometry *mkgeom, geometry_id *geom_id) {
-    const int n = 50;
-    qh_vertex_t *vertices = malloc(n*sizeof(qh_vertex_t));
-    const float radius = 2.0;
-
-
-    for (int i = 0; i < n; ++i) {
-        float a0 = (rand_0to1() * TAU);
-        float a1 = (rand_0to1() * TAU);
-        vertices[i].z = sin(a0) * radius;
-        vertices[i].x = cos(a1) * cos(a0) * rand_0to1() * radius;
-        vertices[i].y = sin(a1) * cos(a0) * rand_0to1() * radius;
-    }
-
-    qh_mesh_t mesh = qh_quickhull3d(vertices, n);
-    qh_mesh_to_geom(&mesh, mkgeom);
-    make_buffer_geometry(mkgeom, geom_id);
-
-    qh_free_mesh(mesh);
-}
 
 
 void game_init(struct game *game, int width, int height) {
@@ -190,7 +146,14 @@ void game_init(struct game *game, int width, int height) {
     struct node *pnode = get_node(&player->node_id);
     assert(pnode);
     assert(res->player_id.index == 1);
-    player->model = get_model(model_pirate_officer);
+    /* player->model_id = get_static_model(model_pirate_officer, NULL); */
+
+    struct model *pmodel  = new_model(&player->model_id); assert(pmodel);
+
+    proc_sphere(geom);
+
+    ok = load_model(&player->model, "pirate-officer");
+    assert(ok);
     node_set_label(pnode, "player");
     node_attach(&player->node_id, &res->root_id);
 

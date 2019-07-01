@@ -18,14 +18,11 @@ CLOSED: [2019-06-22 Sat 12:52]
 ** DONE Load poses in engine
 CLOSED: [2019-06-22 Sat 12:52]
 
-** TODO factor node properties
-
-perhaps there's a more minimal subset of node that would be useful to
-both joints and entities?
-
-** TODO use nodes for joints
+** DONE use nodes for joints
+CLOSED: [2019-06-30 Sun 17:26]
 
 It will just be easier for interpolation
+
 
 ** TODO Load bone weights
 ** TODO Run pose
@@ -39,6 +36,7 @@ It will just be easier for interpolation
 * Entity
 
 ** TODO Entity loading stress test
+
 
 * Procedural
 
