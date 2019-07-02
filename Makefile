@@ -53,6 +53,7 @@ OBJS += $(SRC)/procmesh.o
 
 TESTS =  test/test_animation
 TESTS += test/test_resource
+TESTS += test/test_scene
 
 SRCS=$(OBJS:.o=.c)
 
@@ -77,6 +78,7 @@ test/%: test/%.o $(OBJS)
 check: $(TESTS)
 	./test/test_animation
 	./test/test_resource
+	./test/test_scene
 
 $(BIN): src/main.o $(OBJS)
 	$(CC) $(CFLAGS) $^ $(LDFLAGS) -o $@

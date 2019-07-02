@@ -16,7 +16,7 @@ make_buffer(GLenum target, const void *buffer_data, GLsizei buffer_size) {
   check_gl();
   assert(buffer_size > 0);
 
-  debug("buffer data %d\n", buffer_size);
+  /* debug("buffer data %d\n", buffer_size); */
   glBufferData(target, buffer_size, buffer_data, GL_STATIC_DRAW);
   check_gl();
 

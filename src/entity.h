@@ -5,6 +5,8 @@
 #include "node.h"
 #include "model.h"
 #include "id.h"
+#include "util.h"
+#include <assert.h>
 
 #define RESERVED_ENTITIES 2
 #define MAX_ENTITIES 2048
@@ -31,9 +33,17 @@ struct resource_manager *_internal_get_entity_system();
 void destroy_entity(entity_id *);
 void init_entity_system();
 struct entity *get_entity(entity_id *);
+const char *entity_label(struct entity *);
 struct entity *get_all_entities(u32 *count, entity_id **ids);
-struct entity *new_entity(entity_id *);
+struct entity *new_entity_(entity_id *);
 struct entity *new_entity_with_node(entity_id *, node_id *);
 void destroy_entity_system();
+
+static inline struct entity *new_entity(entity_id *id)
+{
+    if (id)
+        assert((int)id->index == -1 && "error: " __FILE__ ":" STRIZE(__LINE__) " missing init_id or already initialized");
+    return new_entity_(id);
+}
 
 #endif /* ENTITY_H */

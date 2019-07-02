@@ -36,13 +36,19 @@ void default_scene(struct game *game) {
     node_translate(tnode, V3(0.0, 50.0, 0.0));
     node_recalc(tnode);
     float z = terrain->fn(terrain, tnode->mat[M_X], tnode->mat[M_Y]);
-    node_detach(tnode, pnode);
+    /* node_detach(tnode, pnode); */
     tnode->mat[M_Z] = z;
     // END ENTITIES
 
 
 }
 
-/* void pbr_scene(struct game *game) { */
-/*     struct model *sphere = get_static_model(model_icosphere, NULL); */
-/* } */
+void pbr_scene(struct game *game) {
+    struct entity *ent = new_entity(NULL);
+    struct node *node  = get_node(&ent->node_id); assert(node);
+
+    ent->model_id = get_static_model(model_icosphere, NULL);
+    node_set_label(node, "sphere");
+    node_attach(&game->test_resources.root_id, &ent->node_id);
+
+}

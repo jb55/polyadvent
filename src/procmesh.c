@@ -49,6 +49,7 @@ void proc_sphere(struct geometry *geom) {
     qh_mesh_to_geom(&mesh, &mkgeom);
     make_buffer_geometry(&mkgeom, geom);
 
+    free(vertices);
     free(mkgeom.normals);
     qh_free_mesh(mesh);
 }

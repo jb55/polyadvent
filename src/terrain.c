@@ -54,7 +54,7 @@ void reset_terrain(struct terrain *terrain, float size) {
 void init_terrain(struct terrain *terrain, float size) {
     init_id(&terrain->entity_id);
 
-    struct entity *ent  = new_entity(&terrain->entity_id); assert(ent);
+    struct entity *ent  = new_entity(&terrain->entity_id);
     struct node *node   = get_node(&ent->node_id); assert(node);
     struct model *model = new_model(&ent->model_id); assert(model);
     /* struct model *model = init_model(&ent->model_id); assert(model); */

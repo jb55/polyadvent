@@ -84,8 +84,10 @@ struct user_settings {
 };
 
 struct game {
+    SDL_Window *window;
     int counter;
     int seed;
+    int quit;
     float dt;
     u64 frame;
     struct user_settings user_settings;
@@ -98,6 +100,7 @@ struct game {
 struct entity *get_player(struct resources *);
 struct entity *get_terrain_entity(struct terrain *);
 void game_init(struct game *game, int width, int height);
+void quit_game(struct game *game);
 void should_update(struct game *game);
 int was_key_pressed_this_frame(struct game *game, int scancode);
 int is_free_camera(struct game *game);

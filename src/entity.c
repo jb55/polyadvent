@@ -3,6 +3,7 @@
 #include "node.h"
 #include "model.h"
 #include "resource.h"
+#include "debug.h"
 #include <assert.h>
 
 #define DEF_NUM_ENTITIES 1024
@@ -25,6 +26,7 @@ struct entity *init_entity(struct entity *ent, node_id *id) {
         init_id(&new_id);
         new_node(&new_id);
         ent->node_id = new_id;
+        /* debug("init_entity with new node_id %llu\n", new_id.uuid); */
     }
     else {
         ent->node_id = *id;
@@ -41,12 +43,20 @@ static inline struct entity *new_uninitialized_entity(entity_id *id) {
     return new_resource(&esys, id);
 }
 
-struct entity *new_entity(entity_id *id) {
+struct entity *new_entity_(entity_id *id) {
     return new_entity_with_node(id, NULL);
 }
 
 
-struct entity *new_entity_with_node(entity_id *id, node_id *node) {
+struct entity *new_entity_with_node(entity_id *id, node_id *node)
+{
+    entity_id new_id;
+
+    if (id == NULL) {
+        id = &new_id;
+        init_id(&new_id);
+    }
+
     return init_entity(new_uninitialized_entity(id), node);
 }
 
@@ -65,7 +75,8 @@ void destroy_entities() {
     }
 };
 
-void destroy_entity(entity_id *id) {
+void destroy_entity(entity_id *id)
+{
     struct entity *ent = get_entity(id);
     assert(ent);
     if (ent == NULL)
@@ -76,9 +87,19 @@ void destroy_entity(entity_id *id) {
     if (node == NULL)
         return;
 
+    if (id->index < RESERVED_ENTITIES) {
+        unusual("trying to destroy reserved entity with node %s\n", node->label);
+        return;
+    }
+
     node_detach_from_parent(node);
-    destroy_resource(&esys, &ent->node_id);
     destroy_resource(&esys, id);
+}
+
+const char *entity_label(struct entity *ent)
+{
+    struct node *node = get_node(&ent->node_id); assert(node);
+    return node->label;
 }
 
 void destroy_entity_system() {

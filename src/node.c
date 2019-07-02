@@ -2,6 +2,7 @@
 
 #include "node.h"
 #include "mat_util.h"
+#include "debug.h"
 #include <string.h>
 #include <stdio.h>
 #include <assert.h>
@@ -28,6 +29,11 @@ struct node *get_node(node_id *id)
 
 void destroy_node(node_id *id)
 {
+#ifdef DEBUG
+    struct node *node = get_node(id);
+    debug("destroying node %llu %s\n", id->uuid, node->label);
+#endif
+
     destroy_resource(&node_manager, id);
 }
 

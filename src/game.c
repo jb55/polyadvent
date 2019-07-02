@@ -55,8 +55,35 @@ static void init_user_settings(struct user_settings *settings) {
 }
 
 
+static void init_sdl(SDL_Window **window, int width, int height)
+{
+    SDL_Init( SDL_INIT_VIDEO );
+
+    /* SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES); */
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
+
+    SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
+    SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
+    SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
+    SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
+    SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+    SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
+    SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 4);
+
+    *window = SDL_CreateWindow("SDL2/OpenGL Demo", 0, 0, width, height,
+                                          SDL_WINDOW_OPENGL|SDL_WINDOW_RESIZABLE);
+
+    SDL_GL_CreateContext(*window);
+}
+
+void quit_game(struct game *game)
+{
+    game->quit = 1;
+}
 
 void game_init(struct game *game, int width, int height) {
+    init_sdl(&game->window, width, height);
     init_gl(&game->test_resources, width, height);
     init_entity_system();
     init_model_manager();
@@ -84,6 +111,7 @@ void game_init(struct game *game, int width, int height) {
     mat4 *light_dir = res->light_dir;
     int ok = 0;
 
+    game->quit = 0;
     game->frame = 0;
 
     const double size = 10000.0;

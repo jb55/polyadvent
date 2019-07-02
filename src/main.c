@@ -38,27 +38,6 @@ int main(void)
     /* SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES); */
     int width = 640;
     int height = 480;
-
-    SDL_Init( SDL_INIT_VIDEO );
-
-    /* SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES); */
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
-
-    SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
-    SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
-    SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
-    SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
-    SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-    SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
-    SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 4);
-
-
-    SDL_Window *window = SDL_CreateWindow(
-        "SDL2/OpenGL Demo", 0, 0, width, height,
-        SDL_WINDOW_OPENGL|SDL_WINDOW_RESIZABLE);
-
-    SDL_GL_CreateContext(window);
     game_init(&game, width, height);
     /* reset_scene(&game); */
     /* pbr_scene(&game); */
@@ -85,7 +64,7 @@ int main(void)
     };
 
 
-    while (1) {
+    while (!game.quit) {
         game.frame++;
         process_events(&game.input, game.frame);
         if (game.input.resized_height) {
@@ -116,7 +95,7 @@ int main(void)
         render(&game, &default_config);
 
         /* Swap front and back buffers */
-        SDL_GL_SwapWindow(window);
+        SDL_GL_SwapWindow(game.window);
     }
 
     /* free(slab_buffer); */

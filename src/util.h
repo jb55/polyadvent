@@ -16,6 +16,9 @@
         }                                               \
     }
 
+#define STRIZE_DETAIL(x) #x
+#define STRIZE(x) STRIZE_DETAIL(x)
+
 #define UP_VEC V3(0.0, 0.0, 1.0)
 #define PI 3.14159265
 #define TAU 6.2831853

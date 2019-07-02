@@ -134,7 +134,7 @@ void print_id(struct resource_id *id)
 void *new_resource(struct resource_manager *r, struct resource_id *id)
 {
     assert(id);
-    assert((int)id->index == -1 && "res_id already initialized or uninitialized");
+    assert((int)id->index == -1 && "res_id is uninitialized");
 
     struct resource_id *fresh_id;
 
@@ -174,8 +174,10 @@ void *get_resource(struct resource_manager *r, struct resource_id *id) {
 
 
 void destroy_resource(struct resource_manager *r, struct resource_id *id) {
-    if (is_resource_destroyed(id))
+    if (is_resource_destroyed(id)) {
+        unusual("trying to destroy resource %llu which was already destroyed\n", id->uuid);
         return;
+    }
 
     enum refresh_status res = refresh_id(r, id, id);
     // entity already deleted
@@ -183,9 +185,12 @@ void destroy_resource(struct resource_manager *r, struct resource_id *id) {
     /*       id->uuid, id->generation, id->index); */
 
     if (res == RESOURCE_DELETED) {
+        unusual("trying to destroy resource %llu which was already destroyed (2)\n", id->uuid);
         id->generation = 0;
         return;
     }
+
+    /* debug("destroying resource %llu\n", id->uuid); */
 
     r->resource_count--;
     r->generation++;
