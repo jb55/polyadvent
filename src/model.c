@@ -2,6 +2,7 @@
 #include "model.h"
 #include "ply.h"
 #include "resource.h"
+#include "debug.h"
 #include <assert.h>
 
 #define MODELDEF(name) { .id = model_##name, .loaded = 0, .file = #name }
@@ -46,6 +47,7 @@ static inline struct model *new_uninitialized_model(struct resource_id *id) {
 static struct model *new_model_resource(model_id *model_id)
 {
     struct model *model = new_uninitialized_model(&model_id->dyn_model_id);
+    /* debug("new model %llu\n", model_id->dyn_model_id.uuid); */
     init_id(&model->geom_id);
     new_geometry(&model->geom_id);
     return model;
@@ -53,7 +55,7 @@ static struct model *new_model_resource(model_id *model_id)
 
 void init_model_manager() {
     init_resource_manager(&dyn_modelman, sizeof(struct model),
-                          DEF_DYNAMIC_MODELS, MAX_DYNAMIC_MODELS);
+                          DEF_DYNAMIC_MODELS, MAX_DYNAMIC_MODELS, "model");
 }
 
 
@@ -100,6 +102,18 @@ static struct model *load_static_model(enum static_model m)
         return 0;
 
     return model;
+}
+
+void destroy_model(model_id *model_id)
+{
+    if (model_id->type == STATIC_MODEL)
+        return;
+
+    struct resource_id *id = &model_id->dyn_model_id;
+    struct model *model = get_model(model_id);
+
+    destroy_geometry(&model->geom_id);
+    destroy_resource(&dyn_modelman, id);
 }
 
 model_id get_static_model(enum static_model m, struct model **model)

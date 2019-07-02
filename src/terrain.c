@@ -2,6 +2,7 @@
 #include "terrain.h"
 #include "util.h"
 #include "delaunay.h"
+#include "debug.h"
 #include "vec3.h"
 #include "perlin.h"
 #include "poisson.h"
@@ -240,4 +241,54 @@ void destroy_terrain(struct terrain *terrain) {
     struct entity *ent = get_entity(&terrain->entity_id); assert(ent);
     struct model *model = get_model(&ent->model_id); assert(model);
     destroy_buffer_geometry(&model->geom_id);
+}
+
+
+void update_terrain(struct terrain *terrain) {
+    static int first = 1;
+    static float last_scale = -1.0;
+
+    struct entity *ent = get_entity(&terrain->entity_id);
+    assert(ent);
+    struct perlin_settings *ts = &terrain->settings;
+    struct node *tnode = get_node(&ent->node_id);
+    assert(tnode);
+
+    debug("updating terrain\n");
+
+    if (first) {
+        reset_terrain(terrain, terrain->size);
+        /* tnode->pos[0] = rand_0to1() * terrain->size; */
+        /* tnode->pos[1] = rand_0to1() * terrain->size; */
+        first = 0;
+    }
+
+    ts->ox = tnode->pos[0];
+    ts->oy = tnode->pos[1];
+
+    double scale = tnode->pos[2] * 0.0015;
+    if (scale == 0) scale = 1.0;
+
+    printf("terrain %f %f %f\n", tnode->pos[0], tnode->pos[1], tnode->pos[2]);
+
+    /* ts.o1s = fabs(sin(1/n) * 0.25); */
+    /* ts.o1 = fabs(cos(n*0.2) * 0.5); */
+    /* ts.o2s = fabs(cos(n+2) * 0.5); */
+    /* ts.o2 = fabs(sin(n*0.02) * 2); */
+    ts->freq = scale * 0.05;
+    ts->amplitude = 50.0;
+
+    /* if (terrain->fn) */
+    /*     destroy_terrain(terrain); */
+
+    /* const double pdist = min(5.0, max(1.1, 1.0/scale*1.4)); */
+
+    /* printf("pdist %f\n", pdist); */
+
+    if (last_scale == -1.0 || fabs(scale - last_scale) > 0.00001) {
+        gen_terrain_samples(terrain, scale);
+    }
+
+    last_scale = scale;
+    create_terrain(terrain, scale);
 }

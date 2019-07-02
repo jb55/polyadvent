@@ -32,6 +32,7 @@ struct terrain {
 double old_noisy_boi(struct terrain *, double x, double y);
 
 
+void update_terrain(struct terrain *terrain);
 void gen_terrain_samples(struct terrain *terrain, float scale);
 void init_terrain(struct terrain *terrain, float size);
 void reset_terrain(struct terrain *terrain, float size);

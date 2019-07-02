@@ -39,17 +39,18 @@ void null_id(struct resource_id *id)
 }
 
 void init_resource_manager(struct resource_manager *r, u32 elem_size,
-                           u32 initial_elements, u32 max_elements) {
+                           u32 initial_elements, u32 max_elements, const char *name) {
     r->generation = 1;
     r->resource_count = 0;
     r->elem_size = elem_size;
     r->max_capacity = max_elements;
     r->current_capacity = initial_elements;
+    r->name = name;
 
     assert(initial_elements != 0);
 
     r->resources = calloc(initial_elements, elem_size);
-    r->ids = calloc(initial_elements, sizeof(*r->ids));
+    r->ids = calloc(initial_elements, sizeof(struct resource_id));
 }
 
 void destroy_resource_manager(struct resource_manager *r) {
@@ -63,7 +64,8 @@ static int refresh_id(struct resource_manager *r, struct resource_id *id,
     // rollover is ok
     /* assert(->generation <= esys.generation); */
     if (id->generation != r->generation) {
-        /* debug("id gen %d != res gen %d, refreshing\n", id->generation, r->generation); */
+        /* debug("id %llu gen %d != res gen %d, refreshing\n", */
+        /*       id->uuid, id->generation, r->generation); */
         // try to find uuid in new memory layout
         for (u32 i = 0; i < r->resource_count; i++) {
             struct resource_id *newer_id = &r->ids[i];
@@ -97,6 +99,8 @@ static void new_id(struct resource_manager *r, struct resource_id *id)
 
 static void resize(struct resource_manager *r)
 {
+    debug("resizing %s resources, count %d+1 > current capacity %d\n",
+          r->name, r->resource_count, r->current_capacity);
     void *new_mem;
     u32 new_size = r->resource_count * 1.5;
     if (new_size >= r->max_capacity)
@@ -121,14 +125,12 @@ static void resize(struct resource_manager *r)
     }
     r->current_capacity = new_size;
     r->ids = new_mem;
-
-    // 2 to avoid issues with compact generation incrementing
-    r->generation += 2;
 }
 
-void print_id(struct resource_id *id)
+void print_id(struct resource_id *id, int nl)
 {
-    printf("res_id(uuid:%llu ind:%d gen:%d)\n", id->uuid, id->index, id->generation);
+    printf("id(u:%llu i:%d g:%d)%s",
+           id->uuid, id->index, id->generation, nl?"\n":"");
 }
 
 void *new_resource(struct resource_manager *r, struct resource_id *id)
@@ -158,14 +160,14 @@ void *get_resource(struct resource_manager *r, struct resource_id *id) {
     assert((int64_t)id->generation != -1 && "id intialized but not allocated (needs new_ call)");
 
     if (id->generation == 0) {
-        //unusual("getting already deleted resource %llu\n", id->uuid);
+        /* unusual("getting already deleted resource %llu\n", id->uuid); */
         return NULL;
     }
 
     enum refresh_status res = refresh_id(r, id, id);
 
     if (res == RESOURCE_DELETED) {
-        unusual("getting deleted resource %llu\n", id->uuid);
+        unusual("getting deleted %s resource %llu\n", r->name, id->uuid);
         return NULL;
     }
 
@@ -190,18 +192,27 @@ void destroy_resource(struct resource_manager *r, struct resource_id *id) {
         return;
     }
 
-    /* debug("destroying resource %llu\n", id->uuid); */
+    debug("destroying %s resource %llu ind %d res_count %d\n",
+          r->name, id->uuid, id->index, r->resource_count);
 
     r->resource_count--;
     r->generation++;
 
+    assert((int)r->resource_count - (int)id->index >= 0);
+
+    // TODO: we're copying OOB here
     memmove(index_resource(r, id->index),
             index_resource(r, id->index+1),
-            r->elem_size * r->resource_count);
+            r->elem_size * (r->resource_count - id->index));
 
     memmove(&r->ids[id->index],
             &r->ids[id->index+1],
-            sizeof(*r->ids) * r->resource_count);
+            sizeof(struct resource_id) * (r->resource_count - id->index));
+
+
+    for (u32 i = id->index; i < r->resource_count; i++) {
+        r->ids[i].index--;
+    }
 }
 
 int is_id_allocated(struct resource_id *id)

@@ -88,55 +88,6 @@ static void remap_samples(struct point *points, int n_samples,
     }
 }
 
-void update_terrain(struct terrain *terrain) {
-    static int first = 1;
-    static float last_scale = -1.0;
-
-    struct entity *ent = get_entity(&terrain->entity_id);
-    assert(ent);
-    struct perlin_settings *ts = &terrain->settings;
-    struct node *tnode = get_node(&ent->node_id);
-    assert(tnode);
-
-    debug("updating terrain\n");
-
-    if (first) {
-        reset_terrain(terrain, terrain->size);
-        tnode->pos[0] = rand_0to1() * terrain->size;
-        tnode->pos[1] = rand_0to1() * terrain->size;
-        first = 0;
-    }
-
-    ts->ox = tnode->pos[0];
-    ts->oy = tnode->pos[1];
-
-    double scale = tnode->pos[2] * 0.0015;
-    if (scale == 0) scale = 1.0;
-
-    printf("terrain %f %f %f\n", tnode->pos[0], tnode->pos[1], tnode->pos[2]);
-
-    /* ts.o1s = fabs(sin(1/n) * 0.25); */
-    /* ts.o1 = fabs(cos(n*0.2) * 0.5); */
-    /* ts.o2s = fabs(cos(n+2) * 0.5); */
-    /* ts.o2 = fabs(sin(n*0.02) * 2); */
-    ts->freq = scale * 0.05;
-    ts->amplitude = 50.0;
-
-    /* if (terrain->fn) */
-    /*     destroy_terrain(terrain); */
-
-    /* const double pdist = min(5.0, max(1.1, 1.0/scale*1.4)); */
-
-    /* printf("pdist %f\n", pdist); */
-
-    if (last_scale == -1.0 || fabs(scale - last_scale) > 0.00001) {
-        gen_terrain_samples(terrain, scale);
-    }
-
-    last_scale = scale;
-    create_terrain(terrain, scale);
-}
-
 static void player_terrain_collision(struct terrain *terrain, struct entity *player) {
     // player movement
     static vec3 last_pos[3] = {0};
@@ -382,7 +333,7 @@ static void player_update(struct game *game, struct entity *player) {
 
 void update (struct game *game) {
 	static int toggle_fog = 0;
-	static int first = 1;
+	static int needs_terrain_update = 0;
 	struct resources *res          = &game->test_resources;
     struct terrain   *terrain      = &game->terrain;
 	struct node      *root         = get_node(&game->test_resources.root_id);
@@ -400,9 +351,9 @@ void update (struct game *game) {
 
     gravity(game);
 
-	if (first) {
+	if (needs_terrain_update) {
 		update_terrain(terrain);
-		first = 0;
+		needs_terrain_update = 0;
 	}
 
     /* spherical_dir(game->test_resources.camera.coords, camera_dir); */

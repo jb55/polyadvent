@@ -134,6 +134,8 @@ void game_init(struct game *game, int width, int height) {
 
     init_terrain(terrain, size);
     create_terrain(terrain, size);
+    update_terrain(terrain);
+
     /* get_entity(&terrain->entity_id)->flags |= ENT_INVISIBLE; */
 
     create_skybox(&res->skybox, &res->programs[SKYBOX_PROGRAM]);

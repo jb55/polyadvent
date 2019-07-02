@@ -58,5 +58,6 @@ void init_geometry_id(geometry_id *);
 struct geometry *new_geometry(geometry_id *);
 struct geometry *get_geometry(geometry_id *);
 struct geometry *get_all_geometry(u32 *count, geometry_id **ids);
+void destroy_geometry(geometry_id *geom_id);
 
 #endif /* GEOMETRY_H */

@@ -6,6 +6,7 @@
 
 void default_scene(struct game *);
 void reset_scene(struct game *);
+void entity_test_scene(struct game *);
 void pbr_scene(struct game *);
 
 #endif /* SCENE_H */

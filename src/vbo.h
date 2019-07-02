@@ -69,5 +69,6 @@ make_int_vertex_buffer(struct vbo *vbo, const int *data,
 
 void bind_uv_vbo(struct vbo *vbo, gpu_addr slot);
 void bind_vbo(struct vbo *vbo, gpu_addr slot, GLenum type);
+void free_vbo(struct vbo *vbo);
 
 #endif /* POLYADVENT_BUFFER_H */

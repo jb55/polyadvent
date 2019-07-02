@@ -19,6 +19,7 @@ struct node *new_node(node_id *id)
 {
     struct node *n = node_init(new_uninitialized_node(id));
     assert((int64_t)id->uuid != -1);
+    /* debug("new node %llu\n", id->uuid); */
     return n;
 }
 
@@ -39,7 +40,7 @@ void destroy_node(node_id *id)
 
 void init_node_manager()
 {
-    init_resource_manager(&node_manager, sizeof(struct node), 128, 0xFFFF);
+    init_resource_manager(&node_manager, sizeof(struct node), 128, 0xFFFF, "node");
 }
 
 struct node *node_init(struct node *node) {
@@ -107,7 +108,7 @@ int node_needs_recalc(struct node *node)
 }
 
 vec3 *node_world(struct node *node) {
-    node_recalc(node);
+
     return &node->mat[M_X];
 }
 
@@ -175,7 +176,7 @@ int node_detach(struct node *node, struct node *from) {
         if (child && child == node) {
             destroy_node(child_id);
             memmove(&from->children_ids[i], &from->children_ids[i+1],
-                    sizeof(*from->children_ids) * from->n_children - 1);
+                    sizeof(*from->children_ids) * (from->n_children - i - 1));
             // TODO: test node_detach
             from->n_children--;
             return 1;

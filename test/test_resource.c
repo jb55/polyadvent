@@ -6,43 +6,79 @@
 #include "debug.h"
 #include <assert.h>
 
-void test_compact()
+static void print_int_resources(struct resource_manager *m)
+{
+    int *ints = (int*)m->resources;
+
+    for (u32 i = 0; i < m->resource_count; i++) {
+        printf("%d ", ints[i]);
+    }
+
+    printf("\n");
+}
+
+
+static void print_ids(struct resource_manager *m)
+{
+    for (u32 i = 0; i < m->resource_count; i++) {
+        print_id(&m->ids[i], 0);
+        printf(" ");
+    }
+    printf("\n");
+}
+
+
+static void test_compact()
 {
     printf("test_compact\n");
     struct resource_manager r;
-    struct resource_id ids[3], first_id;
+    struct resource_id ids[20];
     int *p;
+    u32 i;
 
-    init_resource_manager(&r, sizeof(int), 2, 4);
+    init_resource_manager(&r, sizeof(int), 2, 6, "int");
 
-    for (int i = 0; i < (int)ARRAY_SIZE(ids); i++)
+    for (i = 0; i < (int)ARRAY_SIZE(ids); i++)
         init_id(&ids[i]);
 
-    init_id(&first_id);
+    i = 0;
 
-    p = new_resource(&r, &first_id);
-    assert(r.resource_count == 1);
-    *p = 11;
+    p = new_resource(&r, &ids[i++]);
+    assert(r.resource_count == 1); *p = 0;
 
-    p = new_resource(&r, &ids[0]);
-    *p = 22;
+    p = new_resource(&r, &ids[i++]); *p = 1;
     assert(r.resource_count == 2);
 
-    destroy_resource(&r, &first_id);
-    assert(r.resource_count == 1);
-    assert(get_resource(&r, &first_id) == NULL);
-    assert(*(int*)get_resource(&r, &ids[0]) == 22);
+    p = new_resource(&r, &ids[i++]); *p = 2;
+    p = new_resource(&r, &ids[i++]);
+    *p = 3;
 
-    new_resource(&r, &ids[1]);
-    assert(r.resource_count == 2);
-    assert(r.current_capacity == 2);
 
-    new_resource(&r, &ids[2]);
+    print_int_resources(&r);
+    print_ids(&r);
+
+    assert(r.resource_count == 4);
+    destroy_resource(&r, &ids[1]);
     assert(r.resource_count == 3);
-    assert(r.current_capacity >= 3);
+    print_int_resources(&r);
+    print_ids(&r);
+
+    assert(*(int*)get_resource(&r, &ids[0]) == 0);
+    assert(       get_resource(&r, &ids[1]) == NULL);
+    print_id(&ids[1], 1);
+    debug("%d\n",*(int*)get_resource(&r, &ids[2]) );
+    assert(*(int*)get_resource(&r, &ids[2]) == 2);
+
+    new_resource(&r, &ids[i++]);
+    assert(r.resource_count == 4);
+    assert(r.current_capacity >= 4);
+
+    new_resource(&r, &ids[i++]);
+    assert(r.resource_count == 5);
+    assert(r.current_capacity >= 5);
 }
 
-void test_int_resource_manager()
+static void test_int_resource_manager()
 {
     printf("test_int_resource_manager\n");
     struct resource_manager r
@@ -50,7 +86,7 @@ void test_int_resource_manager()
     struct resource_id id, first_id;
     int *p;
     // 2 item case
-    init_resource_manager(&r, sizeof(int), 1, 2);
+    init_resource_manager(&r, sizeof(int), 1, 2, "int");
 
     init_id(&id);
     init_id(&first_id);
@@ -74,7 +110,7 @@ void test_int_resource_manager()
     destroy_resource_manager(&r);
 }
 
-void test_entity_system()
+static void test_entity_system()
 {
     printf("test_entity_system\n");
     u32 count;

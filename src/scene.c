@@ -1,6 +1,10 @@
 
+
 #include "game.h"
 #include "model.h"
+#include "procmesh.h"
+#include "debug.h"
+#include "vec3.h"
 #include <assert.h>
 
 void reset_scene(struct game *game) {
@@ -43,12 +47,63 @@ void default_scene(struct game *game) {
 
 }
 
-void pbr_scene(struct game *game) {
+static void delete_every_other_entity()
+{
+    u32 count;
+    entity_id *ids;
+
+    for (u32 i = RESERVED_ENTITIES; i < 1000; i++) {
+        get_all_entities(&count, &ids);
+
+        if (i >= count)
+            return;
+
+        if (i % 2 == 0) {
+            struct entity *ent = get_entity(&ids[i]); assert(ent);
+            struct model *pmodel = get_model(&ent->model_id); assert(pmodel);
+
+            destroy_model(&ent->model_id);
+            destroy_entity(&ids[i]);
+        }
+    }
+}
+
+
+
+void entity_test_scene(struct game *game)
+{
+    struct entity *player  = get_player(&game->test_resources);
+    struct terrain *terrain  = &game->terrain;
+    player->model_id = get_static_model(model_pirate_officer, NULL);
+
+    for (int i = 0; i < 500; i++) {
+        struct entity *ent = new_entity(NULL);
+        struct node *node  = get_node(&ent->node_id);
+
+        struct model *pmodel  = new_model(&ent->model_id); assert(pmodel);
+        struct geometry *geom = get_geometry(&pmodel->geom_id); assert(geom);
+
+        proc_sphere(geom);
+        pmodel->shading = SHADING_VERT_COLOR;
+
+        double x = rand_0to1() * terrain->size;
+        double y = rand_0to1() * terrain->size;
+        double z = terrain->fn(terrain, x, y);
+
+        node_scale(node, 10.0);
+        node_translate(node, V3(x, y, z));
+
+        node_recalc(node);
+    }
+
+}
+
+void pbr_scene(struct game *game)
+{
     struct entity *ent = new_entity(NULL);
     struct node *node  = get_node(&ent->node_id); assert(node);
+    struct entity *player = get_player(&game->test_resources);
 
     ent->model_id = get_static_model(model_icosphere, NULL);
     node_set_label(node, "sphere");
-    node_attach(&game->test_resources.root_id, &ent->node_id);
-
 }

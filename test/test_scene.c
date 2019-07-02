@@ -12,6 +12,28 @@
 #define t_assert(cond, msg) assert(cond && msg);
 
 
+void delete_every_other_entity()
+{
+    u32 count;
+    entity_id *ids;
+
+    for (u32 i = RESERVED_ENTITIES; i < 1000; i++) {
+        get_all_entities(&count, &ids);
+
+        if (i >= count)
+            return;
+
+        if (i % 2 == 0) {
+            struct entity *ent = get_entity(&ids[i]); assert(ent);
+            struct model *pmodel = get_model(&ent->model_id); assert(pmodel);
+
+            destroy_model(&ent->model_id);
+            destroy_entity(&ids[i]);
+        }
+    }
+}
+
+
 int scene_tests(struct game *game) {
     struct node *root = get_node(&game->test_resources.root_id);
     assert(root);
@@ -40,6 +62,14 @@ int scene_tests(struct game *game) {
 
     t_assert(node_count(root) == initial_node_count,
            "scene: node count doesn't match initial after reset_scene");
+
+    entity_test_scene(game);
+
+    get_all_entities(&ent_count, NULL);
+    /* assert(ent_count == 102); */
+
+    delete_every_other_entity();
+    assert(ent_count == 502);
 
     return 1;
 }

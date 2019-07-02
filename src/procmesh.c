@@ -35,7 +35,7 @@ void proc_sphere(struct geometry *geom) {
     const int n = 50;
     qh_vertex_t *vertices = malloc(n*sizeof(qh_vertex_t));
     const float radius = 2.0;
-
+    float *colors;
 
     for (int i = 0; i < n; ++i) {
         float a0 = (rand_0to1() * TAU);
@@ -43,13 +43,26 @@ void proc_sphere(struct geometry *geom) {
         vertices[i].z = sin(a0) * radius;
         vertices[i].x = cos(a1) * cos(a0) * rand_0to1() * radius;
         vertices[i].y = sin(a1) * cos(a0) * rand_0to1() * radius;
+
     }
 
     qh_mesh_t mesh = qh_quickhull3d(vertices, n);
+
+    assert(mesh.nvertices);
+    colors = malloc(mesh.nvertices * 3 * sizeof(*colors));
+    assert(colors);
+    for (u32 i = 0; i < mesh.nvertices; i++) {
+        for (int j = 0; j < 3; j++)
+            colors[i*3+j] = 0.5;
+    }
+    mkgeom.colors = colors;
+
     qh_mesh_to_geom(&mesh, &mkgeom);
+
     make_buffer_geometry(&mkgeom, geom);
 
     free(vertices);
+    free(colors);
     free(mkgeom.normals);
     qh_free_mesh(mesh);
 }

@@ -174,7 +174,7 @@ void geometry_centroid(struct geometry *geom, float *dest) {
 
 void init_geometry_manager() {
     init_resource_manager(&geom_manager, sizeof(struct geometry),
-                          DEF_NUM_GEOMETRY, MAX_GEOMETRY);
+                          DEF_NUM_GEOMETRY, MAX_GEOMETRY, "geometry");
 }
 
 struct geometry *get_geometry(geometry_id *geom_id) {
@@ -183,9 +183,25 @@ struct geometry *get_geometry(geometry_id *geom_id) {
 
 
 struct geometry *new_geometry(geometry_id *geom_id) {
-    return new_resource(&geom_manager, geom_id);
+    struct geometry *geom = new_resource(&geom_manager, geom_id);
+    /* debug("new geometry %llu\n", geom_id->uuid); */
+    return geom;
 }
 
 struct geometry *get_all_geometry(u32 *count, geometry_id **ids) {
     return get_all_resources(&geom_manager, count, ids);
+}
+
+void destroy_geometry(geometry_id *geom_id)
+{
+    struct geometry *geom = get_geometry(geom_id); assert(geom);
+    struct vbo *vbo;
+
+    for (int i = 0; i < n_vertex_attrs; i++) {
+        vbo = &geom->vbos[i];
+        if (vbo->handle)
+            glDeleteBuffers(1, &vbo->handle);
+    }
+
+    destroy_resource(&geom_manager, geom_id);
 }

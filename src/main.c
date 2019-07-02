@@ -40,7 +40,7 @@ int main(void)
     int height = 480;
     game_init(&game, width, height);
     /* reset_scene(&game); */
-    /* pbr_scene(&game); */
+    entity_test_scene(&game);
 
     check_gl();
     double last = hires_time_in_seconds();

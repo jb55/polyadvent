@@ -62,6 +62,7 @@ struct model *get_model(model_id *);
 struct model *get_model_geom(model_id *, struct geometry **);
 struct model *new_model(model_id *);
 struct model *new_static_model(model_id *);
+void destroy_model(model_id *);
 
 model_id get_static_model(enum static_model, struct model**);
 

@@ -25,6 +25,7 @@ struct resource_manager {
     u32 slots_used;
     u32 max_capacity;
     u32 current_capacity;
+    const char *name;
 };
 
 #define ideq(a, b) ((a)->uuid == (b)->uuid)
@@ -36,10 +37,10 @@ void *get_all_resources(struct resource_manager *, u32 *count, struct resource_i
 void destroy_resource(struct resource_manager *, struct resource_id *id);
 void destroy_resource_manager(struct resource_manager *);
 void *new_resource(struct resource_manager *, struct resource_id *id);
-void print_id(struct resource_id *);
+void print_id(struct resource_id *, int nl);
 void null_id(struct resource_id *id);
 
 void init_resource_manager(struct resource_manager *r, u32 elem_size,
-                           u32 initial_elements, u32 max_elements);
+                           u32 initial_elements, u32 max_elements, const char *name);
 
 #endif /* RESOURCE_H */

@@ -108,7 +108,7 @@ void destroy_entity_system() {
 
 void init_entity_system() {
     init_resource_manager(&esys, sizeof(struct entity), DEF_NUM_ENTITIES,
-                          MAX_ENTITIES);
+                          MAX_ENTITIES, "entity");
 }
 
 
