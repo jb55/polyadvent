@@ -1,6 +1,7 @@
 
 #include "input.h"
 #include "util.h"
+#include "debug.h"
 #include "common.h"
 
 static void key_down(struct input *input, int scancode, u64 current_frame) {
@@ -66,7 +67,7 @@ void process_events(struct input *input, u64 current_frame) {
       case SDL_WINDOWEVENT_RESIZED:
           if (!event.window.data1)
               continue;
-          printf("resizing %d %d\n", event.window.data1, event.window.data2);
+          debug("resizing %d %d\n", event.window.data1, event.window.data2);
           input->resized_width = event.window.data1;
           input->resized_height = event.window.data2;
           assert(input->resized_width);

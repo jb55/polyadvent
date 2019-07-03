@@ -371,8 +371,10 @@ void update (struct game *game) {
 
     player_update(game, player);
 
+#ifdef DEBUG
 	if (was_key_pressed_this_frame(game, SDL_SCANCODE_R))
 		try_reload_shaders(res);
+#endif
 
 	if (was_key_pressed_this_frame(game, SDL_SCANCODE_C))
 		printf("light_dir %f %f %f\n", light[0], light[1], light[2]);
