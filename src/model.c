@@ -19,7 +19,7 @@ static int static_models_initialized = 0;
 
 void init_model_id(model_id *id)
 {
-    assert((int)id->dyn_model_id.index != -1);
+    /* assert((int)id->dyn_model_id.index != -1); */
     id->type = DYNAMIC_MODEL;
     init_id(&id->dyn_model_id);
 }

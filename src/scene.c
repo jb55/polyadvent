@@ -62,7 +62,7 @@ void entity_test_scene(struct game *game)
     proc_sphere(geom);
     pmodel->shading = SHADING_VERT_COLOR;
 
-    for (int i = 0; i < 500; i++) {
+    for (int i = 0; i < terrain->size*0.2; i++) {
         struct entity *ent = new_entity(NULL);
         struct node *node  = get_node(&ent->node_id);
 
@@ -72,7 +72,7 @@ void entity_test_scene(struct game *game)
         double y = rand_0to1() * terrain->size;
         double z = terrain->fn(terrain, x, y);
 
-        node_scale(node, 10.0);
+        node_scale(node, pow(15.0, rand_0to1()));
         node_rotate(node, V3(rand_0to1(),rand_0to1(),rand_0to1()));
         node_translate(node, V3(x, y, z));
 
