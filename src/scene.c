@@ -47,27 +47,6 @@ void default_scene(struct game *game) {
 
 }
 
-static void delete_every_other_entity()
-{
-    u32 count;
-    entity_id *ids;
-
-    for (u32 i = RESERVED_ENTITIES; i < 1000; i++) {
-        get_all_entities(&count, &ids);
-
-        if (i >= count)
-            return;
-
-        if (i % 2 == 0) {
-            struct entity *ent = get_entity(&ids[i]); assert(ent);
-            struct model *pmodel = get_model(&ent->model_id); assert(pmodel);
-
-            destroy_model(&ent->model_id);
-            destroy_entity(&ids[i]);
-        }
-    }
-}
-
 
 
 void entity_test_scene(struct game *game)
