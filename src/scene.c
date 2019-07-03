@@ -75,22 +75,26 @@ void entity_test_scene(struct game *game)
     struct entity *player  = get_player(&game->test_resources);
     struct terrain *terrain  = &game->terrain;
     player->model_id = get_static_model(model_pirate_officer, NULL);
+    model_id proc_id;
+    init_model_id(&proc_id);
+
+    struct model *pmodel  = new_model(&proc_id); assert(pmodel);
+    struct geometry *geom = get_geometry(&pmodel->geom_id); assert(geom);
+    proc_sphere(geom);
+    pmodel->shading = SHADING_VERT_COLOR;
 
     for (int i = 0; i < 500; i++) {
         struct entity *ent = new_entity(NULL);
         struct node *node  = get_node(&ent->node_id);
 
-        struct model *pmodel  = new_model(&ent->model_id); assert(pmodel);
-        struct geometry *geom = get_geometry(&pmodel->geom_id); assert(geom);
-
-        proc_sphere(geom);
-        pmodel->shading = SHADING_VERT_COLOR;
+        ent->model_id = proc_id;
 
         double x = rand_0to1() * terrain->size;
         double y = rand_0to1() * terrain->size;
         double z = terrain->fn(terrain, x, y);
 
         node_scale(node, 10.0);
+        node_rotate(node, V3(rand_0to1(),rand_0to1(),rand_0to1()));
         node_translate(node, V3(x, y, z));
 
         node_recalc(node);
