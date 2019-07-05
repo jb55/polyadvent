@@ -343,17 +343,6 @@ void render (struct game *game, struct render_config *config) {
         if (node == NULL)
             return;
 
-        if (i == 1) {
-            debug("rendering %s\n", node->label);
-            print_id(&entity->model_id, true);
-            struct model *model = get_model(&entity->model_id);
-            struct geometry *geom = get_geometry(&model->geom_id);
-            print_id(&model->geom_id, true);
-
-            printf("num_verts: %d\n", geom->num_verts);
-        }
-
-
         mat4_multiply(view_proj, node->mat, mvp);
         mat4_copy(node->mat, model_view);
         mat4_multiply(config->depth_vp, model_view, depth_mvp);

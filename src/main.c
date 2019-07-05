@@ -48,7 +48,7 @@ int main(void)
     mat4_id(depth_vp);
 
     struct render_config fbo_render_config = {
-      .draw_ui = 0,
+      .draw_ui = 1,
       .is_depth_pass = 1,
       .camera = game.test_resources.sun_camera_id,
       .projection = game.test_resources.proj_ortho,
@@ -56,7 +56,7 @@ int main(void)
     };
 
     struct render_config default_config = {
-      .draw_ui = 0,
+      .draw_ui = 1,
       .is_depth_pass = 0,
       .camera = game.test_resources.camera_node_id,
       .projection = game.test_resources.proj_persp,
