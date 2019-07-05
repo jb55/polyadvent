@@ -93,11 +93,7 @@ static int parse_header(const char **cursor, int *nverts, int *ninds) {
     ok = parse_element(cursor, "face", ninds);
     if (ok) return 1;
 
-    ok = parse_element(cursor, "face", ninds);
-    if (ok) return 1;
-
-
-    return ok;
+    return 0;
 }
 
 static int parse_magic(const char **cursor) {

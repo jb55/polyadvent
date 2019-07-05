@@ -40,10 +40,10 @@ void main() {
   // vec3 color = reflect_env(vertex.position);
   vec3 color = pbr(vertex.color, normalize(V), vertex.normal);
 
-  // if (fog_on) {
-  //   vec3 fog = apply_fog(color, vertex.position, length(V), camera_position, V);
-  //   color = fog;
-  // }
+  if (fog_on) {
+    vec3 fog = apply_fog(color, vertex.position, length(V), camera_position, V);
+    color = fog;
+  }
 
   color *= shadow_strength(v4_pos, v4_normal, vertex.shadow_coord);
 

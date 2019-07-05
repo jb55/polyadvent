@@ -275,8 +275,8 @@ void update_terrain(struct terrain *terrain) {
     /* ts.o1 = fabs(cos(n*0.2) * 0.5); */
     /* ts.o2s = fabs(cos(n+2) * 0.5); */
     /* ts.o2 = fabs(sin(n*0.02) * 2); */
-    ts->freq = scale * 0.05;
-    ts->amplitude = 50.0;
+    ts->freq = scale * 0.08;
+    ts->amplitude = 70.0;
 
     /* if (terrain->fn) */
     /*     destroy_terrain(terrain); */

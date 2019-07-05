@@ -78,8 +78,6 @@ vec3 standard_light(vec3 color, vec4 position, vec4 normal) {
     vec3 final = (ambient + diffuse + specular) * color;
 
     // tone mapping
-    // final = final / (vec3(1.0) - final * exposure);
-    // final = final / (vec3(1.0) + color);
     // final = uncharted_tonemap(final);
 
     return final;

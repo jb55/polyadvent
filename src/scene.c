@@ -31,7 +31,6 @@ void default_scene(struct game *game) {
 
     struct entity *tower = new_entity(NULL);
     struct node *tnode = get_node(&tower->node_id);
-    struct node *pnode = get_node(&player->node_id);
 
     assert(tnode);
     tower->model_id = get_static_model(model_tower, NULL);
@@ -54,19 +53,20 @@ void entity_test_scene(struct game *game)
     struct entity *player  = get_player(&game->test_resources);
     struct terrain *terrain  = &game->terrain;
     player->model_id = get_static_model(model_pirate_officer, NULL);
-    model_id proc_id;
-    init_model_id(&proc_id);
 
-    struct model *pmodel  = new_model(&proc_id); assert(pmodel);
+    model_id rock_model;
+    init_model_id(&rock_model);
+
+    /* model_id rock_model = get_static_model(model_tower, NULL); */
+    struct model *pmodel  = new_model(&rock_model); assert(pmodel);
     struct geometry *geom = get_geometry(&pmodel->geom_id); assert(geom);
     proc_sphere(geom);
-    pmodel->shading = SHADING_VERT_COLOR;
 
     for (int i = 0; i < terrain->size*0.2; i++) {
         struct entity *ent = new_entity(NULL);
         struct node *node  = get_node(&ent->node_id);
 
-        ent->model_id = proc_id;
+        ent->model_id = rock_model;
 
         double x = rand_0to1() * terrain->size;
         double y = rand_0to1() * terrain->size;
