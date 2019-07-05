@@ -39,7 +39,7 @@ void create_skybox(struct skybox *skybox, struct gpu_program *program) {
     int ok;
 
     node_init(&skybox->node);
-    init_model_id(&skybox->model_id);
+    init_id(&skybox->model_id);
 
     skybox->program = program;
 

@@ -5,7 +5,6 @@
 #include "debug.h"
 #include <assert.h>
 
-
 static struct resource_manager geom_manager;
 
 void
@@ -174,7 +173,7 @@ void geometry_centroid(struct geometry *geom, float *dest) {
 
 void init_geometry_manager() {
     init_resource_manager(&geom_manager, sizeof(struct geometry),
-                          DEF_NUM_GEOMETRY, MAX_GEOMETRY, "geometry");
+                          DEF_NUM_GEOMETRY, MAX_GEOMETRY, "geometry", NULL);
 }
 
 struct geometry *get_geometry(geometry_id *geom_id) {

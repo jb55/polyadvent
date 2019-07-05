@@ -5,6 +5,7 @@
 #include "resource.h"
 
 #define MAX_NODE_CHILDREN 4
+#define N_STATIC_NODES 32
 
 enum node_flags {
   NODE_IGNORE_RECALC = 1 << 0

@@ -9,10 +9,21 @@
 
 static u64 resource_uuids = 0;
 
-static inline void *index_resource(struct resource_manager *r, int i) {
-    unsigned char *p = r->resources;
-    assert(p);
-    return p + (i * r->elem_size);
+static inline void *index_resource_(u8 *res, u32 elem_size, int i)
+{
+    assert(res);
+    return res + (i * elem_size);
+}
+
+static inline void *index_resource(struct resource_manager *r, int i)
+{
+    return index_resource_(r->resources, r->elem_size, i);
+}
+
+
+static inline void *index_static_resource(struct resource_manager *r, int i)
+{
+    return index_resource_(r->static_res.resources, r->elem_size, i);
 }
 
 void *get_all_resources(struct resource_manager *r, u32 *count, struct resource_id **ids) {
@@ -39,13 +50,30 @@ void null_id(struct resource_id *id)
 }
 
 void init_resource_manager(struct resource_manager *r, u32 elem_size,
-                           u32 initial_elements, u32 max_elements, const char *name) {
+                           u32 initial_elements, u32 max_elements,
+                           const char *name,
+                           struct static_resources *static_res)
+{
     r->generation = 1;
     r->resource_count = 0;
     r->elem_size = elem_size;
     r->max_capacity = max_elements;
     r->current_capacity = initial_elements;
     r->name = name;
+
+    if (static_res) {
+        r->static_res = *static_res;
+
+        if (r->static_res.resources == NULL) {
+            r->static_res.resources =
+                calloc(r->static_res.capacity, elem_size);
+        }
+    }
+    else {
+        r->static_res.count = 0;
+        r->static_res.capacity = 0;
+        r->static_res.resources = NULL;
+    }
 
     assert(initial_elements != 0);
 
@@ -97,6 +125,13 @@ static void new_id(struct resource_manager *r, struct resource_id *id)
     assert(id->generation);
 }
 
+static void new_static_id(struct resource_manager *r, struct resource_id *id)
+{
+    id->index = r->static_res.count;
+    id->uuid  = STATIC_UUID;
+    id->generation = 0xFFFFFFFF;
+}
+
 static void resize(struct resource_manager *r)
 {
     debug("resizing %s resources, count %d+1 > current capacity %d\n",
@@ -129,14 +164,37 @@ static void resize(struct resource_manager *r)
 
 void print_id(struct resource_id *id, int nl)
 {
+    int is_static = is_static_resource(id);
+
+    if (is_static) {
+        printf("sid(%llu @ %d)%s", id->uuid & ~U64HOB, id->index, nl?"\n":"");
+        return;
+    }
+
     printf("id(u:%llu i:%d g:%d)%s",
            id->uuid, id->index, id->generation, nl?"\n":"");
+}
+
+void *new_static_resource(struct resource_manager *r,
+                          struct resource_id *id)
+{
+    assert(r->static_res.resources);
+    assert(id);
+    assert(id->index == 0xFFFFFFFF && "res_id is uninitialized");
+    assert(r->static_res.count + 1 < r->static_res.capacity);
+    if    (r->static_res.count + 1 < r->static_res.capacity)
+        return NULL; // we're full
+
+    new_static_id(r, id);
+
+    return index_static_resource(r, r->static_res.count++);
 }
 
 void *new_resource(struct resource_manager *r, struct resource_id *id)
 {
     assert(id);
-    assert((int)id->index == -1 && "res_id is uninitialized");
+    assert(id->uuid != STATIC_UUID && "called new_resource with a static id");
+    assert(id->index == 0xFFFFFFFF && "res_id is uninitialized");
 
     struct resource_id *fresh_id;
 
@@ -147,16 +205,25 @@ void *new_resource(struct resource_manager *r, struct resource_id *id)
         resize(r);
 
     fresh_id = &r->ids[r->resource_count];
-
     new_id(r, fresh_id);
-
-    if (id)
-        *id = *fresh_id;
+    *id = *fresh_id;
 
     return index_resource(r, r->resource_count++);
 }
 
+void *get_static_resource(struct resource_manager *r,
+                          struct resource_id *id)
+{
+    assert(r->static_res.capacity > 0 && "trying to get a static "
+           "resource on a manager doesn't have static resources");
+
+    return index_static_resource(r, id->index);
+}
+
 void *get_resource(struct resource_manager *r, struct resource_id *id) {
+    if (id->uuid == STATIC_UUID)
+        return get_static_resource(r, id);
+
     assert((int64_t)id->generation != -1 && "id intialized but not allocated (needs new_ call)");
 
     if (id->generation == 0) {
@@ -213,9 +280,4 @@ void destroy_resource(struct resource_manager *r, struct resource_id *id) {
     for (u32 i = id->index; i < r->resource_count; i++) {
         r->ids[i].index--;
     }
-}
-
-int is_id_allocated(struct resource_id *id)
-{
-    return (int)id->index != -1;
 }

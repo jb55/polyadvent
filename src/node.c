@@ -40,7 +40,13 @@ void destroy_node(node_id *id)
 
 void init_node_manager()
 {
-    init_resource_manager(&node_manager, sizeof(struct node), 128, 0xFFFF, "node");
+    struct static_resources nodes = {
+      .count     = 0,
+      .capacity  = N_STATIC_NODES,
+    };
+
+    init_resource_manager(&node_manager, sizeof(struct node), 128,
+                          0xFFFF, "node", &nodes);
 }
 
 struct node *node_init(struct node *node) {

@@ -12,27 +12,14 @@
 #define MAX_STATIC_MODELS 128
 #define MAX_DYNAMIC_MODELS 2048
 
+typedef struct resource_id model_id;
+
 enum static_model {
   model_tower,
   model_icosphere,
   model_pirate_officer,
   NUM_STATIC_MODELS
 };
-
-enum model_type {
-  STATIC_MODEL,
-  DYNAMIC_MODEL
-};
-
-typedef struct model_id_t
-{
-    enum model_type type;
-    union {
-        struct resource_id dyn_model_id;
-        enum static_model static_model_id;
-    };
-} model_id;
-
 
 enum shading {
     SHADING_TERRAIN,

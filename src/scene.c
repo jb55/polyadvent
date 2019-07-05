@@ -55,7 +55,7 @@ void entity_test_scene(struct game *game)
     player->model_id = get_static_model(model_pirate_officer, NULL);
 
     model_id rock_model;
-    init_model_id(&rock_model);
+    init_id(&rock_model);
 
     /* model_id rock_model = get_static_model(model_tower, NULL); */
     struct model *pmodel  = new_model(&rock_model); assert(pmodel);

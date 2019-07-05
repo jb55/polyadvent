@@ -17,13 +17,6 @@ static struct resource_manager dyn_modelman;
 
 static int static_models_initialized = 0;
 
-void init_model_id(model_id *id)
-{
-    /* assert((int)id->dyn_model_id.index != -1); */
-    id->type = DYNAMIC_MODEL;
-    init_id(&id->dyn_model_id);
-}
-
 struct model *init_model(struct model *model) {
     init_id(&model->geom_id);
     model->shading = SHADING_VERT_COLOR;
@@ -46,7 +39,7 @@ static inline struct model *new_uninitialized_model(struct resource_id *id) {
 
 static struct model *new_model_resource(model_id *model_id)
 {
-    struct model *model = new_uninitialized_model(&model_id->dyn_model_id);
+    struct model *model = new_uninitialized_model(model_id);
     /* debug("new model %llu\n", model_id->dyn_model_id.uuid); */
     init_id(&model->geom_id);
     new_geometry(&model->geom_id);
@@ -61,23 +54,13 @@ void init_model_manager() {
 
 struct model *new_model(model_id *id)
 {
-    id->type = DYNAMIC_MODEL;
     return new_model_resource(id);
 }
 
+
 struct model *get_model(model_id *model_id)
 {
-
-    switch(model_id->type) {
-    case DYNAMIC_MODEL:
-        return get_resource(&dyn_modelman, &model_id->dyn_model_id);
-    case STATIC_MODEL: {
-        struct model *model;
-        get_static_model(model_id->static_model_id, &model);
-        return model;
-    }
-    }
-    assert(!"unhandled case in get_model");
+    return get_resource(&dyn_modelman, model_id);
 }
 
 
@@ -106,26 +89,22 @@ static struct model *load_static_model(enum static_model m)
 
 void destroy_model(model_id *model_id)
 {
-    if (model_id->type == STATIC_MODEL)
+    if (is_static_resource(model_id))
         return;
 
-    struct resource_id *id = &model_id->dyn_model_id;
     struct model *model = get_model(model_id);
 
     destroy_geometry(&model->geom_id);
-    destroy_resource(&dyn_modelman, id);
+    destroy_resource(&dyn_modelman, model_id);
 }
+
 
 model_id get_static_model(enum static_model m, struct model **model)
 {
-    model_id model_id;
-    model_id.type = STATIC_MODEL;
-    model_id.static_model_id = m;
-
     if (model)
         *model = load_static_model(m);
 
-    return model_id;
+    return make_static_id(m);
 }
 
 

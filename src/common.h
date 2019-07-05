@@ -8,6 +8,7 @@ typedef int bool;
 
 #define MAT3_ELEMS 9
 #define MAT4_ELEMS 16
+#define U64HOB 0x8000000000000000
 
 #define SLAB(f) "etc/slab/" f
 #define RESOURCE(f) "etc/shaders/" f

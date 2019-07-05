@@ -3,11 +3,17 @@
 * TODO Proc Trees                                                   :procgen:
 * TODO [#A] Instance rendering for ground debris             :perf:rendering:
 * TODO [#B] Load bone weights                                          :anim:
+:LOGBOOK:
+CLOCK: [2019-07-05 Fri 09:28]
+:END:
 
 * TODO Simple pthreads job system                              :jobs:threads:
 
-* TODO Run pose                                                        :anim:
-* TODO Simple animation test                                           :anim:
+* Run pose                                                             :anim:
+:LOGBOOK:
+CLOCK: [2019-07-05 Fri 09:28]--[2019-07-05 Fri 09:28] =>  0:00
+:END:
+
 
 * TODO Initial physics system                                       :physics:
 * TODO Entity loading stress test                                      :perf:
