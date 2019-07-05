@@ -18,16 +18,10 @@ struct resource_id {
     u32 generation;
 };
 
-struct static_resources {
-    u8 *resources;
-    u32 count;
-    u32 capacity;
-};
-
 struct resource_manager {
     u8 *resources;
-    struct static_resources static_res;
     struct resource_id *ids;
+    u32 static_elems;
     u32 resource_count;
     u32 generation;
     u32 elem_size;
@@ -53,7 +47,7 @@ void null_id(struct resource_id *id);
 
 void init_resource_manager(struct resource_manager *r, u32 elem_size,
                            u32 initial_elements, u32 max_elements, const char *name,
-                           struct static_resources *static_res
+                           int static_resources
                            );
 
 

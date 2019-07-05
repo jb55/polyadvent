@@ -21,11 +21,6 @@ static inline void *index_resource(struct resource_manager *r, int i)
 }
 
 
-static inline void *index_static_resource(struct resource_manager *r, int i)
-{
-    return index_resource_(r->static_res.resources, r->elem_size, i);
-}
-
 void *get_all_resources(struct resource_manager *r, u32 *count, struct resource_id **ids) {
     if (count != 0)
         *count = r->resource_count;
@@ -49,36 +44,31 @@ void null_id(struct resource_id *id)
     id->index = -1;
 }
 
+static void init_static_ids(struct resource_manager *r)
+{
+    for (u32 i = 0; i < r->static_elems; i++)
+        r->ids[i] = make_static_id(i);
+}
+
 void init_resource_manager(struct resource_manager *r, u32 elem_size,
                            u32 initial_elements, u32 max_elements,
                            const char *name,
-                           struct static_resources *static_res)
+                           int static_elems)
 {
     r->generation = 1;
-    r->resource_count = 0;
+    r->resource_count = static_elems;
     r->elem_size = elem_size;
     r->max_capacity = max_elements;
-    r->current_capacity = initial_elements;
+    r->current_capacity = initial_elements + static_elems;
     r->name = name;
-
-    if (static_res) {
-        r->static_res = *static_res;
-
-        if (r->static_res.resources == NULL) {
-            r->static_res.resources =
-                calloc(r->static_res.capacity, elem_size);
-        }
-    }
-    else {
-        r->static_res.count = 0;
-        r->static_res.capacity = 0;
-        r->static_res.resources = NULL;
-    }
+    r->static_elems = static_elems;
 
     assert(initial_elements != 0);
 
-    r->resources = calloc(initial_elements, elem_size);
-    r->ids = calloc(initial_elements, sizeof(struct resource_id));
+    r->resources = calloc(r->current_capacity, elem_size);
+    r->ids = calloc(r->current_capacity, sizeof(struct resource_id));
+
+    init_static_ids(r);
 }
 
 void destroy_resource_manager(struct resource_manager *r) {
@@ -95,7 +85,7 @@ static int refresh_id(struct resource_manager *r, struct resource_id *id,
         /* debug("id %llu gen %d != res gen %d, refreshing\n", */
         /*       id->uuid, id->generation, r->generation); */
         // try to find uuid in new memory layout
-        for (u32 i = 0; i < r->resource_count; i++) {
+        for (u32 i = r->static_elems; i < r->resource_count; i++) {
             struct resource_id *newer_id = &r->ids[i];
             if (newer_id->uuid == id->uuid) {
                 /* debug("found %llu, ind %d -> %d\n", new_id->uuid, new_id->index, new->index); */
@@ -123,13 +113,6 @@ static void new_id(struct resource_manager *r, struct resource_id *id)
     id->uuid  = ++resource_uuids;
     id->generation = r->generation;
     assert(id->generation);
-}
-
-static void new_static_id(struct resource_manager *r, struct resource_id *id)
-{
-    id->index = r->static_res.count;
-    id->uuid  = STATIC_UUID;
-    id->generation = 0xFFFFFFFF;
 }
 
 static void resize(struct resource_manager *r)
@@ -167,7 +150,7 @@ void print_id(struct resource_id *id, int nl)
     int is_static = is_static_resource(id);
 
     if (is_static) {
-        printf("sid(%llu @ %d)%s", id->uuid & ~U64HOB, id->index, nl?"\n":"");
+        printf("sid(%d)%s", id->index, nl?"\n":"");
         return;
     }
 
@@ -175,20 +158,6 @@ void print_id(struct resource_id *id, int nl)
            id->uuid, id->index, id->generation, nl?"\n":"");
 }
 
-void *new_static_resource(struct resource_manager *r,
-                          struct resource_id *id)
-{
-    assert(r->static_res.resources);
-    assert(id);
-    assert(id->index == 0xFFFFFFFF && "res_id is uninitialized");
-    assert(r->static_res.count + 1 < r->static_res.capacity);
-    if    (r->static_res.count + 1 < r->static_res.capacity)
-        return NULL; // we're full
-
-    new_static_id(r, id);
-
-    return index_static_resource(r, r->static_res.count++);
-}
 
 void *new_resource(struct resource_manager *r, struct resource_id *id)
 {
@@ -211,13 +180,13 @@ void *new_resource(struct resource_manager *r, struct resource_id *id)
     return index_resource(r, r->resource_count++);
 }
 
+
 void *get_static_resource(struct resource_manager *r,
                           struct resource_id *id)
 {
-    assert(r->static_res.capacity > 0 && "trying to get a static "
-           "resource on a manager doesn't have static resources");
+    assert(id->index < r->static_elems && "oob static index");
 
-    return index_static_resource(r, id->index);
+    return index_resource(r, id->index);
 }
 
 void *get_resource(struct resource_manager *r, struct resource_id *id) {
@@ -243,12 +212,20 @@ void *get_resource(struct resource_manager *r, struct resource_id *id) {
 
 
 void destroy_resource(struct resource_manager *r, struct resource_id *id) {
+    assert(id->index >= r->static_elems && "cant destroy a static resource");
+
+    if (id->index < r->static_elems) {
+        unusual("trying to destroy a static %s resource #%d\n", r->name, id->index);
+        return;
+    }
+
     if (is_resource_destroyed(id)) {
         unusual("trying to destroy resource %llu which was already destroyed\n", id->uuid);
         return;
     }
 
     enum refresh_status res = refresh_id(r, id, id);
+
     // entity already deleted
     /* debug("refresh res %d uuid %llu gen %d index %d\n", res, */
     /*       id->uuid, id->generation, id->index); */

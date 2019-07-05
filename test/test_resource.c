@@ -36,7 +36,7 @@ static void test_compact()
     int *p;
     u32 i;
 
-    init_resource_manager(&r, sizeof(int), 2, 6, "int");
+    init_resource_manager(&r, sizeof(int), 2, 6, "int", 0);
 
     for (i = 0; i < (int)ARRAY_SIZE(ids); i++)
         init_id(&ids[i]);
@@ -86,7 +86,7 @@ static void test_int_resource_manager()
     struct resource_id id, first_id;
     int *p;
     // 2 item case
-    init_resource_manager(&r, sizeof(int), 1, 2, "int");
+    init_resource_manager(&r, sizeof(int), 1, 2, "int", 0);
 
     init_id(&id);
     init_id(&first_id);
@@ -124,16 +124,16 @@ static void test_entity_system()
     init_id(&ent_id);
 
     ents = get_all_entities(&count, &ids);
-    assert(count == 0);
+    assert(count == RESERVED_ENTITIES);
 
     ent = new_entity(&ent_id);
     ents = get_all_entities(&count, &ids);
 
     assert(ent != NULL);
-    assert(count == 1);
-    assert(&ents[0] == ent);
+    assert(count == 1+RESERVED_ENTITIES);
+    assert(&ents[RESERVED_ENTITIES] == ent);
 
-    assert(ideq(&ids[0], &ent_id));
+    assert(ideq(&ids[RESERVED_ENTITIES], &ent_id));
 
     destroy_entity_system();
 }

@@ -55,10 +55,12 @@ void reset_terrain(struct terrain *terrain, float size) {
 void init_terrain(struct terrain *terrain, float size) {
     init_id(&terrain->entity_id);
 
-    struct entity *ent  = new_entity(&terrain->entity_id);
-    struct node *node   = get_node(&ent->node_id); assert(node);
+    struct entity *ent  = &static_entities()[entity_terrain];
+    struct node *node   = &static_nodes()[node_terrain];
     struct model *model = new_model(&ent->model_id); assert(model);
     /* struct model *model = init_model(&ent->model_id); assert(model); */
+
+    terrain->entity_id = make_static_id(entity_terrain);
 
     assert(terrain->entity_id.index == 0);
 

@@ -48,6 +48,7 @@ struct entity *new_entity_(entity_id *id) {
 }
 
 
+
 struct entity *new_entity_with_node(entity_id *id, node_id *node)
 {
     entity_id new_id;
@@ -108,7 +109,13 @@ void destroy_entity_system() {
 
 void init_entity_system() {
     init_resource_manager(&esys, sizeof(struct entity), DEF_NUM_ENTITIES,
-                          MAX_ENTITIES, "entity");
+                          MAX_ENTITIES, "entity", RESERVED_ENTITIES);
+
+    for (int i = 0; i < RESERVED_ENTITIES; i++) {
+        node_id node_id = make_static_id(i);
+        struct entity *ent = &static_entities()[i];
+        init_entity(ent, &node_id);
+    }
 }
 
 

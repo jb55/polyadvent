@@ -5,7 +5,6 @@
 #include "resource.h"
 
 #define MAX_NODE_CHILDREN 4
-#define N_STATIC_NODES 32
 
 enum node_flags {
   NODE_IGNORE_RECALC = 1 << 0
@@ -49,5 +48,13 @@ struct node *get_node(node_id *);
 struct node *new_node(node_id *);
 void destroy_node(node_id *);
 void init_node_manager();
+
+
+extern struct resource_manager node_manager;
+
+static inline struct node *static_nodes()
+{
+    return (struct node*)node_manager.resources;
+}
 
 #endif /* POLYADVENT_NODE_H */

@@ -172,10 +172,10 @@ void game_init(struct game *game, int width, int height) {
 
     // player entity
     init_id(&res->player_id);
-    player = new_entity(&res->player_id);
-    struct node *pnode = get_node(&player->node_id);
+    player = &static_entities()[entity_player];
+    struct node *pnode = &static_nodes()[node_player];
     assert(pnode);
-    assert(res->player_id.index == 1);
+    assert(res->player_id.index == entity_player);
     /* player->model_id = get_static_model(model_pirate_officer, NULL); */
 
     struct model *pmodel  = new_model(&player->model_id); assert(pmodel);

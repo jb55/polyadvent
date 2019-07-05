@@ -3,12 +3,13 @@
 #include "node.h"
 #include "mat_util.h"
 #include "debug.h"
+#include "static_resources.h"
 #include <string.h>
 #include <stdio.h>
 #include <assert.h>
 #include <stdint.h>
 
-static struct resource_manager node_manager = {0};
+struct resource_manager node_manager = {0};
 
 static inline struct node *new_uninitialized_node(node_id *id)
 {
@@ -40,13 +41,8 @@ void destroy_node(node_id *id)
 
 void init_node_manager()
 {
-    struct static_resources nodes = {
-      .count     = 0,
-      .capacity  = N_STATIC_NODES,
-    };
-
     init_resource_manager(&node_manager, sizeof(struct node), 128,
-                          0xFFFF, "node", &nodes);
+                          0xFFFF, "node", N_STATIC_NODES);
 }
 
 struct node *node_init(struct node *node) {

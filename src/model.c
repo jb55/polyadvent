@@ -3,19 +3,18 @@
 #include "ply.h"
 #include "resource.h"
 #include "debug.h"
+#include "util.h"
 #include <assert.h>
 
 #define MODELDEF(name) { .id = model_##name, .loaded = 0, .file = #name }
 
-static struct model_def static_models[NUM_STATIC_MODELS] = {
+static struct model_def static_model_defs[NUM_STATIC_MODELS] = {
   MODELDEF(tower),
   MODELDEF(icosphere),
   MODELDEF(pirate_officer),
 };
 
 static struct resource_manager dyn_modelman;
-
-static int static_models_initialized = 0;
 
 struct model *init_model(struct model *model) {
     init_id(&model->geom_id);
@@ -24,13 +23,18 @@ struct model *init_model(struct model *model) {
     return model;
 }
 
+static inline struct model *static_models()
+{
+    return (struct model *)dyn_modelman.resources;
+}
+
+
 static void initialize_static_models() {
+    struct model *models = static_models();
     for (int i = 0; i < NUM_STATIC_MODELS; i++) {
-        struct model_def *sm = &static_models[i];
-        assert(sm->id == i);
-        init_model(&sm->model);
+        struct model *sm = &models[i];
+        init_model(sm);
     }
-    static_models_initialized = 1;
 }
 
 static inline struct model *new_uninitialized_model(struct resource_id *id) {
@@ -46,9 +50,13 @@ static struct model *new_model_resource(model_id *model_id)
     return model;
 }
 
-void init_model_manager() {
+void init_model_manager()
+{
     init_resource_manager(&dyn_modelman, sizeof(struct model),
-                          DEF_DYNAMIC_MODELS, MAX_DYNAMIC_MODELS, "model");
+                          DEF_DYNAMIC_MODELS, MAX_DYNAMIC_MODELS, "model",
+                          NUM_STATIC_MODELS);
+
+    initialize_static_models();
 }
 
 
@@ -63,15 +71,11 @@ struct model *get_model(model_id *model_id)
     return get_resource(&dyn_modelman, model_id);
 }
 
-
 static struct model *load_static_model(enum static_model m)
 {
     static char path[128] = {0};
 
-    if (!static_models_initialized)
-        initialize_static_models();
-
-    struct model *model = &static_models[m].model;
+    struct model *model = &static_models()[m];
 
     if (is_id_allocated(&model->geom_id) && get_geometry(&model->geom_id))
         return model;
@@ -79,7 +83,7 @@ static struct model *load_static_model(enum static_model m)
     int ok = 0;
 
     // Load mesh
-    snprintf(path, 128, "data/models/%s.ply", static_models[m].file);
+    snprintf(path, 128, "data/models/%s.ply", static_model_defs[m].file);
     ok = parse_ply(path, &model->geom_id);
     if (!ok)
         return 0;

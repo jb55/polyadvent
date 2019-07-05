@@ -17,7 +17,7 @@ void delete_every_other_entity()
     u32 count;
     entity_id *ids;
 
-    for (u32 i = RESERVED_ENTITIES; i < 1000; i++) {
+    for (u32 i = 0; i < 1000; i++) {
         get_all_entities(&count, &ids);
 
         if (i >= count)

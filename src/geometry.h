@@ -7,7 +7,7 @@
 #include "shader.h"
 #include "resource.h"
 
-#define DEF_NUM_GEOMETRY 32
+#define DEF_NUM_GEOMETRY 64
 #define MAX_GEOMETRY 1024
 
 // -1 is uninitialized
