@@ -164,6 +164,7 @@ void *new_resource(struct resource_manager *r, struct resource_id *id)
     assert(id);
     assert(id->uuid != STATIC_UUID && "called new_resource with a static id");
     assert(id->index == 0xFFFFFFFF && "res_id is uninitialized");
+    assert(id->index >= r->static_elems);
 
     struct resource_id *fresh_id;
 
@@ -240,6 +241,7 @@ void destroy_resource(struct resource_manager *r, struct resource_id *id) {
           r->name, id->uuid, id->index, r->resource_count);
 
     r->resource_count--;
+    assert(r->resource_count >= r->static_elems);
     r->generation++;
 
     assert((int)r->resource_count - (int)id->index >= 0);

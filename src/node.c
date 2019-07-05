@@ -43,6 +43,9 @@ void init_node_manager()
 {
     init_resource_manager(&node_manager, sizeof(struct node), 128,
                           0xFFFF, "node", N_STATIC_NODES);
+
+    for (int i = 0; i < N_STATIC_NODES; i++)
+        node_init(&static_nodes()[i]);
 }
 
 struct node *node_init(struct node *node) {

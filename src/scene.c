@@ -52,7 +52,6 @@ void entity_test_scene(struct game *game)
 {
     struct entity *player  = get_player(&game->test_resources);
     struct terrain *terrain  = &game->terrain;
-    player->model_id = get_static_model(model_pirate_officer, NULL);
 
     model_id rock_model;
     init_id(&rock_model);
@@ -60,6 +59,10 @@ void entity_test_scene(struct game *game)
     /* model_id rock_model = get_static_model(model_tower, NULL); */
     struct model *pmodel  = new_model(&rock_model); assert(pmodel);
     struct geometry *geom = get_geometry(&pmodel->geom_id); assert(geom);
+    printf("rock geom ");
+    print_id(&pmodel->geom_id, 1);
+    printf("rock model ");
+    print_id(&rock_model, 1);
     proc_sphere(geom);
 
     for (int i = 0; i < terrain->size*0.2; i++) {
@@ -75,6 +78,7 @@ void entity_test_scene(struct game *game)
         node_scale(node, pow(15.0, rand_0to1()));
         node_rotate(node, V3(rand_0to1(),rand_0to1(),rand_0to1()));
         node_translate(node, V3(x, y, z));
+        node_set_label(node, "rock");
 
         node_recalc(node);
     }

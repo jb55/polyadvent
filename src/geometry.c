@@ -6,7 +6,7 @@
 #include "static_resources.h"
 #include <assert.h>
 
-static struct resource_manager geom_manager;
+struct resource_manager geom_manager;
 
 void
 destroy_buffer_geometry(geometry_id *geom_id) {
@@ -172,10 +172,15 @@ void geometry_centroid(struct geometry *geom, float *dest) {
     vec3_scale(dest, 0.5, dest);
 };
 
+
 void init_geometry_manager() {
     init_resource_manager(&geom_manager, sizeof(struct geometry),
                           DEF_NUM_GEOMETRY, MAX_GEOMETRY, "geometry",
                           NUM_STATIC_MODELS);
+
+    for (int i = 0; i < NUM_STATIC_MODELS; i++) {
+        init_geometry(&static_geometry()[i]);
+    }
 }
 
 struct geometry *get_geometry(geometry_id *geom_id) {

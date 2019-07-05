@@ -82,9 +82,9 @@ void process_events(struct input *input, u64 current_frame) {
 
   }
 
-  if (input->resized_width)
-    printf("checking resize %d %d\n", input->resized_width,
-            input->resized_height);
+  /* if (input->resized_width) */
+  /*   printf("checking resize %d %d\n", input->resized_width, */
+  /*           input->resized_height); */
 
 }
 

@@ -3,14 +3,17 @@
 #include "xml.h"
 #include "util.h"
 #include "node.h"
+#include "debug.h"
 #include "animation.h"
 
 enum dae_state {
     PARSING_START,
     PARSING_NODE,
+    PARSING_FLOAT_ARRAY,
     PARSING_POSE,
     PARSING_JOINT,
     PARSING_JOINT_MATRIX,
+    PARSING_WEIGHTS,
 };
 
 struct dae_data {
@@ -19,6 +22,8 @@ struct dae_data {
     FILE *dae_file;
     struct pose *poses;
     int *nposes;
+    float *weights;
+    int nweights;
     char current_name[JOINT_LABEL_SIZE];
 };
 
@@ -68,9 +73,15 @@ static void dae_tag_start(struct xmlparser *x, const char *t, size_t tl)
 {
     struct dae_data *data = (struct dae_data*)x->user_data;
 
+    debug("state %d tag_start %.*s\n", data->state, (int)tl, t);
+
     if (streq(t, "node")) {
         data->state = PARSING_NODE;
         data->node_level++;
+    }
+    else if (streq(t, "float_array")) {
+        debug("-> PARSING_FLOAT_ARRAY\n");
+        data->state = PARSING_FLOAT_ARRAY;
     }
     else if (data->state == PARSING_JOINT && streq(t, "matrix"))
         data->state = PARSING_JOINT_MATRIX;
@@ -100,11 +111,12 @@ static void dae_tagbody(struct xmlparser *x, const char *d, size_t dl)
 {
     static int count = 0;
     struct dae_data *data = (struct dae_data*)x->user_data;
+    struct pose *pose;
 
     if (data->state == PARSING_JOINT_MATRIX) {
         assert(*data->nposes);
 
-        struct pose *pose = &data->poses[*data->nposes - 1];
+        pose = &data->poses[*data->nposes - 1];
         assert(pose);
 
         struct joint *joint = &pose->joints[pose->njoints];
@@ -122,6 +134,32 @@ static void dae_tagbody(struct xmlparser *x, const char *d, size_t dl)
         pose->njoints++;
         data->state = PARSING_POSE;
     }
+    else if (data->state == PARSING_WEIGHTS) {
+        pose = &data->poses[*data->nposes];
+        assert(data->nweights > 0);
+        data->weights = calloc(data->nweights, sizeof(float));
+
+        const char *p = d;
+        float val;
+        int i;
+
+        for (i = 0; i < data->nweights; i++) {
+            sscanf(p, "%f", &val);
+            data->weights[i] = val;
+
+            while (p < d+dl) {
+                if (*(p++) == ' ')
+                    break;
+            }
+        }
+
+        assert(data->nweights == i);
+
+        pose->nweights = data->nweights;
+        pose->weights = data->weights;
+
+        data->state = PARSING_POSE;
+    }
 }
 
 static int dae_getc(struct xmlparser *x)
@@ -137,21 +175,30 @@ void dae_attr(struct xmlparser *x, const char *t, size_t tl,
 
     if (data->state == PARSING_NODE
         && streq(a, "id")
-        && streq(v, "Armature"))
-    {
+        && streq(v, "Armature")) {
+
         struct pose *pose = &data->poses[(*data->nposes)++];
         data->state = PARSING_POSE;
         init_pose(pose);
     }
+    else if (data->state == PARSING_FLOAT_ARRAY
+             && streq(a, "id")
+             && contains(v, "skin-weights-array")) {
+        debug("PARSING_SOURCE -> PARSING_WEIGHTS_START\n");
+        data->state = PARSING_WEIGHTS;
+    }
+    else if (data->state == PARSING_WEIGHTS
+             && streq(a, "count")) {
+        data->nweights = atoi(v);
+    }
     else if (data->state == PARSING_NODE
-             && streq(a, "name"))
-    {
+             && streq(a, "name")) {
         strncpy(data->current_name, v, sizeof(data->current_name));
     }
     else if (data->state == PARSING_NODE
              && streq(a, "type")
-             && streq(v, "JOINT"))
-    {
+             && streq(v, "JOINT")) {
+
         data->state = PARSING_JOINT;
     }
 }
@@ -190,6 +237,8 @@ void load_poses(const char *filename, struct pose *poses, int *nposes)
       .state  = PARSING_START,
       .poses  = poses,
       .nposes = nposes,
+      .nweights = -1,
+      .weights = NULL
     };
 
     data.dae_file = fopen("data/models/pirate-officer.dae", "rb");

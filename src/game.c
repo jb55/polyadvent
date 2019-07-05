@@ -86,9 +86,9 @@ void game_init(struct game *game, int width, int height) {
     init_sdl(&game->window, width, height);
     init_gl(&game->test_resources, width, height);
     init_entity_system();
+    init_geometry_manager();
     init_model_manager();
     init_node_manager();
-    init_geometry_manager();
     init_user_settings(&game->user_settings);
     check_gl();
 
@@ -175,13 +175,14 @@ void game_init(struct game *game, int width, int height) {
     player = &static_entities()[entity_player];
     struct node *pnode = &static_nodes()[node_player];
     assert(pnode);
+    res->player_id = make_static_id(entity_player);
     assert(res->player_id.index == entity_player);
     /* player->model_id = get_static_model(model_pirate_officer, NULL); */
 
-    struct model *pmodel  = new_model(&player->model_id); assert(pmodel);
-    struct geometry *geom = get_geometry(&pmodel->geom_id); assert(geom);
+    struct model *pmodel;
+    player->model_id = get_static_model(model_pirate_officer, &pmodel);
+    print_id(&player->model_id, true);
 
-    proc_sphere(geom);
     pmodel->shading = SHADING_VERT_COLOR;
 
     node_set_label(pnode, "player");

@@ -68,8 +68,8 @@ int main(void)
         game.frame++;
         process_events(&game.input, game.frame);
         if (game.input.resized_height) {
-            printf("handling resize %d %d\n", game.input.resized_width,
-                   game.input.resized_height);
+            /* printf("handling resize %d %d\n", game.input.resized_width, */
+            /*        game.input.resized_height); */
             handle_resize(&game, game.input.resized_width, game.input.resized_height);
         }
         //default_config.camera = game.test_resources.camera_node->mat;

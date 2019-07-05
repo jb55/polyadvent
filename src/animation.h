@@ -21,6 +21,8 @@ struct joint
 struct pose
 {
     struct joint joints[MAX_JOINTS];
+    float *weights;
+    int nweights;
     int njoints;
 };
 

@@ -3,6 +3,7 @@
 #include "entity.h"
 #include "model.h"
 #include "util.h"
+#include "procmesh.h"
 #include "debug.h"
 #include <assert.h>
 
@@ -138,6 +139,37 @@ static void test_entity_system()
     destroy_entity_system();
 }
 
+void test_geometry()
+{
+    printf("test_geometry\n");
+    init_geometry_manager();
+    init_model_manager();
+
+    struct model *model;
+    model_id player_model_id =
+        get_static_model(model_pirate_officer, &model);
+
+    struct geometry *geom = get_geometry(&model->geom_id);
+    assert(geom);
+
+    assert(geom->num_verts == 2676);
+
+    model_id rock_model;
+    init_id(&rock_model);
+    struct model *pmodel  = new_model(&rock_model); assert(pmodel);
+    struct geometry *pgeom = get_geometry(&pmodel->geom_id); assert(geom);
+    proc_sphere(pgeom);
+
+    model_id player_model_id2 = make_static_id(model_pirate_officer);
+
+    assert(ideq(&player_model_id, &player_model_id2));
+
+    pmodel = get_model(&player_model_id2);
+    pgeom = get_geometry(&pmodel->geom_id);
+
+    assert(geom->num_verts == 2676);
+}
+
 void test_dynamic_model_manager()
 {
     printf("test_dynamic_model_manager\n");
@@ -146,6 +178,7 @@ void test_dynamic_model_manager()
 
 int main(int argc, char *argv[])
 {
+    test_geometry();
     test_int_resource_manager();
     test_compact();
     test_dynamic_model_manager();

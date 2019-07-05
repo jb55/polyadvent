@@ -76,15 +76,26 @@ static struct model *load_static_model(enum static_model m)
     static char path[128] = {0};
 
     struct model *model = &static_models()[m];
+    struct geometry *geom = &static_geometry()[m];
+    init_geometry(geom);
+    model->geom_id = make_static_id(m);
 
-    if (is_id_allocated(&model->geom_id) && get_geometry(&model->geom_id))
+    if (get_geometry(&model->geom_id)->has_vbos) {
+        debug("model %s already loaded\n", static_model_defs[m].file);
         return model;
+    }
 
     int ok = 0;
 
     // Load mesh
+    debug("loading %s model with geom_id ", static_model_defs[m].file);
+
+    print_id(&model->geom_id, true);
+    assert(m < NUM_STATIC_MODELS);
     snprintf(path, 128, "data/models/%s.ply", static_model_defs[m].file);
-    ok = parse_ply(path, &model->geom_id);
+    ok = parse_ply(path, geom);
+    if (m == model_pirate_officer)
+        printf("num_verts: %d\n", geom->num_verts);
     if (!ok)
         return 0;
 

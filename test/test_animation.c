@@ -1,6 +1,7 @@
 
 #include "animation.h"
 #include "util.h"
+#include "debug.h"
 #include <assert.h>
 #include <stdio.h>
 
@@ -21,8 +22,14 @@ int main(int argc, char *argv[])
 
     load_poses("data/models/pirate-officer.dae", poses, &nposes);
     assert(nposes == 1);
-
     pose = &poses[0];
+
+    debug("pose->nweights %d\n", pose->nweights);
+    assert(pose->nweights == 389);
+    assert(approxeq(pose->weights[0], 0.05213558));
+    debug("pose last weight %f\n", pose->weights[388]);
+    assert(approxeq(pose->weights[388], 0.01394611));
+
     assert(pose->njoints == 11);
 
     joint = &pose->joints[0];

@@ -30,6 +30,7 @@
 #define min(a,b) (a < b ? a : b)
 #define max(a,b) (a > b ? a : b)
 #define streq(a,b) (strcmp(a,b) == 0)
+#define contains(a,b) (strstr(a,b) != NULL)
 #define memeq(a,b,n1,n2) (memcmp(a,b,min(n1, n2)) == 0)
 #define approxeq(a, b) (fabs(a-b) < EPSILON)
 

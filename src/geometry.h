@@ -59,5 +59,13 @@ struct geometry *new_geometry(geometry_id *);
 struct geometry *get_geometry(geometry_id *);
 struct geometry *get_all_geometry(u32 *count, geometry_id **ids);
 void destroy_geometry(geometry_id *geom_id);
+struct resource_manager *get_geometry_manager();
+
+extern struct resource_manager geom_manager;
+
+static inline struct geometry *static_geometry()
+{
+    return (struct geometry *)geom_manager.resources;
+}
 
 #endif /* GEOMETRY_H */

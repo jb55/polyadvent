@@ -66,9 +66,4 @@ static inline int is_static_resource(struct resource_id *id)
 }
 
 
-static inline int is_id_allocated(struct resource_id *id)
-{
-    return (int)id->index != -1;
-}
-
 #endif /* RESOURCE_H */

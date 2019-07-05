@@ -101,7 +101,7 @@ static int parse_magic(const char **cursor) {
 }
 
 
-int parse_ply(const char *filename, geometry_id *geom_id) {
+int parse_ply(const char *filename, struct geometry *geom) {
     size_t len;
     int success = 0;
     int nverts = 0;
@@ -222,7 +222,6 @@ int parse_ply(const char *filename, geometry_id *geom_id) {
     free((void*)data);
 
     if (success) {
-        struct geometry *geom = new_geometry(geom_id);
         assert(geom);
 
         mkgeom.num_indices = ninds * 3;
