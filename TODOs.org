@@ -1,50 +1,39 @@
 
-* Rendering
+* TODO Item system                                                    :items:
+* TODO Proc Trees                                                   :procgen:
+* TODO [#A] Instance rendering for ground debris             :perf:rendering:
+* TODO [#B] Load bone weights                                          :anim:
 
-** TODO Debris on ground
+* TODO Simple pthreads job system                              :jobs:threads:
 
-To create a sense of movement
+* TODO Run pose                                                        :anim:
+* TODO Simple animation test                                           :anim:
 
-** TODO Half edge subdivision for tessellation
+* TODO Initial physics system                                       :physics:
+* TODO Entity loading stress test                                      :perf:
 
-* Multicore
+* TODO Infinite terrain                                             :terrain:
 
-** TODO Simple pthreads job system
 
-* Animation
+* TODO [#C] Half edge subdivision for tessellation        :terrain:rendering:
+* TODO [#C] Procedural animation?                                      :anim:
+* TODO Windows build                                                :windows:
 
-** DONE Initial animation system
+* DONE Initial animation system
 CLOSED: [2019-06-22 Sat 12:52]
-** DONE Load poses in engine
+* DONE Load poses in engine
 CLOSED: [2019-06-22 Sat 12:52]
 
-** DONE use nodes for joints
+* DONE use nodes for joints
 CLOSED: [2019-06-30 Sun 17:26]
 
 It will just be easier for interpolation
 
-
-** TODO Load bone weights
-** TODO Run pose
-** TODO Simple animation test
-** TODO Procedural animation?
-
-
-* Physics
-
-** TODO Initial physics system
-* Entity
-
-** TODO Entity loading stress test
-
-
-* Procedural
-
-** TODO Trees
-** DONE quickhull tests
+* DONE quickhull tests
 CLOSED: [2019-04-12 Fri 09:37]
 
-* Terrain
+* DONE Initial debris on ground
+CLOSED: [2019-07-04 Thu 13:54]
 
-** TODO Infinite terrain
+To create a sense of movement
 
