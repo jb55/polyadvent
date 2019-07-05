@@ -43,7 +43,7 @@ vec3 pbr(vec3 albedo, vec3 V, vec3 normal) {
     const float ao = 12.0;
     const float metallic = 0.6;
     const float roughness = 0.6;
-    vec3 radiance = sun_color * light_intensity * 2.0;
+    vec3 radiance = sun_color * light_intensity * 4.0;
     // radiance += texture(skybox, vec3(0.0, 0.0, 1.0)).rgb;
     vec3 N = normalize(normal);
     vec3 L = normalize(light_dir);
