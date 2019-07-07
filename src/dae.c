@@ -233,8 +233,8 @@ static void process_joint_children(struct joint *joints, int njoints)
     }
 }
 
-void load_model(const char *filename, struct model *model,
-                struct make_geometry *geom)
+void load_dae(const char *filename, struct model *model,
+              struct make_geometry *geom)
 {
     struct xmlparser x = {0};
     struct dae_data data = {

@@ -20,7 +20,7 @@ int main(int argc, char *argv[])
     init_model(&model);
     init_make_geometry(&geom);
 
-    load_model("data/models/pirate-officer.dae", &model, &geom);
+    load_dae("data/models/pirate-officer.dae", &model, &geom);
     assert(model.nposes == 1);
     pose = &model.poses[0];
 

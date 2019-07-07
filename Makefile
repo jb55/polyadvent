@@ -62,9 +62,6 @@ install: $(BIN)
 	install -d $(PREFIX)/bin
 	install $(BIN) $(PREFIX)/bin
 
-nixbuild:
-	nix-shell shell.nix --command 'make -j4'
-
 TAGS:
 	etags $(SRCS)
 

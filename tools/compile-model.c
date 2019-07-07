@@ -4,11 +4,7 @@
 #include <assert.h>
 
 #include "dae.h"
-
-
-static void save_mdl(struct model *model, struct make_geometry *geom)
-{
-}
+#include "mdl.h"
 
 
 void usage()
@@ -35,9 +31,8 @@ int main(int argc, char *argv[])
     init_model(&model);
     init_make_geometry(&geom);
 
-    int nposes;
-
-    load_model(filename, &model, &geom);
+    load_dae(filename, &model, &geom);
+    save_mdl(outfile, &model, &geom);
 
     FILE *out = fopen(outfile, "wb");
     fprintf(out, "hello, world\n");
