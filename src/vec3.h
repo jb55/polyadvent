@@ -28,5 +28,8 @@ vec3 *vec3_add(vec3 *vec, vec3 *vec2, vec3 *dest);
 int vec3_eq(vec3 *a, vec3 *b, float precision);
 void vec3_copy(vec3 *a, vec3 *dest);
 
+#define EPSILON 0.0001
+#define vec3_approxeq(a, b) vec3_eq(a, b, EPSILON)
+
 
 #endif /* VEC3_H */

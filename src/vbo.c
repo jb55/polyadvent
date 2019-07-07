@@ -69,7 +69,7 @@ struct vbo* make_float_vertex_buffer(struct vbo *vbo, const void *data,
 }
 
 
-struct vbo* make_int_vertex_buffer(struct vbo *vbo, const int *data,
+struct vbo* make_int_vertex_buffer(struct vbo *vbo, const u32 *data,
                                    struct num_elements num_elements,
                                    struct components components)
 {

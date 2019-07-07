@@ -211,3 +211,18 @@ void destroy_geometry(geometry_id *geom_id)
 
     destroy_resource(&geom_manager, geom_id);
 }
+
+void free_make_geometry(struct make_geometry *mkgeom)
+{
+    if (mkgeom->vertices)
+        free(mkgeom->vertices);
+
+    if (mkgeom->normals)
+        free(mkgeom->normals);
+
+    if (mkgeom->colors)
+        free(mkgeom->colors);
+
+    if (mkgeom->indices)
+        free(mkgeom->indices);
+}

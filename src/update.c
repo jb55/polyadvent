@@ -93,7 +93,7 @@ static void player_terrain_collision(struct terrain *terrain, struct entity *pla
     static vec3 last_pos[3] = {0};
     struct node *node = get_node(&player->node_id);
 
-    if (!vec3_eq(node->pos, last_pos, 0.0001)) {
+    if (!vec3_approxeq(node->pos, last_pos)) {
         float player_z = node->pos[2];
 
         float terrain_z =

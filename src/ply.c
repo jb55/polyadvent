@@ -4,6 +4,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include "file.h"
+#include "mdl.h"
 #include "common.h"
 #include "ply.h"
 #include "vec3.h"
@@ -101,7 +102,22 @@ static int parse_magic(const char **cursor) {
 }
 
 
-int parse_ply(const char *filename, struct geometry *geom) {
+int parse_ply(const char *filename, struct geometry *geom)
+{
+    struct mdl_geometry mdlgeom;
+    init_mdl_geometry(&mdlgeom);
+    struct make_geometry *mkgeom = &mdlgeom.mkgeom;
+
+    int ok = parse_ply_with_mkgeom(filename, &mdlgeom);
+
+    make_buffer_geometry(mkgeom, geom);
+    free_make_geometry(mkgeom);
+
+    return ok;
+}
+
+int parse_ply_with_mkgeom(const char *filename, struct mdl_geometry *mdlgeom)
+{
     size_t len;
     int success = 0;
     int nverts = 0;
@@ -111,11 +127,10 @@ int parse_ply(const char *filename, struct geometry *geom) {
     int cvert = 0;
     int cind = 0;
 
+    struct make_geometry *mkgeom = &mdlgeom->mkgeom;
     enum ply_state state = PLY_MAGIC;
     const char *data = file_contents(filename, &len);
     const char *p = data;
-    struct make_geometry mkgeom;
-    init_make_geometry(&mkgeom);
 
     float vert[3], norm[3], min[3], max[3];
     int inds[3];
@@ -142,10 +157,10 @@ int parse_ply(const char *filename, struct geometry *geom) {
                     break;
                 }
 
-                mkgeom.vertices = calloc(nverts * 3, sizeof(*mkgeom.vertices));
-                mkgeom.normals  = calloc(nverts * 3, sizeof(*mkgeom.normals));
-                mkgeom.colors   = calloc(nverts * 3, sizeof(*mkgeom.colors));
-                mkgeom.indices  = calloc(ninds * 3, sizeof(*mkgeom.indices));
+                mkgeom->vertices = calloc(nverts * 3, sizeof(*mkgeom->vertices));
+                mkgeom->normals  = calloc(nverts * 3, sizeof(*mkgeom->normals));
+                mkgeom->colors   = calloc(nverts * 3, sizeof(*mkgeom->colors));
+                mkgeom->indices  = calloc(ninds * 3, sizeof(*mkgeom->indices));
 
                 state = PLY_VERTICES;
             }
@@ -168,17 +183,17 @@ int parse_ply(const char *filename, struct geometry *geom) {
                 vec3_max(vert, max, max);
             }
 
-            mkgeom.vertices[cvert * 3]     = vert[0];
-            mkgeom.vertices[cvert * 3 + 1] = vert[1];
-            mkgeom.vertices[cvert * 3 + 2] = vert[2];
+            mkgeom->vertices[cvert * 3]     = vert[0];
+            mkgeom->vertices[cvert * 3 + 1] = vert[1];
+            mkgeom->vertices[cvert * 3 + 2] = vert[2];
 
-            mkgeom.normals[cvert * 3]     = norm[0];
-            mkgeom.normals[cvert * 3 + 1] = norm[1];
-            mkgeom.normals[cvert * 3 + 2] = norm[2];
+            mkgeom->normals[cvert * 3]     = norm[0];
+            mkgeom->normals[cvert * 3 + 1] = norm[1];
+            mkgeom->normals[cvert * 3 + 2] = norm[2];
 
-            mkgeom.colors[cvert * 3]     = color[0] / 255.0;
-            mkgeom.colors[cvert * 3 + 1] = color[1] / 255.0;
-            mkgeom.colors[cvert * 3 + 2] = color[2] / 255.0;
+            mkgeom->colors[cvert * 3]     = color[0] / 255.0;
+            mkgeom->colors[cvert * 3 + 1] = color[1] / 255.0;
+            mkgeom->colors[cvert * 3 + 2] = color[2] / 255.0;
 
             cvert++;
 
@@ -194,9 +209,9 @@ int parse_ply(const char *filename, struct geometry *geom) {
                 break;
             }
 
-            mkgeom.indices[cind * 3]     = inds[0];
-            mkgeom.indices[cind * 3 + 1] = inds[1];
-            mkgeom.indices[cind * 3 + 2] = inds[2];
+            mkgeom->indices[cind * 3]     = inds[0];
+            mkgeom->indices[cind * 3 + 1] = inds[1];
+            mkgeom->indices[cind * 3 + 2] = inds[2];
 
             cind++;
 
@@ -222,20 +237,11 @@ int parse_ply(const char *filename, struct geometry *geom) {
     free((void*)data);
 
     if (success) {
-        assert(geom);
+        mkgeom->num_indices = ninds * 3;
+        mkgeom->num_verts = nverts * 3;
 
-        mkgeom.num_indices = ninds * 3;
-        mkgeom.num_verts = nverts * 3;
-
-        make_buffer_geometry(&mkgeom, geom);
-
-        vec3_copy(min, geom->min);
-        vec3_copy(max, geom->max);
-
-        free(mkgeom.vertices);
-        free(mkgeom.normals);
-        free(mkgeom.colors);
-        free(mkgeom.indices);
+        vec3_copy(min, mdlgeom->min);
+        vec3_copy(max, mdlgeom->max);
     }
 
     return success;
