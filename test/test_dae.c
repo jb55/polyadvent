@@ -48,6 +48,7 @@ static void test_save_mdl()
     init_model(&model2);
     init_mdl_geometry(&mg2);
 
+    // TODO: test more models
     const char *filename = "data/models/pirate_officer.ply";
     parse_ply_with_mkgeom(filename, &mg);
 
@@ -58,9 +59,38 @@ static void test_save_mdl()
     out = fopen("/tmp/test.mdl", "rb");
     load_mdl(out, &model2, &mg2);
 
+    struct make_geometry *mk1 = &mg.mkgeom;
+    struct make_geometry *mk2 = &mg.mkgeom;
+
     assert(model.nposes == model2.nposes);
     assert(vec3_approxeq(mg.min, mg2.min));
     assert(vec3_approxeq(mg.max, mg2.max));
+    assert(mk1->num_verts == mk2->num_verts);
+    assert(mk1->num_indices == mk2->num_indices);
+    assert(mk1->num_uv_components == mk2->num_uv_components);
+    assert(mk1->num_joint_ids == mk2->num_joint_ids);
+
+    assert(memeq(mk1->vertices, mk2->vertices,
+                 mk1->num_verts * 3, mk2->num_verts * 3));
+
+    assert(memeq(mk1->colors, mk2->colors,
+                 mk1->num_verts * 3, mk2->num_verts * 3));
+
+    assert(memeq(mk1->normals, mk2->normals,
+                 mk1->num_verts * 3, mk2->num_verts * 3));
+
+    assert(memeq(mk1->indices, mk2->indices,
+                 mk1->num_indices, mk2->num_indices));
+
+    assert(memeq(mk1->tex_coords, mk2->tex_coords,
+                 mk1->num_verts * mk2->num_uv_components,
+                 mk2->num_verts * mk2->num_uv_components));
+
+    assert(memeq(mk1->joint_ids, mk2->joint_ids,
+                 mk1->num_joint_ids, mk2->num_joint_ids));
+
+    assert(memeq(mk1->joint_weights, mk2->joint_weights,
+                 mk1->num_verts * 3, mk2->num_verts * 3));
 }
 
 int main(int argc, char *argv[])

@@ -40,7 +40,6 @@ struct make_geometry {
     int num_joint_ids;
 
     float *joint_weights;
-    int num_weights;
 };
 
 struct geometry_manager {
