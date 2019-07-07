@@ -18,7 +18,7 @@ DAES=$(wildcard data/models/*.dae)
 MODELS=$(DAES:.dae=.mdl)
 OBJS=$(SRCS:.c=.o)
 
-TESTS =  test/test_animation
+TESTS =  test/test_dae
 TESTS += test/test_resource
 TESTS += test/test_scene
 
@@ -31,7 +31,7 @@ clean:
 
 include $(OBJS:.o=.d)
 include main.d
-include test/test_animation.d
+include test/test_dae.d
 
 %.d: %.c
 	@rm -f $@; \
@@ -51,7 +51,7 @@ data/models/%.mdl: data/models/%.dae tools/compile-model
 	./tools/compile-model $< $@
 
 check: $(TESTS)
-	./test/test_animation
+	./test/test_dae
 	./test/test_resource
 	./test/test_scene
 

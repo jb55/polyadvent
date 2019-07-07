@@ -5,24 +5,24 @@
 #include <assert.h>
 #include <stdio.h>
 
+#include "dae.h"
 
 int main(int argc, char *argv[])
 {
     struct pose *pose;
     struct joint *joint;
     struct node *node;
-    struct pose poses[4];
+    struct model model;
+    struct make_geometry geom;
     int nposes;
 
     init_node_manager();
+    init_model(&model);
+    init_make_geometry(&geom);
 
-    for (int i = 0; i < (int)ARRAY_SIZE(poses); i++) {
-        init_pose(&poses[i]);
-    }
-
-    load_poses("data/models/pirate-officer.dae", poses, &nposes);
-    assert(nposes == 1);
-    pose = &poses[0];
+    load_model("data/models/pirate-officer.dae", &model, &geom);
+    assert(model.nposes == 1);
+    pose = &model.poses[0];
 
     debug("pose->nweights %d\n", pose->nweights);
     assert(pose->nweights == 389);

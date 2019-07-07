@@ -17,7 +17,6 @@ struct joint
     node_id node_id;
 };
 
-
 struct pose
 {
     struct joint joints[MAX_JOINTS];

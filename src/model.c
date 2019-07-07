@@ -20,6 +20,10 @@ struct model *init_model(struct model *model) {
     init_id(&model->geom_id);
     model->shading = SHADING_VERT_COLOR;
     model->texture = 0;
+    model->nposes = 0;
+    for (u16 i = 0; i < ARRAY_SIZE(model->poses); i++) {
+        init_pose(model->poses);
+    }
     return model;
 }
 
