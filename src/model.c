@@ -94,12 +94,9 @@ static struct model *load_static_model(enum static_model m)
     // Load mesh
     debug("loading %s model with geom_id ", static_model_defs[m].file);
 
-    print_id(&model->geom_id, true);
     assert(m < NUM_STATIC_MODELS);
     snprintf(path, 128, "data/models/%s.ply", static_model_defs[m].file);
     ok = parse_ply(path, geom);
-    if (m == model_pirate_officer)
-        printf("num_verts: %d\n", geom->num_verts);
     if (!ok)
         return 0;
 

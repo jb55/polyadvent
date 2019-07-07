@@ -138,7 +138,6 @@ static void parse_joint_matrix(struct dae_data *data, const char *d,
     assert(&joint->node_id == &pose->joints[pose->njoints].node_id);
 
     parse_joint(d, pose->njoints, joint);
-    print_id(&joint->node_id, 1);
     node_set_label(node, data->current_name);
     joint->children_ids[0] = data->node_level;
     pose->njoints++;

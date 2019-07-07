@@ -54,20 +54,12 @@ static void test_compact()
     p = new_resource(&r, &ids[i++]);
     *p = 3;
 
-
-    print_int_resources(&r);
-    print_ids(&r);
-
     assert(r.resource_count == 4);
     destroy_resource(&r, &ids[1]);
     assert(r.resource_count == 3);
-    print_int_resources(&r);
-    print_ids(&r);
 
     assert(*(int*)get_resource(&r, &ids[0]) == 0);
     assert(       get_resource(&r, &ids[1]) == NULL);
-    print_id(&ids[1], 1);
-    debug("%d\n",*(int*)get_resource(&r, &ids[2]) );
     assert(*(int*)get_resource(&r, &ids[2]) == 2);
 
     new_resource(&r, &ids[i++]);

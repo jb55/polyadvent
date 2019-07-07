@@ -89,10 +89,8 @@ load_samples(int *seed, int *n_samples) {
   int localseed;
   seed = seed ? seed : &localseed;
   res = fread(seed, sizeof(*seed), 1, fp);
-  printf("loaded seed %d\n", *seed);
   assert(res);
   res = fread(n_samples, sizeof(*n_samples), 1, fp);
-  printf ("loaded n_samples %d\n", *n_samples);
   assert(res);
   struct point *samples = malloc(*n_samples * sizeof(*samples));
   res = fread(samples, sizeof(*samples), *n_samples, fp);

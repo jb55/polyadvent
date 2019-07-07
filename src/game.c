@@ -184,7 +184,6 @@ void game_init(struct game *game, int width, int height) {
 
     struct model *pmodel;
     player->model_id = get_static_model(model_pirate_officer, &pmodel);
-    print_id(&player->model_id, true);
 
     pmodel->shading = SHADING_VERT_COLOR;
 

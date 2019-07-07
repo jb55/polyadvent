@@ -5,9 +5,9 @@
 
 #include "dae.h"
 
+
 static void save_mdl(struct model *model, struct make_geometry *geom)
 {
-
 }
 
 
