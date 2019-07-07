@@ -8,3 +8,5 @@ polyadvent
 /test/test_scene
 /archive
 *.zip
+/tools/compile-model
+/samples.bin
