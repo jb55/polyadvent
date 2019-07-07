@@ -50,7 +50,6 @@ void default_scene(struct game *game) {
 
 void entity_test_scene(struct game *game)
 {
-    struct entity *player  = get_player(&game->test_resources);
     struct terrain *terrain  = &game->terrain;
 
     model_id rock_model;
@@ -59,13 +58,8 @@ void entity_test_scene(struct game *game)
     /* model_id rock_model = get_static_model(model_tower, NULL); */
     struct model *pmodel  = new_model(&rock_model); assert(pmodel);
     struct geometry *geom = get_geometry(&pmodel->geom_id); assert(geom);
-    printf("rock geom ");
-    print_id(&pmodel->geom_id, 1);
-    printf("rock model ");
-    print_id(&rock_model, 1);
     proc_sphere(geom);
 
-    for (int i = 0; i < terrain->size*0.2; i++) {
         struct entity *ent = new_entity(NULL);
         struct node *node  = get_node(&ent->node_id);
 

@@ -73,26 +73,17 @@ static void dae_tag_start(struct xmlparser *x, const char *t, size_t tl)
 {
     struct dae_data *data = (struct dae_data*)x->user_data;
 
-    debug("state %d tag_start %.*s\n", data->state, (int)tl, t);
-
     if (streq(t, "node")) {
         data->state = PARSING_NODE;
         data->node_level++;
     }
     else if (streq(t, "float_array")) {
-        debug("-> PARSING_FLOAT_ARRAY\n");
         data->state = PARSING_FLOAT_ARRAY;
     }
     else if (data->state == PARSING_JOINT && streq(t, "matrix"))
         data->state = PARSING_JOINT_MATRIX;
     else
         return;
-
-    /* printf("\n"); */
-    /* for (int i = 0; i < data->opened; i++) { */
-    /*     putchar(' '); */
-    /* } */
-    /* printf("%s", t); */
 }
 
 static void dae_tag_end(struct xmlparser *x, const char *t, size_t tl, int what)
@@ -184,7 +175,6 @@ void dae_attr(struct xmlparser *x, const char *t, size_t tl,
     else if (data->state == PARSING_FLOAT_ARRAY
              && streq(a, "id")
              && contains(v, "skin-weights-array")) {
-        debug("PARSING_SOURCE -> PARSING_WEIGHTS_START\n");
         data->state = PARSING_WEIGHTS;
     }
     else if (data->state == PARSING_WEIGHTS
@@ -241,7 +231,7 @@ void load_poses(const char *filename, struct pose *poses, int *nposes)
       .weights = NULL
     };
 
-    data.dae_file = fopen("data/models/pirate-officer.dae", "rb");
+    data.dae_file = fopen(filename, "rb");
     if (data.dae_file == NULL)
         exit(1);
 
