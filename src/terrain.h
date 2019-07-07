@@ -36,7 +36,7 @@ void update_terrain(struct terrain *terrain);
 void gen_terrain_samples(struct terrain *terrain, float scale);
 void init_terrain(struct terrain *terrain, float size);
 void reset_terrain(struct terrain *terrain, float size);
-void create_terrain(struct terrain *terrain, float scale);
+void create_terrain(struct terrain *terrain, float scale, int seed);
 void destroy_terrain(struct terrain *terrain);
 
 

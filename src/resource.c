@@ -204,7 +204,7 @@ void *get_resource(struct resource_manager *r, struct resource_id *id) {
     enum refresh_status res = refresh_id(r, id, id);
 
     if (res == RESOURCE_DELETED) {
-        unusual("getting deleted %s resource %llu\n", r->name, id->uuid);
+        /* unusual("getting deleted %s resource %llu\n", r->name, id->uuid); */
         return NULL;
     }
 
@@ -237,8 +237,8 @@ void destroy_resource(struct resource_manager *r, struct resource_id *id) {
         return;
     }
 
-    debug("destroying %s resource %llu ind %d res_count %d\n",
-          r->name, id->uuid, id->index, r->resource_count);
+    /* debug("destroying %s resource %llu ind %d res_count %d\n", */
+    /*       r->name, id->uuid, id->index, r->resource_count); */
 
     r->resource_count--;
     assert(r->resource_count >= r->static_elems);

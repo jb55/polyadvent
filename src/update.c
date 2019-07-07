@@ -352,7 +352,7 @@ void update (struct game *game) {
     gravity(game);
 
 	if (needs_terrain_update) {
-		update_terrain(terrain);
+		/* update_terrain(terrain); */
 		needs_terrain_update = 0;
 	}
 

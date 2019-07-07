@@ -12,6 +12,7 @@
 #include "stb_image.h"
 #include "skybox.h"
 #include "quickhull.h"
+#include "poisson.h"
 #include "procmesh.h"
 #include "util.h"
 
@@ -109,23 +110,23 @@ void game_init(struct game *game, int width, int height) {
     assert(sun_camera);
 
     mat4 *light_dir = res->light_dir;
-    int ok = 0;
 
     game->quit = 0;
     game->frame = 0;
 
     const double size = 10000.0;
+    double scale = 0.03;
 
     terrain->settings = (struct perlin_settings){
         .depth = 1,
-        .freq  = 0.02,
+        .freq  = scale * 0.08,
         .o1 = 2.0, .o1s = 0.5,
         .o2 = 4.0, .o2s = 0.25,
-        .amplitude  = 1.0,
+        .amplitude  = 70.0,
         .ox = 0,
         .oy = 0,
         .exp = 5.3,
-        .scale = 1.0
+        .scale = scale
     };
 
     create_ui(&game->ui, width, height, &res->programs[UI_PROGRAM]);
@@ -133,8 +134,10 @@ void game_init(struct game *game, int width, int height) {
     check_gl();
 
     init_terrain(terrain, size);
-    create_terrain(terrain, size);
-    update_terrain(terrain);
+    int seed;
+    terrain->samples = load_samples(&seed, &terrain->n_samples);
+    create_terrain(terrain, size, game->seed);
+    /* update_terrain(terrain); */
 
     /* get_entity(&terrain->entity_id)->flags |= ENT_INVISIBLE; */
 

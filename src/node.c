@@ -41,7 +41,7 @@ void destroy_node(node_id *id)
 
 void init_node_manager()
 {
-    init_resource_manager(&node_manager, sizeof(struct node), 128,
+    init_resource_manager(&node_manager, sizeof(struct node), 4096,
                           0xFFFF, "node", N_STATIC_NODES);
 
     for (int i = 0; i < N_STATIC_NODES; i++)

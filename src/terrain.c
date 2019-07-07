@@ -82,6 +82,8 @@ double offset_fn(struct terrain* terrain, double x, double y) {
 }
 
 void gen_terrain_samples(struct terrain *terrain, float scale) {
+
+    debug("generating terrain samples\n");
     if (terrain->samples)
         free(terrain->samples);
 
@@ -102,15 +104,18 @@ void gen_terrain_samples(struct terrain *terrain, float scale) {
 
     terrain->samples = samples;
     terrain->n_samples = n_samples;
+
 }
 
-void create_terrain(struct terrain *terrain, float scale) {
+void create_terrain(struct terrain *terrain, float scale, int seed) {
     u32 i;
     const double size = terrain->size;
 
     float tmp1[3], tmp2[3];
-    if (!terrain->n_samples)
+    if (!terrain->n_samples) {
         gen_terrain_samples(terrain, scale);
+        /* save_samples(terrain->samples, seed, terrain->n_samples); */
+    }
     assert(terrain->n_samples > 0);
     del_point2d_t *points = calloc(terrain->n_samples, sizeof(*points));
 
@@ -236,6 +241,7 @@ void create_terrain(struct terrain *terrain, float scale) {
     free(del_verts);
     free(del_norms);
     free(del_indices);
+
 }
 
 
@@ -292,5 +298,5 @@ void update_terrain(struct terrain *terrain) {
     }
 
     last_scale = scale;
-    create_terrain(terrain, scale);
+    create_terrain(terrain, scale, 0);
 }

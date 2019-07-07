@@ -4,6 +4,7 @@
 #include "fbo.h"
 #include "file.h"
 #include "game.h"
+#include "debug.h"
 #include "geometry.h"
 #include "gl.h"
 #include "hires.h"
@@ -30,6 +31,7 @@ int main(void)
     int nsamples;
 
     int seed = time(NULL);
+    debug("seed %d\n", seed);
     srand(seed);
 
     struct game game;
