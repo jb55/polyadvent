@@ -1,12 +1,9 @@
 
+* TODO Load dae vertex colors
+
 * TODO Item system                                                    :items:
 * TODO Proc Trees                                                   :procgen:
 * TODO [#A] Instance rendering for ground debris             :perf:rendering:
-* TODO [#B] Load bone weights                                          :anim:
-:LOGBOOK:
-CLOCK: [2019-07-05 Fri 15:46]
-:END:
-
 * TODO Simple pthreads job system                              :jobs:threads:
 
 * Run pose                                                             :anim:
@@ -43,3 +40,9 @@ CLOSED: [2019-07-04 Thu 13:54]
 
 To create a sense of movement
 
+* DONE [#B] Load bone weights                                          :anim:
+CLOSED: [2019-07-08 Mon 10:34]
+:LOGBOOK:
+CLOCK: [2019-07-08 Mon 10:34]--[2019-07-08 Mon 10:34] =>  0:00
+CLOCK: [2019-07-05 Fri 15:46]--[2019-07-05 Fri 23:46] =>  8:00
+:END:

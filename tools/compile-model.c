@@ -4,6 +4,7 @@
 #include <assert.h>
 
 #include "dae.h"
+#include "debug.h"
 #include "mdl.h"
 
 
@@ -26,17 +27,14 @@ int main(int argc, char *argv[])
     const char *outfile = argv[2];
 
     struct model model;
-    struct make_geometry geom;
+    struct mdl_geometry mdl_geom;
 
     init_model(&model);
-    init_make_geometry(&geom);
+    init_mdl_geometry(&mdl_geom);
 
-    load_dae(filename, &model, &geom);
-    save_mdl(outfile, &model, &geom);
+    load_dae(filename, &model, &mdl_geom.mkgeom);
 
-    FILE *out = fopen(outfile, "wb");
-    fprintf(out, "hello, world\n");
-
+    save_mdl(outfile, &model, &mdl_geom);
 
     return 0;
 }

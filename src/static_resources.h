@@ -3,6 +3,7 @@
 #define STATIC_RESOURCES_H
 
 enum static_model {
+    model_cube,
     model_tower,
     model_icosphere,
     model_pirate_officer,

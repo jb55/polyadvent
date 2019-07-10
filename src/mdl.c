@@ -1,6 +1,7 @@
 
 #include "mdl.h"
 #include "debug.h"
+#include "vec3.h"
 #include <assert.h>
 
 
@@ -12,6 +13,7 @@ static inline void write_tag(enum mdl_tag tag, FILE *out)
 // little endian is assumed...
 static inline void write_int(int val, FILE *out)
 {
+    assert(val != 0);
     fwrite(&val, sizeof(val), 1, out);
 }
 
@@ -35,15 +37,16 @@ static inline void write_ints(u32 *ints, int num_ints, FILE *out)
 void init_mdl_geometry(struct mdl_geometry *lgeom)
 {
     init_make_geometry(&lgeom->mkgeom);
-    memset(lgeom->min, 0, sizeof(lgeom->min));
-    memset(lgeom->max, 0, sizeof(lgeom->max));
+    vec3_set(V3(0,0,0), lgeom->min);
+    vec3_set(V3(0,0,0), lgeom->max);
 }
 
-void save_mdl(FILE *out, struct model *model, struct mdl_geometry *lgeom)
+void save_mdl_fd(FILE *out, struct model *model, struct mdl_geometry *lgeom)
 {
     struct make_geometry *mkgeom = &lgeom->mkgeom;
     assert(mkgeom->vertices);
     assert(mkgeom->normals);
+    assert(mkgeom->indices);
 
     for (int i = 0; i < N_MDL_TAGS; i++) {
         switch ((enum mdl_tag)i) {
@@ -115,7 +118,6 @@ void save_mdl(FILE *out, struct model *model, struct mdl_geometry *lgeom)
         }
     }
 
-    assert(mkgeom->indices);
 }
 
 static inline enum mdl_tag read_tag(FILE *stream)
@@ -132,6 +134,7 @@ static inline int read_int(FILE *stream)
 {
     int val = 0;
     int read = fread(&val, sizeof(val), 1, stream);
+    /* debug("val %d ftell %zu\n", val, ftell(stream)-4); */
     assert(read == 1);
     assert(val != 0);
     return val;
@@ -166,7 +169,7 @@ static int read_ints(FILE *stream, u32 **ints)
     return nread;
 }
 
-void load_mdl(FILE *in, struct model *model, struct mdl_geometry *lgeom)
+void load_mdl_fd(FILE *in, struct model *model, struct mdl_geometry *lgeom)
 {
     struct make_geometry *mkgeom = &lgeom->mkgeom;
     int num;
@@ -207,6 +210,9 @@ void load_mdl(FILE *in, struct model *model, struct mdl_geometry *lgeom)
             break;
 
         case MDL_JOINT_WEIGHTS:
+            // TODO: multiple poses
+            debug("loading joint weights\n");
+            model->nposes = 1;
             num = read_floats(in, &mkgeom->joint_weights);
             assert(num == mkgeom->num_verts * 3);
             break;
@@ -226,4 +232,20 @@ void load_mdl(FILE *in, struct model *model, struct mdl_geometry *lgeom)
         case N_MDL_TAGS: assert(!"this shouldn't happend"); break;
         }
     }
+}
+
+void save_mdl(const char *filename, struct model *model, struct mdl_geometry *lgeom)
+{
+    FILE *out = fopen(filename, "wb");
+    assert(out);
+    save_mdl_fd(out, model, lgeom);
+    fclose(out);
+}
+
+void load_mdl(const char *file, struct model *model, struct mdl_geometry *lgeom)
+{
+    FILE *in = fopen(file, "rb");
+    assert(in);
+    load_mdl_fd(in, model, lgeom);
+    fclose(in);
 }

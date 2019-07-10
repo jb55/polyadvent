@@ -11,3 +11,4 @@ polyadvent
 /tools/compile-model
 /samples.bin
 /test/test_dae
+/data/models/*.mdl

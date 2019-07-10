@@ -25,8 +25,11 @@ struct mdl_geometry {
 };
 
 
-void save_mdl(FILE *out, struct model *model, struct mdl_geometry *geom);
-void load_mdl(FILE *in, struct model *model, struct mdl_geometry *geom);
+void save_mdl(const char *filename, struct model *model, struct mdl_geometry *geom);
+void save_mdl_fd(FILE *out, struct model *model, struct mdl_geometry *geom);
+
+void load_mdl(const char *filename, struct model *model, struct mdl_geometry *geom);
+void load_mdl_fd(FILE *in, struct model *model, struct mdl_geometry *geom);
 
 void init_mdl_geometry(struct mdl_geometry *);
 

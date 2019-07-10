@@ -38,7 +38,6 @@ struct model_def {
     char *file;
 };
 
-
 void init_model_manager();
 void init_model_id(model_id *id);
 struct model *init_model(struct model *model);

@@ -9,6 +9,7 @@
 #define MODELDEF(name) { .id = model_##name, .loaded = 0, .file = #name }
 
 static struct model_def static_model_defs[NUM_STATIC_MODELS] = {
+  MODELDEF(cube),
   MODELDEF(tower),
   MODELDEF(icosphere),
   MODELDEF(pirate_officer),
@@ -81,7 +82,10 @@ static struct model *load_static_model(enum static_model m)
 
     struct model *model = &static_models()[m];
     struct geometry *geom = &static_geometry()[m];
+    struct mdl_geometry lgeom;
+    init_mdl_geometry(&lgeom);
     init_geometry(geom);
+
     model->geom_id = make_static_id(m);
 
     if (get_geometry(&model->geom_id)->has_vbos) {
@@ -89,16 +93,15 @@ static struct model *load_static_model(enum static_model m)
         return model;
     }
 
-    int ok = 0;
-
     // Load mesh
     debug("loading %s model with geom_id ", static_model_defs[m].file);
 
     assert(m < NUM_STATIC_MODELS);
-    snprintf(path, 128, "data/models/%s.ply", static_model_defs[m].file);
-    ok = parse_ply(path, geom);
-    if (!ok)
-        return 0;
+    snprintf(path, 128, "data/models/%s.mdl", static_model_defs[m].file);
+    load_mdl(path, model, &lgeom);
+
+    make_buffer_geometry(&lgeom.mkgeom, geom);
+    free_make_geometry(&lgeom.mkgeom);
 
     return model;
 }

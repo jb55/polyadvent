@@ -1,8 +1,11 @@
 NAME ?= polyadvent
 BIN ?= $(NAME)
 PREFIX ?= /usr/local
-DEFS= -DGLFW_INCLUDE_NONE  -DDEBUG
-CFLAGS = $(DEFS) -ggdb -O2 -I src -Wall -Werror -Wextra -std=c99 \
+DEFS= -DGLFW_INCLUDE_NONE -DDEBUG
+# release build lol
+#DEFS= -DGLFW_INCLUDE_NONE -DNDEBUG
+# CFLAGS = $(DEFS) -ggdb -O0 -I src -Wall -Wextra -std=c99
+CFLAGS = $(DEFS) -ggdb -O2 -I src -Wall -Werror -Wextra -std=c99  \
 						-Wno-unused-function \
 						-Wno-unused-parameter \
 						-Wno-unused-variable \
@@ -50,7 +53,7 @@ tools: $(TOOLS)
 data/models/%.mdl: data/models/%.dae tools/compile-model
 	./tools/compile-model $< $@
 
-check: $(TESTS)
+check: $(TESTS) $(MODELS)
 	./test/test_dae
 	./test/test_resource
 	./test/test_scene

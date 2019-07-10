@@ -1,7 +1,7 @@
 #ifndef _XML_H
 #define _XML_H
 
-#define XML_BUFSIZ 1024
+#define XML_BUFSIZ (2<<20)
 
 #include <stdlib.h>
 

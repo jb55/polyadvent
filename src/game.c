@@ -180,7 +180,6 @@ void game_init(struct game *game, int width, int height) {
     assert(pnode);
     res->player_id = make_static_id(entity_player);
     assert(res->player_id.index == entity_player);
-    /* player->model_id = get_static_model(model_pirate_officer, NULL); */
 
     struct model *pmodel;
     player->model_id = get_static_model(model_pirate_officer, &pmodel);
@@ -188,6 +187,7 @@ void game_init(struct game *game, int width, int height) {
     pmodel->shading = SHADING_VERT_COLOR;
 
     node_set_label(pnode, "player");
+    /* node_rotate(pnode, V3(-5.0,0,0)); */
     node_attach(&player->node_id, &res->root_id);
     assert(ideq(&pnode->parent_id, &res->root_id));
 
