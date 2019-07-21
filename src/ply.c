@@ -238,7 +238,7 @@ int parse_ply_with_mkgeom(const char *filename, struct mdl_geometry *mdlgeom)
 
     if (success) {
         mkgeom->num_indices = ninds * 3;
-        mkgeom->num_verts = nverts * 3;
+        mkgeom->num_verts = nverts;
 
         vec3_copy(min, mdlgeom->min);
         vec3_copy(max, mdlgeom->max);
