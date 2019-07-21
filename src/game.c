@@ -162,7 +162,7 @@ void game_init(struct game *game, int width, int height) {
     res->sun_color[1] = 0.6;
     res->sun_color[2] = 0.7;
 
-    game->test_resources.fog_on = 1;
+    game->test_resources.fog_on = 0;
     game->test_resources.diffuse_on = 0;
 
     node_init(root);
