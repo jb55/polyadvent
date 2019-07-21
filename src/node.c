@@ -145,8 +145,9 @@ int node_recalc(struct node *node) {
   float rot[9] = {1.0};
 
   struct node *parent = get_node(&node->parent_id);
-  if (parent && node_needs_recalc(parent))
-    node_recalc(parent);
+  if (parent && node_needs_recalc(parent)) {
+      node_recalc(parent);
+  }
 
   if (!node_needs_recalc(node)) {
     node_recalc_children(node);
@@ -166,6 +167,7 @@ int node_recalc(struct node *node) {
 
   }
   else {
+      debug("custom updating %s\n", node->label);
       node->custom_update(node);
   }
 
