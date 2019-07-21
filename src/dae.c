@@ -263,19 +263,19 @@ static void dae_tagbody(struct xmlparser *x, const char *d, size_t dl)
     if (data->state == PARSING_JOINT_MATRIX) {
         parse_joint_matrix(data, d, dl);
     }
-    else if (data->state == PARSING_POSITIONS) {
+    else if (data->geom && data->state == PARSING_POSITIONS) {
         parse_vertices(data, d, dl);
     }
-    else if (data->state == PARSING_WEIGHTS) {
+    else if (data->geom && data->state == PARSING_WEIGHTS) {
         parse_weights(data, d, dl);
     }
-    else if (data->state == PARSING_NORMALS) {
+    else if (data->geom && data->state == PARSING_NORMALS) {
         parse_normals(data, d, dl);
     }
-    else if (data->state == PARSING_COLORS) {
+    else if (data->geom && data->state == PARSING_COLORS) {
         parse_colors(data, d, dl);
     }
-    else if (data->state == PARSING_INDICES) {
+    else if (data->geom && data->state == PARSING_INDICES) {
         parse_indices(data, d, dl);
     }
     /* else if (data->state == PARSING_TEX_COORDS) { */
@@ -518,7 +518,8 @@ void load_dae(const char *filename, struct model *model,
         process_joint_children(pose->joints, pose->njoints);
     }
 
-    process_indices(&data);
+    if (geom)
+        process_indices(&data);
 
     fclose(data.dae_file);
 }
