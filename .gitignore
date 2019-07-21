@@ -12,3 +12,4 @@ polyadvent
 /samples.bin
 /test/test_dae
 /data/models/*.mdl
+data/models/third-party-src/
