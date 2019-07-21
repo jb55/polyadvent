@@ -25,9 +25,9 @@ double old_noisy_boi(struct terrain *t, double x, double y) {
   struct perlin_settings *s = &t->settings;
   /* x *= s->scale; */
   /* y *= s->scale; */
-  double e =  perlin2d(x, y, s->freq, s->depth)
-            + s->o1s * perlin2d(s->o1 * x, s->o1 * y, s->freq, s->depth)
-            + s->o2s * perlin2d(s->o2 * x, s->o2 * y, s->freq, s->depth);
+  double e =  perlin2d(t->settings.seed, x, y, s->freq, s->depth)
+      + s->o1s * perlin2d(t->settings.seed, s->o1 * x, s->o1 * y, s->freq, s->depth)
+      + s->o2s * perlin2d(t->settings.seed, s->o2 * x, s->o2 * y, s->freq, s->depth);
   return pow(e, s->exp) * s->amplitude;
 }
 
@@ -110,6 +110,7 @@ void gen_terrain_samples(struct terrain *terrain, float scale) {
 void create_terrain(struct terrain *terrain, float scale, int seed) {
     u32 i;
     const double size = terrain->size;
+    terrain->settings.seed = seed;
 
     float tmp1[3], tmp2[3];
     if (!terrain->n_samples) {

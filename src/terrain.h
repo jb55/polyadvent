@@ -9,14 +9,15 @@
 struct point;
 
 struct perlin_settings {
-  double freq;
-  int depth;
-  double amplitude;
-  double ox, oy;
-  double o1, o1s;
-  double o2, o2s;
-  double scale;
-  double exp;
+    double freq;
+    int depth;
+    int seed;
+    double amplitude;
+    double ox, oy;
+    double o1, o1s;
+    double o2, o2s;
+    double scale;
+    double exp;
 };
 
 

@@ -1,7 +1,5 @@
 #include <stdio.h>
 
-static int SEED = 0;
-
 static int hash[] = {
   208,34,231,213,32,248,233,56,161,78,24,140,71,48,140,254,245,255,247,247,40,
   185,248,251,245,28,124,204,204,76,36,1,107,28,234,163,202,224,245,128,167,204,
@@ -16,8 +14,8 @@ static int hash[] = {
   135,176,183,191,253,115,184,21,233,58,129,233,142,39,128,211,118,137,139,255,
   114,20,218,113,154,27,127,246,250,1,8,198,250,209,92,222,173,21,88,102,219};
 
-int noise2(int x, int y) {
-    int tmp = hash[(y + SEED) % 256];
+int noise2(int seed, int x, int y) {
+    int tmp = hash[(y + seed) % 256];
     return hash[(tmp + x) % 256];
 }
 
@@ -29,21 +27,21 @@ float smooth_inter(float x, float y, float s) {
     return lin_inter(x, y, s * s * (3-2*s));
 }
 
-float noise2d(float x, float y) {
+float noise2d(int seed, float x, float y) {
     int x_int = x;
     int y_int = y;
     float x_frac = x - x_int;
     float y_frac = y - y_int;
-    int s = noise2(x_int, y_int);
-    int t = noise2(x_int+1, y_int);
-    int u = noise2(x_int, y_int+1);
-    int v = noise2(x_int+1, y_int+1);
+    int s = noise2(seed, x_int, y_int);
+    int t = noise2(seed, x_int+1, y_int);
+    int u = noise2(seed, x_int, y_int+1);
+    int v = noise2(seed, x_int+1, y_int+1);
     float low = smooth_inter(s, t, x_frac);
     float high = smooth_inter(u, v, x_frac);
     return smooth_inter(low, high, y_frac);
 }
 
-float perlin2d(float x, float y, float freq, int depth) {
+float perlin2d(int seed, float x, float y, float freq, int depth) {
     float xa = x*freq;
     float ya = y*freq;
     float amp = 1.0;
@@ -54,7 +52,7 @@ float perlin2d(float x, float y, float freq, int depth) {
     for(i=0; i<depth; i++)
     {
         div += 256 * amp;
-        fin += noise2d(xa, ya) * amp;
+        fin += noise2d(seed, xa, ya) * amp;
         amp /= 2;
         xa *= 2;
         ya *= 2;
