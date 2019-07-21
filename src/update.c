@@ -340,11 +340,9 @@ void update (struct game *game) {
     struct entity    *player       = get_player(res);
     struct node      *pnode        = get_node(&player->node_id);
     struct node      *cam_node     = get_node(&res->camera_node_id);
-    struct node      *freecam_node = get_node(&res->free_camera_id);
 
     assert(pnode);
     assert(cam_node);
-    assert(freecam_node);
 
     float *time = &res->time;
 	float *light = res->light_dir;
@@ -359,10 +357,12 @@ void update (struct game *game) {
     /* spherical_dir(game->test_resources.camera.coords, camera_dir); */
     /* vec3_scale(camera_dir, -1, camera_dir); */
 
-	if (game->input.modifiers & KMOD_LALT) {
-        if (ideq(&res->camera_node_id, &res->free_camera_id))
-            movement(game, freecam_node, 1.0);
-	}
+    if (ideq(&res->camera_node_id, &res->free_camera_id)) {
+        struct node *freecam_node = get_node(&res->free_camera_id);
+        assert(freecam_node);
+        movement(game, freecam_node, 1.0);
+        node_recalc(freecam_node);
+    }
 	else {
 		player_movement(game, pnode);
 	}
@@ -383,10 +383,14 @@ void update (struct game *game) {
 		toggle_fog = 1;
 
 	if (was_key_pressed_this_frame(game, SDL_SCANCODE_EQUALS)) {
-        if (!ideq(&res->camera_node_id, &res->free_camera_id))
+        if (!ideq(&res->camera_node_id, &res->free_camera_id)) {
+            debug("switching to freecam\n");
             res->camera_node_id = res->free_camera_id;
-        else
+        }
+        else {
+            debug("switching to orbitcam\n");
             res->camera_node_id = res->orbit_camera.node_id;
+        }
     }
 
 	if (toggle_fog) {
@@ -399,5 +403,4 @@ void update (struct game *game) {
     day_night_cycle(*time, res);
 
 	node_recalc(root);
-
 }
