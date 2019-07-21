@@ -3,7 +3,6 @@
 #include <stdlib.h>
 #include <assert.h>
 
-#include "dae.h"
 #include "debug.h"
 #include "mdl.h"
 #include "ply.h"
