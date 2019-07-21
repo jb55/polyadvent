@@ -7,6 +7,7 @@ enum static_model {
     model_tower,
     model_icosphere,
     model_pirate_officer,
+    model_barrel,
     NUM_STATIC_MODELS
 };
 

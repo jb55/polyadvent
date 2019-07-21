@@ -182,9 +182,7 @@ void game_init(struct game *game, int width, int height) {
     assert(res->player_id.index == entity_player);
 
     struct model *pmodel;
-    player->model_id = get_static_model(model_pirate_officer, &pmodel);
-
-    pmodel->shading = SHADING_VERT_COLOR;
+    player->model_id = get_static_model(model_barrel, &pmodel);
 
     node_set_label(pnode, "player");
     /* node_rotate(pnode, V3(-5.0,0,0)); */

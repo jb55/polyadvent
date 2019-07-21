@@ -13,6 +13,7 @@ static struct model_def static_model_defs[NUM_STATIC_MODELS] = {
   MODELDEF(tower),
   MODELDEF(icosphere),
   MODELDEF(pirate_officer),
+  MODELDEF(barrel),
 };
 
 static struct resource_manager dyn_modelman;
