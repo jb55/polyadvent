@@ -255,7 +255,8 @@ void orbit_update_from_mouse(struct orbit *camera, struct input *input,
 
     node_recalc(target_node);
     vec3_copy(node_world(target_node), target);
-    vec3_add(target, V3(0.0, 0.0, player_geom->max[2] * 2.0), target);
+    assert(player_geom->max[2] != 0);
+    vec3_add(target, V3(0.0, 0.0, player_geom->max[2]), target);
     /* vec3_add(target, V3(0.0, 0.0, 10.0), target); */
 
     float mx = 0.0, my = 0.0;
@@ -277,7 +278,7 @@ void orbit_update_from_mouse(struct orbit *camera, struct input *input,
         camera->coords.radius += input->wheel_y * dt * 100.0;
     }
 
-    camera->coords.radius = max(5.0, camera->coords.radius);
+    camera->coords.radius = max(1.0, camera->coords.radius);
 
     camera->coords.azimuth     += mx;
     camera->coords.inclination += my;
@@ -299,7 +300,7 @@ static void camera_keep_above_ground(struct terrain *terrain,
         float cam_terrain_z =
             terrain->fn(terrain, camera_world[0], camera_world[1]);
 
-        const float bias = 2.0;
+        const float bias = 1.0;
 
         if (camera_world[2] < cam_terrain_z + bias)
             camera_world[2] = cam_terrain_z + bias;
@@ -357,11 +358,13 @@ void update (struct game *game) {
     /* spherical_dir(game->test_resources.camera.coords, camera_dir); */
     /* vec3_scale(camera_dir, -1, camera_dir); */
 
-    if (ideq(&res->camera_node_id, &res->free_camera_id)) {
+    if (game->input.modifiers & KMOD_ALT &&
+        ideq(&res->camera_node_id, &res->free_camera_id))
+    {
         struct node *freecam_node = get_node(&res->free_camera_id);
         assert(freecam_node);
+        assert(streq(freecam_node->label, "freecam"));
         movement(game, freecam_node, 1.0);
-        node_recalc(freecam_node);
     }
 	else {
 		player_movement(game, pnode);

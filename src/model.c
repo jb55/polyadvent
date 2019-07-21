@@ -101,6 +101,9 @@ static struct model *load_static_model(enum static_model m)
     snprintf(path, 128, "data/models/%s.mdl", static_model_defs[m].file);
     load_mdl(path, model, &lgeom);
 
+    vec3_copy(lgeom.min, geom->min);
+    vec3_copy(lgeom.max, geom->max);
+
     make_buffer_geometry(&lgeom.mkgeom, geom);
     free_make_geometry(&lgeom.mkgeom);
 

@@ -86,6 +86,8 @@ int main(void)
         /*     accumulator -= dt; */
         /* } */
 
+        default_config.camera = game.test_resources.camera_node_id;
+
         last = new_time;
 
         struct fbo *fbo = &game.test_resources.shadow_buffer;
