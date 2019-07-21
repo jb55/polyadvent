@@ -16,9 +16,9 @@ LDFLAGS = -lSDL2 -lGL -lm
 SRC=src
 
 SRCS=$(wildcard $(SRC)/*.c)
-DAES=$(wildcard data/models/*.dae)
+PLYS=$(wildcard data/models/*.ply)
 
-MODELS=$(DAES:.dae=.mdl)
+MODELS=$(PLYS:.ply=.mdl)
 OBJS=$(SRCS:.c=.o)
 
 TESTS =  test/test_dae
@@ -50,7 +50,7 @@ tools/%: tools/%.o $(OBJS)
 
 tools: $(TOOLS)
 
-data/models/%.mdl: data/models/%.dae tools/compile-model
+data/models/%.mdl: data/models/%.ply tools/compile-model
 	./tools/compile-model $< $@
 
 check: $(TESTS) $(MODELS)
