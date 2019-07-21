@@ -55,8 +55,8 @@ int main(int argc, char *argv[])
     init_model(&model);
     init_mdl_geometry(&mdl_geom);
 
-    load_dae(filename, &model, NULL);
-    replace_ext(filename, strlen(filename), "ply");
+    /* load_dae(filename, &model, NULL); */
+    /* replace_ext(filename, strlen(filename), "dae"); */
 
     int ok = parse_ply_with_mkgeom(filename, &mdl_geom);
     assert(ok);
