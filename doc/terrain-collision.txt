@@ -1,0 +1,21 @@
+
+Basic Idea
+==========
+
+Use an overlay grid for space partitioning vertex indices:
+
+
+      +-----+-----+-----+-----+-----+
+      |     |     |     |     |     |
+      +-----+-----+-----+-----+-----+
+      |     |     | *   |     |     |
+      +-----+-----+-----+-----+-----+
+      |     |     |   * | * * |     |
+      +-----+-----+-----+-----+-----+
+      |     |     |  *  |  *  |     |
+      +-----+-----+-----+-----+-----+
+      |     |     |     |     |     |
+      +-----+-----+-----+-----+-----+
+
+Where *'s are indices to the corresponding vertex. We'll need to save
+height in memory so that collision can reference the heights.
