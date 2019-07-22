@@ -203,17 +203,7 @@ void create_terrain(struct terrain *terrain, float scale, int seed) {
         del_verts[ndv+7] = v[2][1];
         del_verts[ndv+8] = v[2][2];
 
-        // centroid normals
-        /* float c[3]; */
-        /* c[0] = (v[0][0] + v[1][0] + v[2][0]) / 3.0; */
-        /* c[1] = (v[0][1] + v[1][1] + v[2][1]) / 3.0; */
-        /* c[2] = (v[0][2] + v[1][2] + v[2][2]) / 3.0; */
-        /* double dx, dy; */
-        /* deriv((noisefn)terrain->fn, terrain, c[0], c[1], c[2], &dx, &dy); */
-        /* vec3_subtract(v[1], c, tmp1); */
-        /* vec3_subtract(v[2], c, tmp2); */
-
-        // standard normals
+        // normals
         vec3_subtract(v[1], v[0], tmp1);
         vec3_subtract(v[2], v[0], tmp2);
 
