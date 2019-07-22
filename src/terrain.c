@@ -81,7 +81,7 @@ double offset_fn(struct terrain* terrain, double x, double y) {
     return old_noisy_boi(terrain, ox+x, oy+y);
 }
 
-void gen_terrain_samples(struct terrain *terrain, float scale) {
+void gen_terrain_samples(struct terrain *terrain, float scale, const double pdist) {
 
     debug("generating terrain samples\n");
     if (terrain->samples)
@@ -92,8 +92,6 @@ void gen_terrain_samples(struct terrain *terrain, float scale) {
 
     /* struct point *samples = */
     /*   uniform_samples(n_samples, game->terrain.size); */
-
-    static const double pdist = 24.0;
 
     struct point *samples =
         poisson_disk_samples(pdist, terrain->size, 30, &n_samples);
@@ -110,17 +108,26 @@ void gen_terrain_samples(struct terrain *terrain, float scale) {
 void create_terrain(struct terrain *terrain, float scale, int seed) {
     u32 i;
     const double size = terrain->size;
+
+    static const double pdist = 24.0;
     terrain->settings.seed = seed;
 
     float tmp1[3], tmp2[3];
     if (!terrain->n_samples) {
-        gen_terrain_samples(terrain, scale);
+        gen_terrain_samples(terrain, scale, pdist);
         /* save_samples(terrain->samples, seed, terrain->n_samples); */
     }
     assert(terrain->n_samples > 0);
-    del_point2d_t *points = calloc(terrain->n_samples, sizeof(*points));
 
+    del_point2d_t *points = calloc(terrain->n_samples, sizeof(*points));
     float *verts = calloc(terrain->n_samples * 3, sizeof(*verts));
+    terrain->n_cells = round(size / pdist);
+    debug("n_cells %d\n", terrain->n_cells);
+    assert(terrain->n_cells == 417);
+
+    struct terrain_cell *grid =
+        calloc(terrain->n_cells * terrain->n_cells, sizeof(struct terrain_cell));
+
     /* float *normals = calloc(terrain->n_samples * 3, sizeof(*verts)); */
 
     terrain->fn = offset_fn;
@@ -134,7 +141,16 @@ void create_terrain(struct terrain *terrain, float scale, int seed) {
         x = terrain->samples[i].x;
         y = terrain->samples[i].y;
 
+        int grid_x = x / pdist;
+        int grid_y = y / pdist;
+
+        /* debug("grid %f %f %d %d\n", x, y, grid_x, grid_y); */
+        struct terrain_cell *cell = &grid[grid_x * terrain->n_cells + grid_y];
+
+        assert(cell->vert_count + 1 <= MAX_CELL_VERTS);
+
         double z = terrain->fn(terrain, x, y);
+        cell->verts_index[cell->vert_count++] = i;
 
         points[i].x = x;
         points[i].y = y;
@@ -240,9 +256,9 @@ void create_terrain(struct terrain *terrain, float scale, int seed) {
     assert(del_verts);
 
     free(points);
-    free(verts);
     // needed for collision
-    /* free(del_verts); */
+    free(verts);
+    free(del_verts);
 
     // we might need norms in memory eventually as well ?
     free(del_norms);
@@ -258,7 +274,7 @@ void destroy_terrain(struct terrain *terrain) {
 }
 
 
-void update_terrain(struct terrain *terrain) {
+void update_terrain(struct terrain *terrain, const double pdist) {
     static int first = 1;
     static float last_scale = -1.0;
 
@@ -300,7 +316,7 @@ void update_terrain(struct terrain *terrain) {
     /* printf("pdist %f\n", pdist); */
 
     if (last_scale == -1.0 || fabs(scale - last_scale) > 0.00001) {
-        gen_terrain_samples(terrain, scale);
+        gen_terrain_samples(terrain, scale, pdist);
     }
 
     last_scale = scale;
