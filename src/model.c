@@ -124,10 +124,27 @@ void destroy_model(model_id *model_id)
 
 model_id get_static_model(enum static_model m, struct model **model)
 {
-    if (model)
-        *model = load_static_model(m);
+    model_id model_id;
 
-    return make_static_id(m);
+    if (!is_static_model_loaded(m)) {
+        load_static_model(m);
+    }
+
+    model_id = make_static_id(m);
+
+    if (model) {
+        *model = get_model(&model_id);
+    }
+
+    return model_id;
+}
+
+
+bool is_static_model_loaded(enum static_model m)
+{
+    geometry_id geom_id = make_static_id(m);
+    struct geometry *geom = get_geometry(&geom_id);
+    return geom->has_vbos;
 }
 
 

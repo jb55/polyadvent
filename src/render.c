@@ -361,6 +361,7 @@ void render (struct game *game, struct render_config *config) {
         struct model *model = get_model(&entity->model_id);
         assert(model);
         struct geometry *geo = get_geometry(&model->geom_id);
+        /* debug("geo node %s\n", node->label); */
         assert(geo);
         render_geometry(geo, res->vertex_attrs, current_program);
         check_gl();

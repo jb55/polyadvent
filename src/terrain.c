@@ -111,13 +111,15 @@ static inline struct terrain_cell *index_terrain_cell(struct terrain *terrain,
     if (x < 0 || y < 0 || x >= terrain->n_cells || y >= terrain->n_cells)
         return NULL;
 
-    return &terrain->grid[x * terrain->n_cells + y];
+    return &terrain->grid[y * terrain->n_cells + x];
 }
 
 static inline struct terrain_cell *query_terrain_cell(struct terrain *terrain,
                                                       float x, float y,
                                                       int *grid_x, int *grid_y)
 { 
+    assert(x >= 0);
+    assert(y >= 0);
     assert(x < terrain->size);
     assert(y < terrain->size);
     *grid_x = x / terrain->cell_size;
@@ -149,6 +151,21 @@ void query_terrain_grid(struct terrain *terrain, float x, float y,
     cells[8] = index_terrain_cell(terrain, grid_x + 1, grid_y + 1);
 }
 
+static void insert_grid_vertex(struct terrain_cell *cell, float *verts,
+                                       float x, float y, int ind)
+{
+    for (int i = 0; i < cell->vert_count; i++) {
+        float *vert = &verts[ind];
+        if (approxeq(x, vert[0]) && approxeq(y, vert[1])) {
+            return;
+        }
+    }
+
+    assert(cell->vert_count + 1 <= MAX_CELL_VERTS);
+    cell->verts_index[cell->vert_count++] = ind;
+}
+
+
 void create_terrain(struct terrain *terrain, float scale, int seed) {
     u32 i;
     const double size = terrain->size;
@@ -165,9 +182,8 @@ void create_terrain(struct terrain *terrain, float scale, int seed) {
 
     del_point2d_t *points = calloc(terrain->n_samples, sizeof(*points));
     float *verts = calloc(terrain->n_samples * 3, sizeof(*verts));
-    terrain->verts = verts;
-    terrain->n_cells = round(size / pdist);
     terrain->cell_size = pdist;
+    terrain->n_cells = round(size / terrain->cell_size);
     debug("n_cells %d\n", terrain->n_cells);
     assert(terrain->n_cells == 417);
 
@@ -189,16 +205,7 @@ void create_terrain(struct terrain *terrain, float scale, int seed) {
         x = terrain->samples[i].x;
         y = terrain->samples[i].y;
 
-        int grid_x = x / pdist;
-        int grid_y = y / pdist;
-
-        /* debug("grid %f %f %d %d\n", x, y, grid_x, grid_y); */
-        struct terrain_cell *cell = &grid[grid_x * terrain->n_cells + grid_y];
-
-        assert(cell->vert_count + 1 <= MAX_CELL_VERTS);
-
         double z = terrain->fn(terrain, x, y);
-        cell->verts_index[cell->vert_count++] = i;
 
         points[i].x = x;
         points[i].y = y;
@@ -223,6 +230,7 @@ void create_terrain(struct terrain *terrain, float scale, int seed) {
 
     /// XXX (perf): we should be able to do this directly from del instead of
     /// triangulating with tri
+    debug("terrain n_tris %d\n", tri->num_triangles);
     for (i = 0; i < tri->num_triangles; ++i) {
         int nv = i * 3;
         int ndv = i * 9;
@@ -239,17 +247,24 @@ void create_terrain(struct terrain *terrain, float scale, int seed) {
             &verts[p[2]*3]
         };
 
-        del_verts[ndv+0] = v[0][0];
-        del_verts[ndv+1] = v[0][1];
-        del_verts[ndv+2] = v[0][2];
+        for (int j = 0; j < 3; j++) {
+            int ind = ndv + j*3;
+            float x = del_verts[ind+0] = v[j][0];
+            float y = del_verts[ind+1] = v[j][1];
+                      del_verts[ind+2] = v[j][2];
 
-        del_verts[ndv+3] = v[1][0];
-        del_verts[ndv+4] = v[1][1];
-        del_verts[ndv+5] = v[1][2];
+            int grid_x = x / terrain->cell_size;
+            int grid_y = y / terrain->cell_size;
 
-        del_verts[ndv+6] = v[2][0];
-        del_verts[ndv+7] = v[2][1];
-        del_verts[ndv+8] = v[2][2];
+            /* if (i > 169000) */
+            /*     debug("grid %f %f %d %d\n", x, y, grid_x, grid_y); */
+            struct terrain_cell *cell =
+                index_terrain_cell(terrain, grid_x, grid_y);
+
+            assert(cell);
+
+            insert_grid_vertex(cell, del_verts, x, y, ind);
+        }
 
         // normals
         vec3_subtract(v[1], v[0], tmp1);
@@ -295,8 +310,11 @@ void create_terrain(struct terrain *terrain, float scale, int seed) {
 
     free(points);
     // needed for collision
-    /* free(verts); */
-    free(del_verts);
+    free(verts);
+    /* free(del_verts); */
+
+    terrain->verts = del_verts;
+    terrain->n_verts = num_verts;
 
     // we might need norms in memory eventually as well ?
     free(del_norms);

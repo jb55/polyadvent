@@ -6,7 +6,7 @@
 #include "entity.h"
 #include "model.h"
 
-#define MAX_CELL_VERTS 3
+#define MAX_CELL_VERTS 4
 
 struct point;
 

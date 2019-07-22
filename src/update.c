@@ -334,7 +334,7 @@ static void player_update(struct game *game, struct entity *player)
     player_terrain_collision(terrain, player);
     node_recalc(node);
 
-    query_terrain_grid(terrain, node->pos[0], node->pos[1], cells);
+    query_terrain_grid(terrain, node->mat[M_X], node->mat[M_Y], cells);
 
     for (int i = 0; i < ARRAY_SIZE(cells); i++) {
         struct terrain_cell *cell = cells[i];
@@ -350,11 +350,11 @@ static void player_update(struct game *game, struct entity *player)
                 ent->model_id = get_static_model(model_barrel, NULL);
                 struct node *enode = get_node(&ent->node_id);
                 node_set_label(enode, "grid_debug");;
-                assert(cell->verts_index[j] < terrain->n_samples);
-                float *vert = &terrain->verts[cell->verts_index[j] * 3];
+                assert(cell->verts_index[j] < terrain->n_verts);
+                float *vert = &terrain->verts[cell->verts_index[j]];
                 debug("creating new grid_debug entity at %f %f %f\n", vert[0], vert[1], vert[2]);
                 vec3_copy(vert, enode->pos);
-                node_scale(enode, 5.0);
+                node_scale(enode, 25.0);
                 node_mark_for_recalc(enode);
                 node_recalc(enode);
             }

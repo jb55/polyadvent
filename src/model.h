@@ -47,6 +47,8 @@ struct model *new_model(model_id *);
 struct model *new_static_model(model_id *);
 void destroy_model(model_id *);
 
+bool is_static_model_loaded(enum static_model);
+
 model_id get_static_model(enum static_model, struct model**);
 
 #endif /* MODEL_H */
