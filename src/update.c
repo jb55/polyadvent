@@ -307,7 +307,9 @@ static void camera_keep_above_ground(struct terrain *terrain,
     }
 }
 
-static void player_update(struct game *game, struct entity *player) {
+static void player_update(struct game *game, struct entity *player)
+{
+    struct terrain_cell *cells[9];
 
     struct resources *res = &game->test_resources;
     struct orbit *camera = &res->orbit_camera;
@@ -326,8 +328,40 @@ static void player_update(struct game *game, struct entity *player) {
         float yaw = game->test_resources.orbit_camera.coords.azimuth;
         quat_axis_angle(V3(0.0, 0.0, 1.0), -yaw - RAD(90), node->orientation);
     }
-    player_terrain_collision(&game->terrain, player);
+
+    struct terrain *terrain = &game->terrain;
+
+    player_terrain_collision(terrain, player);
     node_recalc(node);
+
+    query_terrain_grid(terrain, node->pos[0], node->pos[1], cells);
+
+    for (int i = 0; i < ARRAY_SIZE(cells); i++) {
+        struct terrain_cell *cell = cells[i];
+        if (!cell)
+            continue;
+
+        for (int j = 0; j < cell->vert_count; j++) {
+            entity_id *ent_id = &cell->debug_ent[j];
+
+            if (is_null_id(ent_id)) {
+                init_id(ent_id);
+                struct entity *ent = new_entity(ent_id);
+                ent->model_id = get_static_model(model_barrel, NULL);
+                struct node *enode = get_node(&ent->node_id);
+                node_set_label(enode, "grid_debug");;
+                assert(cell->verts_index[j] < terrain->n_samples);
+                float *vert = &terrain->verts[cell->verts_index[j] * 3];
+                debug("creating new grid_debug entity at %f %f %f\n", vert[0], vert[1], vert[2]);
+                vec3_copy(vert, enode->pos);
+                node_scale(enode, 5.0);
+                node_mark_for_recalc(enode);
+                node_recalc(enode);
+            }
+
+        }
+
+    }
 }
 
 
