@@ -164,15 +164,15 @@ void create_terrain(struct terrain *terrain, float scale, int seed) {
         int ndv = i * 9;
 
         int p[3] = {
-        tri->tris[nv + 0],
-        tri->tris[nv + 1],
-        tri->tris[nv + 2],
+            tri->tris[nv + 0],
+            tri->tris[nv + 1],
+            tri->tris[nv + 2],
         };
 
         float *v[3] = {
-        &verts[p[0]*3],
-        &verts[p[1]*3],
-        &verts[p[2]*3]
+            &verts[p[0]*3],
+            &verts[p[1]*3],
+            &verts[p[2]*3]
         };
 
         del_verts[ndv+0] = v[0][0];
