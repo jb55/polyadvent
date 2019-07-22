@@ -125,7 +125,7 @@ void create_terrain(struct terrain *terrain, float scale, int seed) {
 
     terrain->fn = offset_fn;
 
-    // 100 random samples from our noise function
+    // n random samples from our noise function
     for (i = 0; i < (u32)terrain->n_samples; i++) {
         int n = i*3;
         double x, y;
@@ -237,9 +237,14 @@ void create_terrain(struct terrain *terrain, float scale, int seed) {
     delaunay2d_release(del);
     tri_delaunay2d_release(tri);
 
+    assert(del_verts);
+
     free(points);
     free(verts);
-    free(del_verts);
+    // needed for collision
+    /* free(del_verts); */
+
+    // we might need norms in memory eventually as well ?
     free(del_norms);
     free(del_indices);
 

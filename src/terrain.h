@@ -23,6 +23,7 @@ struct perlin_settings {
 
 struct terrain {
     entity_id entity_id;
+    float *verts;
     struct perlin_settings settings;
     struct point *samples;
     double (*fn)(struct terrain *, double, double);
