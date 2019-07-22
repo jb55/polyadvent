@@ -26,7 +26,7 @@
 #define RAD(x) ((x)*TAU/360.0)
 
 #define EPSILON 0.0001
-#define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
+#define ARRAY_SIZE(x) ((int)(sizeof(x) / sizeof((x)[0])))
 #define min(a,b) (a < b ? a : b)
 #define max(a,b) (a > b ? a : b)
 #define streq(a,b) (strcmp(a,b) == 0)
