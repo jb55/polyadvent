@@ -43,7 +43,6 @@ void *new_resource(struct resource_manager *, struct resource_id *id);
 void *new_static_resource(struct resource_manager *, struct resource_id *id);
 void print_id(struct resource_id *, int nl);
 void null_id(struct resource_id *id);
-/* int is_static_resource(struct resource_id *id); */
 
 void init_resource_manager(struct resource_manager *r, u32 elem_size,
                            u32 initial_elements, u32 max_elements, const char *name,
@@ -63,6 +62,11 @@ static inline struct resource_id make_static_id(u32 index)
 static inline int is_static_resource(struct resource_id *id)
 {
     return id->uuid == STATIC_UUID;
+}
+
+static inline int is_null_id(struct resource_id *id)
+{
+    return id->generation == 0;
 }
 
 
