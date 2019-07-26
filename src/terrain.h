@@ -24,7 +24,7 @@ struct perlin_settings {
 
 struct terrain_cell {
     u8 vert_count;
-    u16 verts_index[MAX_CELL_VERTS];
+    int verts_index[MAX_CELL_VERTS];
     entity_id debug_ent[MAX_CELL_VERTS];
 };
 

@@ -154,17 +154,93 @@ void query_terrain_grid(struct terrain *terrain, float x, float y,
 static void insert_grid_vertex(struct terrain_cell *cell, float *verts,
                                        float x, float y, int ind)
 {
-    for (int i = 0; i < cell->vert_count; i++) {
-        float *vert = &verts[ind];
-        if (approxeq(x, vert[0]) && approxeq(y, vert[1])) {
-            return;
-        }
-    }
-
     assert(cell->vert_count + 1 <= MAX_CELL_VERTS);
     cell->verts_index[cell->vert_count++] = ind;
 }
 
+static void collide_terrain_debug(struct terrain *terrain, struct terrain_cell *cell)
+{
+    for (int j = 0; j < cell->vert_count; j++) {
+        entity_id *ent_id = &cell->debug_ent[j];
+
+        if (is_null_id(ent_id)) {
+            init_id(ent_id);
+            struct entity *ent = new_entity(ent_id);
+            ent->model_id = get_static_model(model_barrel, NULL);
+            struct node *enode = get_node(&ent->node_id);
+            node_set_label(enode, "grid_debug");
+            assert(cell->verts_index[j] < terrain->n_verts);
+            float *vert = &terrain->verts[cell->verts_index[j]];
+            /* debug("creating new grid_debug entity at %f %f %f\n", vert[0], vert[1], vert[2]); */
+            vec3_copy(vert, enode->pos);
+            node_scale(enode, 5.0);
+            node_mark_for_recalc(enode);
+            node_recalc(enode);
+        }
+    }
+}
+
+static inline void get_closest_cells(struct terrain *terrain,
+                                 vec3 *pos,
+                                 struct terrain_cell *cell,
+                                 struct terrain_cell *closest_cells[3],
+                                 float closest[3])
+{
+    for (int j = 0; j < cell->vert_count; j++) {
+        vec3 *vpos = &terrain->verts[cell->verts_index[j]];
+        float d = vec3_distsq(pos, vpos);
+
+        if (d < closest[0]) {
+            closest[2] = closest[1];
+            closest[1] = closest[0];
+            closest[0] = d;
+
+            closest_cells[2] = closest_cells[1];
+            closest_cells[1] = closest_cells[0];
+            closest_cells[0] = cell;
+        }
+        else if (d < closest[1]) {
+            closest[2] = closest[1];
+            closest[1] = d;
+
+            closest_cells[2] = closest_cells[1];
+            closest_cells[1] = cell;
+        }
+        else if (d < closest[2]) {
+            closest[2] = d;
+            closest_cells[2] = cell;
+        }
+    }
+}
+
+void collide_terrain(struct terrain *terrain, struct node *node, struct model *model, vec3 *move)
+{
+    struct terrain_cell *cells[9];
+    struct terrain_cell *closest_cells[3] = {0};
+    float closest[3] = {FLT_MAX};
+
+    query_terrain_grid(terrain, node->mat[M_X], node->mat[M_Y], cells);
+
+    for (int i = 0; i < ARRAY_SIZE(cells); i++) {
+        struct terrain_cell *cell = cells[i];
+        if (!cell)
+            continue;
+
+        collide_terrain_debug(terrain, cell);
+
+        get_closest_cells(terrain, node_world(node), cell, closest_cells, closest);
+
+        assert(closest_cells[0]);
+        assert(closest_cells[1]);
+        assert(closest_cells[2]);
+
+        // safe bail here
+        if (closest_cells[2] == NULL || closest_cells[1] == NULL || closest_cells[0] == NULL)
+            return;
+
+
+    }
+}
 
 void create_terrain(struct terrain *terrain, float scale, int seed) {
     u32 i;
@@ -182,10 +258,9 @@ void create_terrain(struct terrain *terrain, float scale, int seed) {
 
     del_point2d_t *points = calloc(terrain->n_samples, sizeof(*points));
     float *verts = calloc(terrain->n_samples * 3, sizeof(*verts));
-    terrain->cell_size = pdist;
+    terrain->cell_size = pdist * 1.5;
     terrain->n_cells = round(size / terrain->cell_size);
     debug("n_cells %d\n", terrain->n_cells);
-    assert(terrain->n_cells == 417);
 
     struct terrain_cell *grid =
         calloc(terrain->n_cells * terrain->n_cells, sizeof(struct terrain_cell));
@@ -212,6 +287,18 @@ void create_terrain(struct terrain *terrain, float scale, int seed) {
 
         verts[n] = (float)x;
         verts[n+1] = (float)y;
+
+        int grid_x = x / terrain->cell_size;
+        int grid_y = y / terrain->cell_size;
+
+        /* if (i > 169000) */
+        /*     debug("grid %f %f %d %d\n", x, y, grid_x, grid_y); */
+        struct terrain_cell *cell =
+            index_terrain_cell(terrain, grid_x, grid_y);
+
+        assert(cell);
+
+        insert_grid_vertex(cell, verts, x, y, n);
 
         static const double limit = 1.4;
         if (x < limit || x > size-limit || y < limit || y > size-limit)
@@ -249,21 +336,9 @@ void create_terrain(struct terrain *terrain, float scale, int seed) {
 
         for (int j = 0; j < 3; j++) {
             int ind = ndv + j*3;
-            float x = del_verts[ind+0] = v[j][0];
-            float y = del_verts[ind+1] = v[j][1];
-                      del_verts[ind+2] = v[j][2];
-
-            int grid_x = x / terrain->cell_size;
-            int grid_y = y / terrain->cell_size;
-
-            /* if (i > 169000) */
-            /*     debug("grid %f %f %d %d\n", x, y, grid_x, grid_y); */
-            struct terrain_cell *cell =
-                index_terrain_cell(terrain, grid_x, grid_y);
-
-            assert(cell);
-
-            insert_grid_vertex(cell, del_verts, x, y, ind);
+            del_verts[ind+0] = v[j][0];
+            del_verts[ind+1] = v[j][1];
+            del_verts[ind+2] = v[j][2];
         }
 
         // normals
@@ -310,10 +385,10 @@ void create_terrain(struct terrain *terrain, float scale, int seed) {
 
     free(points);
     // needed for collision
-    free(verts);
-    /* free(del_verts); */
+    /* free(verts); */
+    free(del_verts);
 
-    terrain->verts = del_verts;
+    terrain->verts = verts;
     terrain->n_verts = num_verts;
 
     // we might need norms in memory eventually as well ?

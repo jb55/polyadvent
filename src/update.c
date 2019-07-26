@@ -148,7 +148,7 @@ void resize_fbos(struct entity *player, struct fbo *shadow_buffer,
     }
 
     // TODO: compute better bounds based
-    const float factor = 4.5;
+    const float factor = 10.5;
 
     struct model *model   = get_model(&player->model_id); assert(model);
     struct geometry *geom = get_geometry(&model->geom_id); assert(geom);
@@ -157,6 +157,11 @@ void resize_fbos(struct entity *player, struct fbo *shadow_buffer,
     float right  = geom->max[0] + factor;
     float bottom = geom->min[1] - factor;
     float top    = geom->max[1] + factor/2.0;
+
+    /* float left   = -factor; */
+    /* float right  = factor; */
+    /* float bottom = factor; */
+    /* float top    = -factor; */
 
     const float near = -5.0;
     const float far = 5.0;
@@ -307,9 +312,12 @@ static void camera_keep_above_ground(struct terrain *terrain,
     }
 }
 
+static void terrain_collision_debug(struct terrain *terrain, struct node *node)
+{
+}
+
 static void player_update(struct game *game, struct entity *player)
 {
-    struct terrain_cell *cells[9];
 
     struct resources *res = &game->test_resources;
     struct orbit *camera = &res->orbit_camera;
@@ -334,34 +342,6 @@ static void player_update(struct game *game, struct entity *player)
     player_terrain_collision(terrain, player);
     node_recalc(node);
 
-    query_terrain_grid(terrain, node->mat[M_X], node->mat[M_Y], cells);
-
-    for (int i = 0; i < ARRAY_SIZE(cells); i++) {
-        struct terrain_cell *cell = cells[i];
-        if (!cell)
-            continue;
-
-        for (int j = 0; j < cell->vert_count; j++) {
-            entity_id *ent_id = &cell->debug_ent[j];
-
-            if (is_null_id(ent_id)) {
-                init_id(ent_id);
-                struct entity *ent = new_entity(ent_id);
-                ent->model_id = get_static_model(model_barrel, NULL);
-                struct node *enode = get_node(&ent->node_id);
-                node_set_label(enode, "grid_debug");;
-                assert(cell->verts_index[j] < terrain->n_verts);
-                float *vert = &terrain->verts[cell->verts_index[j]];
-                debug("creating new grid_debug entity at %f %f %f\n", vert[0], vert[1], vert[2]);
-                vec3_copy(vert, enode->pos);
-                node_scale(enode, 25.0);
-                node_mark_for_recalc(enode);
-                node_recalc(enode);
-            }
-
-        }
-
-    }
 }
 
 

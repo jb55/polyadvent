@@ -31,7 +31,7 @@ struct entity *init_entity(struct entity *ent, node_id *id) {
     else {
         ent->node_id = *id;
     }
-    ent->casts_shadows = 1;
+    ent->casts_shadows = 0;
     return ent;
 }
 
