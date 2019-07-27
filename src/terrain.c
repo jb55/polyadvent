@@ -230,9 +230,9 @@ void collide_terrain(struct terrain *terrain, struct node *node, struct model *m
 
         get_closest_cells(terrain, node_world(node), cell, closest_cells, closest);
 
-        assert(closest_cells[0]);
-        assert(closest_cells[1]);
-        assert(closest_cells[2]);
+        /* assert(closest_cells[0]); */
+        /* assert(closest_cells[1]); */
+        /* assert(closest_cells[2]); */
 
         // safe bail here
         if (closest_cells[2] == NULL || closest_cells[1] == NULL || closest_cells[0] == NULL)
