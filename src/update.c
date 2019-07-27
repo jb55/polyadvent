@@ -340,8 +340,10 @@ static void player_update(struct game *game, struct entity *player)
     struct terrain *terrain = &game->terrain;
 
     player_terrain_collision(terrain, player);
+
     node_recalc(node);
 
+    collide_terrain(terrain, node, NULL, NULL);
 }
 
 
