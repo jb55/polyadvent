@@ -12,6 +12,8 @@ struct tri_query {
     struct vert_tri *vtri;
 };
 
+/** Get the top 3 closest terrain vertices to a specific world position `pos`
+ */
 static void get_closest_verts(struct terrain *terrain,
                               vec3 *pos,
                               struct grid_query closest[3],
@@ -50,6 +52,8 @@ static void get_closest_verts(struct terrain *terrain,
     }
 }
 
+
+
 static inline float sign (float *p1, float *p2, float *p3)
 {
     return (p1[0] - p3[0]) * (p2[1] - p3[1]) - (p2[0] - p3[0]) * (p1[1] - p3[1]);
@@ -70,11 +74,9 @@ bool point_in_tri(float *pt, float *v1, float *v2, float *v3)
     return !(has_neg && has_pos);
 }
 
-static void get_closest_tris(struct terrain *terrain, struct vert_tris *vtris)
-{
 
-}
 
+#ifdef DEBUG
 static void terrain_tri_debug(float *verts, struct tri *tri)
 {
 
@@ -107,8 +109,49 @@ static void terrain_tri_debug(float *verts, struct tri *tri)
     }
 
 }
+#endif
 
-void collide_terrain(struct terrain *terrain, struct node *node, struct model *model, vec3 *move)
+
+/** Test all of the triangles around a specific terrain vertex, looking to see if
+ *  we are inside any of them. Return the intersecting triangle. This is all
+ *  done in a 2d way.
+ */
+static struct tri *point_in_vert_tris(float *verts, struct vert_tris *vtris, float *point)
+{
+    for (int i = 0; i < vtris->tri_count; i++) {
+        struct tri *tri = &vtris->tris[i];
+        float *v1 = &verts[tri->vert_indices[0]];
+        float *v2 = &verts[tri->vert_indices[1]];
+        float *v3 = &verts[tri->vert_indices[2]];
+        if (point_in_tri(point, v1, v2, v3))
+            return tri;
+    }
+
+    return NULL;
+}
+
+
+
+static void get_terrain_penetration(float *verts, struct tri *tri, float *pos, float *move)
+{
+    float tmp[3], normal[3];
+
+    float *v1 = &verts[tri->vert_indices[0]];
+    float *v2 = &verts[tri->vert_indices[1]];
+    float *v3 = &verts[tri->vert_indices[2]];
+
+    vec3_subtract(v3, v2, tmp);
+    vec3_subtract(v2, v1, normal);
+    vec3_cross(tmp, normal, normal);
+    vec3_normalize(normal, normal);
+    vec3_subtract(v1, pos, tmp);
+    float d = vec3_dot(tmp, normal);
+    vec3_scale(normal, d, move);
+    /* vec3_add(pos, tmp, move); */
+}
+
+
+void collide_terrain(struct terrain *terrain, float *pos, struct model *model, vec3 *move)
 {
     struct terrain_cell *cells[9] = {0};
     struct grid_query queries[3];
@@ -117,8 +160,6 @@ void collide_terrain(struct terrain *terrain, struct node *node, struct model *m
         queries[i].cell = NULL;
         queries[i].cell_vert_index = -1;
     }
-
-    float *pos = node_world(node);
 
     query_terrain_grid(terrain, pos[0], pos[1], cells);
 
@@ -129,11 +170,12 @@ void collide_terrain(struct terrain *terrain, struct node *node, struct model *m
 
     for (int i = 0; i < vtris->tri_count; i++) {;
         /* terrain_cell_debug(terrain, queries[i].cell, queries[i].cell_vert_index, pos); */
-        terrain_tri_debug(terrain->verts, &vtris->tris[i]);
+
+        struct tri *tri;
+        if ((tri = point_in_vert_tris(terrain->verts, vtris, pos))) {
+            terrain_tri_debug(terrain->verts, tri);
+            get_terrain_penetration(terrain->verts, tri, pos, move);
+            return;
+        }
     }
 }
-
-
-    /* assert(closest_cells[0]); */
-    /* assert(closest_cells[1]); */
-    /* assert(closest_cells[2]); */

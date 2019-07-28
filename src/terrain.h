@@ -63,7 +63,6 @@ struct terrain {
 double old_noisy_boi(struct terrain *, double x, double y);
 
 
-void collide_terrain(struct terrain *terrain, struct node *node, struct model *model, vec3 *move);
 void update_terrain(struct terrain *terrain, const double pdist);
 void gen_terrain_samples(struct terrain *terrain, float scale, const double pdist);
 void init_terrain(struct terrain *terrain, float size);

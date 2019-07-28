@@ -1,7 +1,7 @@
 
 #include "gl.h"
 #include "update.h"
-#include "terrain.h"
+#include "terrain_collision.h"
 #include "util.h"
 #include "mat4.h"
 #include "vec3.h"
@@ -338,10 +338,14 @@ static void player_update(struct game *game, struct entity *player)
 
     struct terrain *terrain = &game->terrain;
 
-    player_terrain_collision(terrain, node);
+    /* player_terrain_collision(terrain, node); */
 
-    collide_terrain(terrain, node, NULL, NULL);
-    node_recalc(node);
+    float move[3];
+    collide_terrain(terrain, node_world(node), NULL, move);
+    node_translate(node, move);
+    /* vec3_add(player->velocity, move, player->velocity); */
+
+
 }
 
 
@@ -362,7 +366,7 @@ void update (struct game *game) {
     float *time = &res->time;
 	float *light = res->light_dir;
 
-    gravity(game);
+    /* gravity(game); */
 
 	if (needs_terrain_update) {
 		/* update_terrain(terrain); */
@@ -418,6 +422,8 @@ void update (struct game *game) {
 		res->fog_on = !res->fog_on;
 		toggle_fog = 0;
 	}
+
+    /* for (int i = 0; i < ) */
 
 	*time = SDL_GetTicks();
 
