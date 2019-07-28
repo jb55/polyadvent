@@ -93,6 +93,8 @@ void game_init(struct game *game, int width, int height) {
     init_user_settings(&game->user_settings);
     check_gl();
 
+    game->wireframe = 0;
+
     struct resources *res = &game->test_resources;
     mat4 *mvp = res->test_mvp;
 

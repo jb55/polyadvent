@@ -88,6 +88,7 @@ struct game {
     int counter;
     int seed;
     int quit;
+    int wireframe;
     float dt;
     u64 frame;
     struct user_settings user_settings;

@@ -367,6 +367,13 @@ void render (struct game *game, struct render_config *config) {
         check_gl();
     }
 
+    if (game->wireframe) {
+        glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+    }
+    else {
+        glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
+    }
+
     if (!config->is_depth_pass) {
         mat4_inverse((float*)camera, view);
         mat4_remove_translations(view);

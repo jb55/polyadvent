@@ -59,11 +59,13 @@ static void movement(struct game *game, struct node *node, float speed_mult) {
     /*   node_translate(node, V3(0, 0, -amt)); */
 
     if (was_key_pressed_this_frame(game, SDL_SCANCODE_P)) {
-        printf("%f %f %f\n",
+        debug("%f %f %f ",
                 node->pos[0],
                 node->pos[1],
                 node->pos[2]);
-        mat4_print(node->mat);
+        node_recalc(node);
+        grid_pos_debug(node->label, &game->terrain, node_world(node));
+        /* mat4_print(node->mat); */
     }
 }
 
@@ -88,10 +90,9 @@ static void remap_samples(struct point *points, int n_samples,
     }
 }
 
-static void player_terrain_collision(struct terrain *terrain, struct entity *player) {
+static void player_terrain_collision(struct terrain *terrain, struct node *node) {
     // player movement
     static vec3 last_pos[3] = {0};
-    struct node *node = get_node(&player->node_id);
 
     if (!vec3_approxeq(node->pos, last_pos)) {
         float player_z = node->pos[2];
@@ -242,7 +243,9 @@ static void gravity(struct game *game) {
     struct node   *pnode  = get_node(&player->node_id);
     assert(pnode);
 
-    node_translate(pnode, V3(0.0, 0.0, -1.0));
+    static const float g = -1.0;
+
+    node_translate(pnode, V3(0.0, 0.0, g));
 }
 
 void orbit_update_from_mouse(struct orbit *camera, struct input *input,
@@ -312,10 +315,6 @@ static void camera_keep_above_ground(struct terrain *terrain,
     }
 }
 
-static void terrain_collision_debug(struct terrain *terrain, struct node *node)
-{
-}
-
 static void player_update(struct game *game, struct entity *player)
 {
 
@@ -339,11 +338,10 @@ static void player_update(struct game *game, struct entity *player)
 
     struct terrain *terrain = &game->terrain;
 
-    player_terrain_collision(terrain, player);
-
-    node_recalc(node);
+    player_terrain_collision(terrain, node);
 
     collide_terrain(terrain, node, NULL, NULL);
+    node_recalc(node);
 }
 
 
@@ -394,6 +392,10 @@ void update (struct game *game) {
 	if (was_key_pressed_this_frame(game, SDL_SCANCODE_R))
 		try_reload_shaders(res);
 #endif
+
+    if (was_key_pressed_this_frame(game, SDL_SCANCODE_F5)) {
+        game->wireframe ^= 1;
+    }
 
 	if (was_key_pressed_this_frame(game, SDL_SCANCODE_C))
 		printf("light_dir %f %f %f\n", light[0], light[1], light[2]);

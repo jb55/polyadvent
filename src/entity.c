@@ -79,7 +79,6 @@ void destroy_entities() {
 void destroy_entity(entity_id *id)
 {
     struct entity *ent = get_entity(id);
-    assert(ent);
     if (ent == NULL)
         return;
 
@@ -118,4 +117,17 @@ void init_entity_system() {
     }
 }
 
+struct entity *new_debug_entity(entity_id *ent_id, float *pos)
+{
+    init_id(ent_id);
+    struct entity *ent = new_entity(ent_id);
+    ent->model_id = get_static_model(model_barrel, NULL);
+    struct node *enode = get_node(&ent->node_id);
+    node_set_label(enode, "debug");
+    vec3_copy(pos, enode->pos);
+    node_scale(enode, 5.0);
+    node_mark_for_recalc(enode);
+    node_recalc(enode);
+    return ent;
+}
 

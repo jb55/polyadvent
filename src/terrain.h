@@ -5,8 +5,10 @@
 
 #include "entity.h"
 #include "model.h"
+#include "debug.h"
 
 #define MAX_CELL_VERTS 4
+#define MAX_VERT_TRIS 24
 
 struct point;
 
@@ -22,15 +24,30 @@ struct perlin_settings {
     double exp;
 };
 
+struct tri {
+#ifdef DEBUG
+    entity_id debug_id;
+#endif
+    int vert_indices[3];
+};
+
+struct vert_tris {
+    u8 tri_count;
+    struct tri tris[MAX_VERT_TRIS];
+};
+
 struct terrain_cell {
     u8 vert_count;
     int verts_index[MAX_CELL_VERTS];
+#ifdef DEBUG
     entity_id debug_ent[MAX_CELL_VERTS];
+#endif
 };
 
 struct terrain {
     entity_id entity_id;
     struct terrain_cell *grid;
+    struct vert_tris *vtris;
     int n_cells; // all cells = grid_cells^2
     float cell_size;
     float *verts;
@@ -54,5 +71,15 @@ void reset_terrain(struct terrain *terrain, float size);
 void create_terrain(struct terrain *terrain, float scale, int seed);
 void destroy_terrain(struct terrain *terrain);
 void query_terrain_grid(struct terrain *terrain, float x, float y, struct terrain_cell *cells[9]);
+
+static inline int grid_index(struct terrain *terrain, float x) {
+    return x / terrain->cell_size;
+}
+
+static inline void grid_pos_debug(const char *thing, struct terrain *terrain, float *pos) {
+    int gx = grid_index(terrain, pos[0]);
+    int gy = grid_index(terrain, pos[1]);
+    debug("%s grid pos (%d, %d)\n", thing, gx, gy);
+}
 
 #endif /* POLYADVENT_TERRAIN_H */

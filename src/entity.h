@@ -36,6 +36,7 @@ const char *entity_label(struct entity *);
 struct entity *get_all_entities(u32 *count, entity_id **ids);
 struct entity *new_entity_(entity_id *);
 struct entity *new_entity_with_node(entity_id *, node_id *);
+struct entity *new_debug_entity(entity_id *, float *pos);
 void destroy_entity_system();
 
 static inline struct entity *static_entities()

@@ -69,7 +69,7 @@ void init_terrain(struct terrain *terrain, float size) {
     ent->casts_shadows = 0;
 
     // this is scale for some reason!?
-    node->pos[2] = 20.0;
+    /* node->pos[2] = 20.0; */
 
     reset_terrain(terrain, size);
 }
@@ -105,11 +105,12 @@ void gen_terrain_samples(struct terrain *terrain, float scale, const double pdis
 
 }
 
-static inline struct terrain_cell *index_terrain_cell(struct terrain *terrain,
-                                                      int x, int y)
+static inline struct terrain_cell *index_terrain_cell(struct terrain *terrain, int x, int y)
 {
-    if (x < 0 || y < 0 || x >= terrain->n_cells || y >= terrain->n_cells)
+    if (x < 0 || y < 0 || x >= terrain->n_cells || y >= terrain->n_cells) {
+        assert(!"terrain oob");
         return NULL;
+    }
 
     return &terrain->grid[y * terrain->n_cells + x];
 }
@@ -122,8 +123,8 @@ static inline struct terrain_cell *query_terrain_cell(struct terrain *terrain,
     assert(y >= 0);
     assert(x < terrain->size);
     assert(y < terrain->size);
-    *grid_x = x / terrain->cell_size;
-    *grid_y = y / terrain->cell_size;
+    *grid_x = grid_index(terrain, x);
+    *grid_y = grid_index(terrain, y);
 
     return index_terrain_cell(terrain, *grid_x, *grid_y);
 }
@@ -151,96 +152,44 @@ void query_terrain_grid(struct terrain *terrain, float x, float y,
     cells[8] = index_terrain_cell(terrain, grid_x + 1, grid_y + 1);
 }
 
-static void insert_grid_vertex(struct terrain_cell *cell, float *verts,
-                                       float x, float y, int ind)
+static void insert_grid_vertex(struct terrain_cell *cell, int ind)
 {
     assert(cell->vert_count + 1 <= MAX_CELL_VERTS);
     cell->verts_index[cell->vert_count++] = ind;
 }
 
-static void collide_terrain_debug(struct terrain *terrain, struct terrain_cell *cell)
+static int terrain_cell_debug(struct terrain *terrain, struct terrain_cell *cell, int ind, vec3 *pos)
 {
+    int ok = 0;
+    entity_id *ent_id = &cell->debug_ent[ind];
+
+    if (is_null_id(ent_id)) {
+        assert(cell->verts_index[ind] < terrain->n_verts);
+        float *vert = &terrain->verts[cell->verts_index[ind]];
+        int gx = grid_index(terrain, pos[0]);
+        int gy = grid_index(terrain, pos[1]);
+        int vgx = grid_index(terrain, vert[0]);
+        int vgy = grid_index(terrain, vert[1]);
+        debug("creating new grid_debug entity at %f %f %f, cell (%d, %d) vert_cell(%d, %d)\n",
+                vert[0], vert[1], vert[2],
+                gx, gy, vgx, vgy);
+        new_debug_entity(ent_id, vert);
+        ok |= 1;
+    }
+
+    return ok;
+}
+
+static int collide_terrain_debug(struct terrain *terrain, struct terrain_cell *cell, int ind, vec3 *pos)
+{
+    int ok = 0;
     for (int j = 0; j < cell->vert_count; j++) {
-        entity_id *ent_id = &cell->debug_ent[j];
-
-        if (is_null_id(ent_id)) {
-            init_id(ent_id);
-            struct entity *ent = new_entity(ent_id);
-            ent->model_id = get_static_model(model_barrel, NULL);
-            struct node *enode = get_node(&ent->node_id);
-            node_set_label(enode, "grid_debug");
-            assert(cell->verts_index[j] < terrain->n_verts);
-            float *vert = &terrain->verts[cell->verts_index[j]];
-            /* debug("creating new grid_debug entity at %f %f %f\n", vert[0], vert[1], vert[2]); */
-            vec3_copy(vert, enode->pos);
-            node_scale(enode, 5.0);
-            node_mark_for_recalc(enode);
-            node_recalc(enode);
-        }
+        ok |= terrain_cell_debug(terrain, cell, ind, pos);
     }
+
+    return ok;
 }
 
-static inline void get_closest_cells(struct terrain *terrain,
-                                 vec3 *pos,
-                                 struct terrain_cell *cell,
-                                 struct terrain_cell *closest_cells[3],
-                                 float closest[3])
-{
-    for (int j = 0; j < cell->vert_count; j++) {
-        vec3 *vpos = &terrain->verts[cell->verts_index[j]];
-        float d = vec3_distsq(pos, vpos);
-
-        if (d < closest[0]) {
-            closest[2] = closest[1];
-            closest[1] = closest[0];
-            closest[0] = d;
-
-            closest_cells[2] = closest_cells[1];
-            closest_cells[1] = closest_cells[0];
-            closest_cells[0] = cell;
-        }
-        else if (d < closest[1]) {
-            closest[2] = closest[1];
-            closest[1] = d;
-
-            closest_cells[2] = closest_cells[1];
-            closest_cells[1] = cell;
-        }
-        else if (d < closest[2]) {
-            closest[2] = d;
-            closest_cells[2] = cell;
-        }
-    }
-}
-
-void collide_terrain(struct terrain *terrain, struct node *node, struct model *model, vec3 *move)
-{
-    struct terrain_cell *cells[9];
-    struct terrain_cell *closest_cells[3] = {0};
-    float closest[3] = {FLT_MAX};
-
-    query_terrain_grid(terrain, node->mat[M_X], node->mat[M_Y], cells);
-
-    for (int i = 0; i < ARRAY_SIZE(cells); i++) {
-        struct terrain_cell *cell = cells[i];
-        if (!cell)
-            continue;
-
-        collide_terrain_debug(terrain, cell);
-
-        get_closest_cells(terrain, node_world(node), cell, closest_cells, closest);
-
-        /* assert(closest_cells[0]); */
-        /* assert(closest_cells[1]); */
-        /* assert(closest_cells[2]); */
-
-        // safe bail here
-        if (closest_cells[2] == NULL || closest_cells[1] == NULL || closest_cells[0] == NULL)
-            return;
-
-
-    }
-}
 
 void create_terrain(struct terrain *terrain, float scale, int seed) {
     u32 i;
@@ -288,17 +237,15 @@ void create_terrain(struct terrain *terrain, float scale, int seed) {
         verts[n] = (float)x;
         verts[n+1] = (float)y;
 
-        int grid_x = x / terrain->cell_size;
-        int grid_y = y / terrain->cell_size;
+        int grid_x = verts[n] / terrain->cell_size;
+        int grid_y = verts[n+1] / terrain->cell_size;
 
-        /* if (i > 169000) */
-        /*     debug("grid %f %f %d %d\n", x, y, grid_x, grid_y); */
         struct terrain_cell *cell =
             index_terrain_cell(terrain, grid_x, grid_y);
 
         assert(cell);
 
-        insert_grid_vertex(cell, verts, x, y, n);
+        insert_grid_vertex(cell, n);
 
         static const double limit = 1.4;
         if (x < limit || x > size-limit || y < limit || y > size-limit)
@@ -311,9 +258,11 @@ void create_terrain(struct terrain *terrain, float scale, int seed) {
     tri_delaunay2d_t *tri = tri_delaunay2d_from(del);
 
     int num_verts = tri->num_triangles * 3;
-    float *del_verts = calloc(num_verts * 3, sizeof(*del_verts));
-    float *del_norms = calloc(num_verts * 3, sizeof(*del_norms));
-    u32   *del_indices = calloc(num_verts, sizeof(*del_indices));
+    float *del_verts = malloc(num_verts * 3 * sizeof(*del_verts));
+    float *del_norms = malloc(num_verts * 3 * sizeof(*del_norms));
+    u32   *del_indices = malloc(num_verts * sizeof(*del_indices));
+    struct vert_tris *vert_tris = calloc(num_verts, sizeof(struct vert_tris));
+    terrain->vtris = vert_tris;
 
     /// XXX (perf): we should be able to do this directly from del instead of
     /// triangulating with tri
@@ -323,18 +272,24 @@ void create_terrain(struct terrain *terrain, float scale, int seed) {
         int ndv = i * 9;
 
         int p[3] = {
-            tri->tris[nv + 0],
-            tri->tris[nv + 1],
-            tri->tris[nv + 2],
+            tri->tris[nv + 0]*3,
+            tri->tris[nv + 1]*3,
+            tri->tris[nv + 2]*3,
         };
 
         float *v[3] = {
-            &verts[p[0]*3],
-            &verts[p[1]*3],
-            &verts[p[2]*3]
+            &verts[p[0]],
+            &verts[p[1]],
+            &verts[p[2]]
         };
 
         for (int j = 0; j < 3; j++) {
+            struct vert_tris *vtris = &vert_tris[p[j]/3];
+            assert(vtris->tri_count + 1 < MAX_VERT_TRIS);
+            struct tri *t = &vtris->tris[vtris->tri_count++];
+            assert(sizeof(p) == sizeof(t->vert_indices));
+            memcpy(t->vert_indices, p, sizeof(p));
+
             int ind = ndv + j*3;
             del_verts[ind+0] = v[j][0];
             del_verts[ind+1] = v[j][1];

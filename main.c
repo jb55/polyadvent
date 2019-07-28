@@ -95,6 +95,7 @@ int main(void)
         check_fbo(fbo);
         bind_fbo(fbo);
         /* glDrawBuffer(GL_NONE); */
+
         render(&game, &fbo_render_config);
         unbind_fbo(&game.test_resources.shadow_buffer);
         render(&game, &default_config);
