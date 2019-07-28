@@ -66,7 +66,7 @@ void init_terrain(struct terrain *terrain, float size) {
 
     model->shading = SHADING_TERRAIN;
     node_set_label(node, "terrain");
-    ent->casts_shadows = 0;
+    ent->flags &= ~ENT_CASTS_SHADOWS;
 
     // this is scale for some reason!?
     /* node->pos[2] = 20.0; */

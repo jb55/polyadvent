@@ -23,7 +23,7 @@ static void movement(struct game *game, struct node *node, float speed_mult) {
     amt *= speed_mult;
 
     if (game->input.modifiers & KMOD_SHIFT)
-        amt *= 50;
+        amt *= 20;
 
     if (game->input.keystates[SDL_SCANCODE_A])
         node_forward(node, V3(-amt,0,0));
@@ -240,12 +240,15 @@ static void day_night_cycle(float time, struct resources *res) {
 
 static void gravity(struct game *game) {
     struct entity *player = get_player(&game->test_resources);
+
+    if (player->flags & ENT_AT_REST)
+        return;
+
     struct node   *pnode  = get_node(&player->node_id);
     assert(pnode);
 
     static const float g = -1.0;
-
-    node_translate(pnode, V3(0.0, 0.0, g));
+    vec3_add(player->velocity, V3(0.0, 0.0, g * game->dt), player->velocity);
 }
 
 void orbit_update_from_mouse(struct orbit *camera, struct input *input,
@@ -315,6 +318,15 @@ static void camera_keep_above_ground(struct terrain *terrain,
     }
 }
 
+static void entity_jump(struct entity *ent)
+{
+    if (ent->flags & ENT_AT_REST)  {
+        struct node *node = get_node(&ent->node_id);
+        debug("jumping\n");
+        vec3_forward(ent->velocity, node->orientation, V3(0.0, 0.0, 1.0), ent->velocity);
+    }
+}
+
 static void player_update(struct game *game, struct entity *player)
 {
 
@@ -341,11 +353,41 @@ static void player_update(struct game *game, struct entity *player)
     /* player_terrain_collision(terrain, node); */
 
     float move[3];
-    collide_terrain(terrain, node_world(node), NULL, move);
-    node_translate(node, move);
-    /* vec3_add(player->velocity, move, player->velocity); */
+    float scaled[3];
+    struct tri *tri = collide_terrain(terrain, node_world(node), NULL, move);
+    /* node_translate(node, move); */
 
+    if (tri) {
+        if (move[2] >= 0) {
+            node_translate(node, move);
+            player->flags |= ENT_AT_REST;
+            vec3_all(player->velocity, 0);
+        }
+        else {
+            player->flags &= ~ENT_AT_REST;
+        }
+    }
 
+    if (was_key_pressed_this_frame(game, SDL_SCANCODE_SPACE)) {
+        entity_jump(player);
+    }
+
+    if (!vec3_approxeq(player->velocity, V3(0,0,0)))
+        player->flags &= ~ENT_AT_REST;
+
+    /* debug("player velocity %f %f %f\n", */
+    /*       player->velocity[0], */
+    /*       player->velocity[1], */
+    /*       player->velocity[2]); */
+
+    /* if (player->flags & ENT_AT_REST) */
+    /*     vec3_scale(player->velocity, 0.00001, player->velocity); */
+
+    if (!(player->flags & ENT_AT_REST)) {
+        debug("player not a rest\n");
+        node_translate(node, player->velocity);
+        node_recalc(node);
+    }
 }
 
 
@@ -366,7 +408,7 @@ void update (struct game *game) {
     float *time = &res->time;
 	float *light = res->light_dir;
 
-    /* gravity(game); */
+    gravity(game);
 
 	if (needs_terrain_update) {
 		/* update_terrain(terrain); */
@@ -401,8 +443,9 @@ void update (struct game *game) {
         game->wireframe ^= 1;
     }
 
-	if (was_key_pressed_this_frame(game, SDL_SCANCODE_C))
+	if (was_key_pressed_this_frame(game, SDL_SCANCODE_C)) {
 		printf("light_dir %f %f %f\n", light[0], light[1], light[2]);
+    }
 
 	if (was_key_pressed_this_frame(game, SDL_SCANCODE_F))
 		toggle_fog = 1;

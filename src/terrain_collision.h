@@ -6,6 +6,6 @@
 #include "node.h"
 #include "model.h"
 
-void collide_terrain(struct terrain *terrain, float *pos, struct model *model, float *move);
+struct tri *collide_terrain(struct terrain *terrain, float *pos, struct model *model, float *move);
 
 #endif /* TERRAIN_COLLISION_H */

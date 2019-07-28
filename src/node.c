@@ -83,7 +83,7 @@ void node_scale(struct node *node, float val) {
 
 void node_translate(struct node *node, vec3 *p) {
   if (vec3_isall(p, 0))
-    return;
+      return;
 
   /* printf("translating %f %f %f\n", p[0], p[1], p[2]); */
   vec3_add(node->pos, p, node->pos);

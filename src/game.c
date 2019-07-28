@@ -178,7 +178,7 @@ void game_init(struct game *game, int width, int height) {
     // player entity
     init_id(&res->player_id);
     player = &static_entities()[entity_player];
-    player->casts_shadows = 1;
+    player->flags |= ENT_CASTS_SHADOWS;
     struct node *pnode = &static_nodes()[node_player];
     assert(pnode);
     res->player_id = make_static_id(entity_player);

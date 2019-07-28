@@ -82,7 +82,7 @@ static void terrain_tri_debug(float *verts, struct tri *tri)
 
     if (is_null_id(&tri->debug_id)) {
 
-        float tmp[3];
+        float tmp[3], tmp2[3], normal[3];
 
         float *v1 = &verts[tri->vert_indices[0]];
         float *v2 = &verts[tri->vert_indices[1]];
@@ -94,7 +94,9 @@ static void terrain_tri_debug(float *verts, struct tri *tri)
         /*       v3[0], v3[1]); */
 
         vec3_subtract(v1, v2, tmp);
+        vec3_subtract(v2, v3, tmp2);
 
+        vec3_cross(tmp, tmp2, normal);
         /* debug("tmp %f %f\n", tmp[0], tmp[1]); */
 
         vec3_scale(tmp, 0.5, tmp);
@@ -105,7 +107,13 @@ static void terrain_tri_debug(float *verts, struct tri *tri)
 
         /* debug("creating new grid_debug entity at %f %f %f\n", tmp[0], tmp[1], tmp[2]); */
 
-        new_debug_entity(&tri->debug_id, tmp);
+        struct entity *ent = new_debug_entity(&tri->debug_id, tmp);
+        struct node *node = get_node(&ent->node_id);
+
+        vec3_normalize(normal, normal);
+        /* vec3_scale(normal, 180/PI, normal); */
+        node_rotate(node, normal);
+        node_recalc(node);
     }
 
 }
@@ -151,7 +159,7 @@ static void get_terrain_penetration(float *verts, struct tri *tri, float *pos, f
 }
 
 
-void collide_terrain(struct terrain *terrain, float *pos, struct model *model, vec3 *move)
+struct tri *collide_terrain(struct terrain *terrain, float *pos, struct model *model, vec3 *move)
 {
     struct terrain_cell *cells[9] = {0};
     struct grid_query queries[3];
@@ -175,7 +183,9 @@ void collide_terrain(struct terrain *terrain, float *pos, struct model *model, v
         if ((tri = point_in_vert_tris(terrain->verts, vtris, pos))) {
             terrain_tri_debug(terrain->verts, tri);
             get_terrain_penetration(terrain->verts, tri, pos, move);
-            return;
+            return tri;
         }
     }
+
+    return NULL;
 }

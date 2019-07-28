@@ -306,7 +306,7 @@ void render (struct game *game, struct render_config *config) {
         if (entity->flags & ENT_INVISIBLE)
             continue;
 
-        if (config->is_depth_pass && !entity->casts_shadows)
+        if (config->is_depth_pass && !(entity->flags & ENT_CASTS_SHADOWS))
             continue;
 
         // TODO this is a bit wonky, refactor this

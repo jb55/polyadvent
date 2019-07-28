@@ -7,6 +7,9 @@
 
 typedef float vec3;
 
+#define approxeq(a, b) (fabs(a-b) < EPSILON)
+#define EPSILON 0.0001
+#define vec3_approxeq(a, b) vec3_eq(a, b, EPSILON)
 #define V3(x,y,z) ((vec3[3]){x,y,z})
 
 static inline vec3 *vec3_create(vec3 *vec) {
@@ -221,7 +224,7 @@ static inline vec3 *vec3_all(vec3 *vec, float n) {
 
 static inline int vec3_isall(vec3 *vec, float n) {
   for (int i = 0; i < 3; ++i) {
-    if (vec[i] != n)
+    if (!approxeq(vec[i], n))
       return 0;
   }
 
@@ -274,8 +277,6 @@ static inline vec3 *vec3_from_yaw_pitch(float yaw, float pitch, float *dest) {
     return dest;
 }
 
-#define EPSILON 0.0001
-#define vec3_approxeq(a, b) vec3_eq(a, b, EPSILON)
 
 
 #endif /* VEC3_H */
