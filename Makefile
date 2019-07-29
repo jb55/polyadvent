@@ -1,11 +1,13 @@
 NAME ?= polyadvent
 BIN ?= $(NAME)
 PREFIX ?= /usr/local
-DEFS= -DGLFW_INCLUDE_NONE -DDEBUG
+DEFS= -DGLFW_INCLUDE_NONE
 # release build lol
-#DEFS= -DGLFW_INCLUDE_NONE -DNDEBUG
-# CFLAGS = $(DEFS) -ggdb -O0 -I src -Wall -Wextra -std=c99
-CFLAGS = $(DEFS) -ggdb -O2 -I src -Wall -Werror -Wextra -std=c99  \
+# DEFS= -DGLFW_INCLUDE_NONE -DNDEBUG
+
+# CFLAGS = $(DEFS) -ggdb -O0 -I src -Wall -Wextra -std=c99 \
+
+CFLAGS = $(DEFS) -O2 -I src -Wall -Werror -Wextra -std=c99  \
 						-Wno-unused-function \
 						-Wno-unused-parameter \
 						-Wno-unused-variable \

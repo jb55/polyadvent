@@ -3,8 +3,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-void
-show_info_log(GLuint shader) {
+void show_info_log(GLuint shader) {
 	GLint msgLen = 0;
 	glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &msgLen);
 
@@ -16,3 +15,5 @@ show_info_log(GLuint shader) {
 
   free(buffer);
 }
+
+

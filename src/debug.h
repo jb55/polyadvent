@@ -6,6 +6,12 @@
 
 void show_info_log(GLuint shader);
 
+// rtassert exists in release builds, use sparingly
+#define rtassert(cond, msg) if (!cond) { \
+        fprintf(stderr, "FATAL %s:%d %s\n", __FILE__, __LINE__, msg); \
+        exit(1); \
+    }
+
 #define unusual(...) fprintf(stderr, "UNUSUAL: " __VA_ARGS__)
 
 #ifdef DEBUG

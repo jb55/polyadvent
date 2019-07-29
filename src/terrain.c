@@ -158,6 +158,7 @@ static void insert_grid_vertex(struct terrain_cell *cell, int ind)
     cell->verts_index[cell->vert_count++] = ind;
 }
 
+#ifdef DEBUG
 static int terrain_cell_debug(struct terrain *terrain, struct terrain_cell *cell, int ind, vec3 *pos)
 {
     int ok = 0;
@@ -179,7 +180,10 @@ static int terrain_cell_debug(struct terrain *terrain, struct terrain_cell *cell
 
     return ok;
 }
+#endif /* DEBUG */
 
+
+#ifdef DEBUG
 static int collide_terrain_debug(struct terrain *terrain, struct terrain_cell *cell, int ind, vec3 *pos)
 {
     int ok = 0;
@@ -189,6 +193,7 @@ static int collide_terrain_debug(struct terrain *terrain, struct terrain_cell *c
 
     return ok;
 }
+#endif /* DEBUG */
 
 
 void create_terrain(struct terrain *terrain, float scale, int seed) {

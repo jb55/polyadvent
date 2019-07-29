@@ -173,6 +173,7 @@ void load_mdl_fd(FILE *in, struct model *model, struct mdl_geometry *lgeom)
 {
     struct make_geometry *mkgeom = &lgeom->mkgeom;
     int num;
+    (void)num;
 
     while (1) {
         enum mdl_tag tag = read_tag(in);

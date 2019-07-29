@@ -8,7 +8,7 @@
 #include "debug.h"
 
 #define MAX_CELL_VERTS 4
-#define MAX_VERT_TRIS 24
+#define MAX_VERT_TRIS 20
 
 struct point;
 

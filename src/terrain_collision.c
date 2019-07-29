@@ -117,6 +117,8 @@ static void terrain_tri_debug(float *verts, struct tri *tri)
     }
 
 }
+#else
+#define terrain_tri_debug(...)
 #endif
 
 

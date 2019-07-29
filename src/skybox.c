@@ -37,6 +37,7 @@ void create_skybox(struct skybox *skybox, struct gpu_program *program) {
     struct shader vertex, frag;
     struct shader *shaders[] = {&vertex, &frag};
     int ok;
+    (void)ok;
 
     node_init(&skybox->node);
     init_id(&skybox->model_id);

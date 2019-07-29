@@ -132,7 +132,7 @@ int parse_ply_with_mkgeom(const char *filename, struct mdl_geometry *mdlgeom)
     const char *data = file_contents(filename, &len);
     const char *p = data;
 
-    float vert[3], norm[3], min[3], max[3];
+    float vert[3], norm[3], min[3]={0}, max[3]={0};
     int inds[3];
     u8 color[3];
 

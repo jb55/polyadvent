@@ -86,6 +86,7 @@ struct point *
 load_samples(int *seed, int *n_samples) {
   FILE *fp = fopen("data/samples-200x200.bin", "rb");
   int res;
+  (void)res;
   int localseed;
   seed = seed ? seed : &localseed;
   res = fread(seed, sizeof(*seed), 1, fp);

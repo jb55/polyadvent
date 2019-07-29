@@ -30,8 +30,8 @@ int main(void)
 {
     int nsamples;
 
-    /* int seed = time(NULL); */
-    int seed = 42;
+    int seed = time(NULL);
+    /* int seed = 42; */
     debug("seed %d\n", seed);
     srand(seed);
 

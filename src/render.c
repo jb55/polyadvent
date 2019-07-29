@@ -74,15 +74,15 @@ init_gl(struct resources *resources, int width, int height) {
     glCullFace(GL_BACK);
 
     glEnable(GL_MULTISAMPLE);
-check_gl();
+    check_gl();
 
 	// Shaders
 	ok = make_shader(GL_VERTEX_SHADER, SHADER("vertex-color.glsl"), &vertex);
-	assert(ok && "vertex-color shader");
+	rtassert(ok, "vertex-color shader");
 
     ok = make_shader(GL_VERTEX_SHADER, SHADER("terrain.v.glsl"),
                      &terrain_vertex);
-	assert(ok && "terrain vertex shader");
+	rtassert(ok, "terrain vertex shader");
 	check_gl();
 
     /* ok = make_shader(GL_GEOMETRY_SHADER, SHADER("terrain.g.glsl"), */
@@ -100,7 +100,7 @@ check_gl();
     /* 	check_gl(); */
 
 	ok = make_shader(GL_FRAGMENT_SHADER, SHADER("test.f.glsl"), &fragment);
-	assert(ok && "default fragment shader");
+	rtassert(ok, "default fragment shader");
 	check_gl();
 
 	// camera
@@ -127,11 +127,12 @@ check_gl();
     ok = make_program_from_shaders(terrain_shaders, ARRAY_SIZE(terrain_shaders),
                                    &resources->programs[TERRAIN_PROGRAM]);
 
-	assert(ok && "terrain program");
+    // TODO: replace rtassert with error reporting/handling
+	rtassert(ok, "terrain program");
     check_gl();
 
 	ok = make_program(&vertex, &fragment, &resources->programs[DEFAULT_PROGRAM]);
-	assert(ok && "vertex-color program");
+	rtassert(ok, "vertex-color program");
     check_gl();
 
     GLuint programs[] =

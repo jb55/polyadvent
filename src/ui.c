@@ -93,6 +93,8 @@ void create_ui(struct ui *ui, int width, int height, struct gpu_program *shader)
     struct shader vertex;
     struct shader fragment;
     int ok = 0;
+    // TODO: handle runtime ui errors (there shouldn't be any...)
+    (void)ok;
 
     ui->shader = shader;
     create_quad(&ui->quad_geom_id);
