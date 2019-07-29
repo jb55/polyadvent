@@ -25,12 +25,16 @@ mat4 *mat4_create_transform(float *pos, float *scale, float *rot, mat4 *dest) {
   return dest;
 }
 
+vec3 *vec3_forward_amt(quat *orientation, float *dir, float *dest)
+{
+    float q[4] = {0};
+    quat_inverse(orientation, q);
+    quat_multiply_vec3(q, dir, dest);
+    return dest;
+}
 
 vec3 *vec3_forward(vec3 *v, quat *orientation, float *dir, float *dest) {
-    float q[4] = {0};
     float movement[3] = {0};
-    quat_inverse(orientation, q);
-    quat_multiply_vec3(q, dir, movement);
-    vec3_add(v, movement, dest);
+    vec3_add(v, vec3_forward_amt(orientation, dir, movement), dest);
     return dest;
 }
