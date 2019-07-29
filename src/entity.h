@@ -14,7 +14,7 @@ enum entity_flags {
   ENT_IS_PLAYER     = 1 << 0,
   ENT_INVISIBLE     = 1 << 1,
   ENT_CASTS_SHADOWS = 1 << 2,
-  ENT_AT_REST       = 1 << 3,
+  ENT_ON_GROUND     = 1 << 3,
 };
 
 struct entity {
