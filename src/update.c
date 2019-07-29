@@ -16,7 +16,26 @@
 #include "debug.h"
 #include <math.h>
 
-static void movement(struct game *game, struct node *node, float speed_mult) {
+
+static void entity_movement(struct game *game, struct entity *ent)
+{
+    static const float move_accel = 1.0f;
+    static const float max_speed = 10.0f;
+    struct node *node = get_node(&ent->node_id);
+
+    float vel[3];
+
+    float amt = 10.0 * game->dt;
+
+    if (game->input.keystates[SDL_SCANCODE_W]) {
+        vec3_forward(ent->velocity, node->orientation, V3(0,amt,0), vel);
+        if (vec3_lengthsq(vel) <= max_speed*max_speed)
+            vec3_copy(vel, ent->velocity);
+    }
+}
+
+static void movement(struct game *game, struct node *node, float speed_mult)
+{
     float amt = 3.0 * game->dt;
     float turn = 1.0 * game->dt;
 
@@ -109,8 +128,11 @@ static void player_terrain_collision(struct terrain *terrain, struct node *node)
 
 }
 
-static void player_movement(struct game *game, struct node *player_node) {
-    movement(game, player_node, 2.0);
+static void player_movement(struct game *game, struct entity *player) {
+    /* if (player->flags & ENT_ON_GROUND) */
+    /*     entity_movement(game, player); */
+    struct node *node = get_node(&player->node_id);
+    movement(game, node, 2.0);
 }
 
 
