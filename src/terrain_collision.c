@@ -142,7 +142,7 @@ static struct tri *point_in_vert_tris(float *verts, struct vert_tris *vtris, flo
 
 
 
-static void get_terrain_penetration(float *verts, struct tri *tri, float *pos, float *move)
+static float get_terrain_penetration(float *verts, struct tri *tri, float *pos, float *move)
 {
     float tmp[3], normal[3];
 
@@ -158,10 +158,11 @@ static void get_terrain_penetration(float *verts, struct tri *tri, float *pos, f
     float d = vec3_dot(tmp, normal);
     vec3_scale(normal, d, move);
     /* vec3_add(pos, tmp, move); */
+    return d;
 }
 
 
-struct tri *collide_terrain(struct terrain *terrain, float *pos, struct model *model, vec3 *move)
+struct tri *collide_terrain(struct terrain *terrain, float *pos, float *move, float *pen)
 {
     struct terrain_cell *cells[9] = {0};
     struct grid_query queries[3];
@@ -184,7 +185,7 @@ struct tri *collide_terrain(struct terrain *terrain, float *pos, struct model *m
             struct tri *tri;
             if ((tri = point_in_vert_tris(terrain->verts, vtris, pos))) {
                 terrain_tri_debug(terrain->verts, tri);
-                get_terrain_penetration(terrain->verts, tri, pos, move);
+                *pen = get_terrain_penetration(terrain->verts, tri, pos, move);
                 return tri;
             }
         }
