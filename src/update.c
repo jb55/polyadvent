@@ -326,23 +326,25 @@ void orbit_update_from_mouse(struct orbit *camera, struct input *input,
 
 static void camera_keep_above_ground(struct terrain *terrain,
                                      struct node *camera) {
-    float move[3], above[3];
+    if (static_entities()[entity_terrain].flags & ENT_INVISIBLE)
+        return;
+    float move[3];
     float *camworld = node_world(camera);
     float pen;
     static const float penlim = 1.0;
     struct tri *tri = collide_terrain(terrain, camworld, move, &pen);
+
     if (!tri)
         return;
-    if (!(get_entity(&terrain->entity_id)->flags & ENT_INVISIBLE)) {
-        if (pen < penlim) {
-            float dir[3];
-            vec3_normalize(move, dir);
-            vec3_scale(dir, pen < 0 ? penlim : -penlim, above);
-            vec3_add(camworld, move, camworld);
-            vec3_add(camworld, above, camworld);
-            /* vec3_add(move, above, move); */
-            /* vec3_add(camworld, move, camworld); */
-        }
+
+    if (pen < penlim) {
+        float dir[3], above[3];
+        vec3_normalize(move, dir);
+        vec3_scale(dir, pen < 0 ? penlim : -penlim, above);
+        vec3_add(camworld, move, camworld);
+        vec3_add(camworld, above, camworld);
+        /* vec3_add(move, above, move); */
+        /* vec3_add(camworld, move, camworld); */
     }
 }
 
