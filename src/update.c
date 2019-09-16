@@ -325,18 +325,26 @@ void orbit_update_from_mouse(struct orbit *camera, struct input *input,
 }
 
 static void camera_keep_above_ground(struct terrain *terrain,
-                                     const struct node *camera) {
-    if (!(get_entity(&terrain->entity_id)->flags & ENT_INVISIBLE)) {
-        float *camera_world = node_world((struct node*)camera);
-        /* float *target = node_world(&get_player(res)->node); */
-        /* spherical_pos(&res->camera.coords, target, camera_world); */
-        float cam_terrain_z =
-            terrain->fn(terrain, camera_world[0], camera_world[1]);
+                                     struct node *camera) {
+    if (static_entities()[entity_terrain].flags & ENT_INVISIBLE)
+        return;
+    float move[3];
+    float *camworld = node_world(camera);
+    float pen;
+    static const float penlim = 1.0;
+    struct tri *tri = collide_terrain(terrain, camworld, move, &pen);
 
-        const float bias = 1.0;
+    if (!tri)
+        return;
 
-        if (camera_world[2] < cam_terrain_z + bias)
-            camera_world[2] = cam_terrain_z + bias;
+    if (pen < penlim) {
+        float dir[3], above[3];
+        vec3_normalize(move, dir);
+        vec3_scale(dir, pen < 0 ? penlim : -penlim, above);
+        vec3_add(camworld, move, camworld);
+        vec3_add(camworld, above, camworld);
+        /* vec3_add(move, above, move); */
+        /* vec3_add(camworld, move, camworld); */
     }
 }
 
@@ -376,16 +384,17 @@ static void player_update(struct game *game, struct entity *player)
 
     float move[3];
     float pos[3];
+    float pen;
     vec3_copy(node_world(node), pos);
     debug("node_world(player) %f %f %f\n", pos[0], pos[1], pos[2]);
-    struct tri *tri = collide_terrain(terrain, pos, NULL, move);
+    struct tri *tri = collide_terrain(terrain, pos, move, &pen);
     /* node_translate(node, move); */
 
     if (tri) {
         if (vec3_eq(move, V3(0,0,0), 0.01)) {
             player->flags |= ENT_ON_GROUND;
         }
-        else if (move[2] >= 0) {
+        else if (pen < 0) {
             node_translate(node, move);
             /* vec3_all(player->velocity, 0); */
             vec3_scale(player->velocity, 0.1, player->velocity);

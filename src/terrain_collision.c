@@ -142,7 +142,7 @@ static struct tri *point_in_vert_tris(float *verts, struct vert_tris *vtris, flo
 
 
 
-static void get_terrain_penetration(float *verts, struct tri *tri, float *pos, float *move)
+static float get_terrain_penetration(float *verts, struct tri *tri, float *pos, float *move)
 {
     float tmp[3], normal[3];
 
@@ -158,10 +158,11 @@ static void get_terrain_penetration(float *verts, struct tri *tri, float *pos, f
     float d = vec3_dot(tmp, normal);
     vec3_scale(normal, d, move);
     /* vec3_add(pos, tmp, move); */
+    return d;
 }
 
 
-struct tri *collide_terrain(struct terrain *terrain, float *pos, struct model *model, vec3 *move)
+struct tri *collide_terrain(struct terrain *terrain, float *pos, float *move, float *pen)
 {
     struct terrain_cell *cells[9] = {0};
     struct grid_query queries[3];
@@ -172,20 +173,21 @@ struct tri *collide_terrain(struct terrain *terrain, float *pos, struct model *m
     }
 
     query_terrain_grid(terrain, pos[0], pos[1], cells);
-
     get_closest_verts(terrain, pos, queries, cells);
 
-    int closest_vind = queries[0].cell->verts_index[queries[0].cell_vert_index];
-    struct vert_tris *vtris = &terrain->vtris[closest_vind / 3];
+    for (int j = 0; j < ARRAY_SIZE(queries); j++) {
+        int vind = queries[j].cell->verts_index[queries[j].cell_vert_index];
+        struct vert_tris *vtris = &terrain->vtris[vind / 3];
 
-    for (int i = 0; i < vtris->tri_count; i++) {;
-        /* terrain_cell_debug(terrain, queries[i].cell, queries[i].cell_vert_index, pos); */
+        for (int i = 0; i < vtris->tri_count; i++) {;
+            /* terrain_cell_debug(terrain, queries[i].cell, queries[i].cell_vert_index, pos); */
 
-        struct tri *tri;
-        if ((tri = point_in_vert_tris(terrain->verts, vtris, pos))) {
-            terrain_tri_debug(terrain->verts, tri);
-            get_terrain_penetration(terrain->verts, tri, pos, move);
-            return tri;
+            struct tri *tri;
+            if ((tri = point_in_vert_tris(terrain->verts, vtris, pos))) {
+                terrain_tri_debug(terrain->verts, tri);
+                *pen = get_terrain_penetration(terrain->verts, tri, pos, move);
+                return tri;
+            }
         }
     }
 
