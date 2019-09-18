@@ -44,16 +44,23 @@ include test/test_dae.d
 	sed 's,\(.*\)\.o[ :]*,src/\1.o $@ : ,g' < $@.$$$$ > $@; \
 	rm -f $@.$$$$
 
+%.o: %.c
+	@echo "cc $<"
+	@$(CC) -c -o $@ $(CPPFLAGS) $(CFLAGS) $<
+
 test/%: test/%.o $(OBJS)
-	$(CC) $(CFLAGS) $^ $(LDFLAGS) -o $@
+	@echo "link $@"
+	@$(CC) $(CFLAGS) $^ $(LDFLAGS) -o $@
 
 tools/%: tools/%.o $(OBJS)
-	$(CC) $(CFLAGS) $^ $(LDFLAGS) -o $@
+	@echo "link $@"
+	@$(CC) $(CFLAGS) $^ $(LDFLAGS) -o $@
 
 tools: $(TOOLS)
 
 data/models/%.mdl: data/models/%.ply tools/compile-model
-	./tools/compile-model $< $@
+	@echo "compile-model $@"
+	@./tools/compile-model $< $@
 
 check: $(TESTS) $(MODELS)
 	./test/test_dae
@@ -61,7 +68,8 @@ check: $(TESTS) $(MODELS)
 	./test/test_scene
 
 $(BIN): main.o $(OBJS)
-	$(CC) $(CFLAGS) $^ $(LDFLAGS) -o $@
+	@echo "link $@"
+	@$(CC) $(CFLAGS) $^ $(LDFLAGS) -o $@
 
 install: $(BIN)
 	install -d $(PREFIX)/bin
