@@ -1,8 +1,10 @@
-{ stdenv
-, SDL2
-, mesa
+{ nixpkgs ? import <nixpkgs> {}
 }:
 
+let
+  pkgs = nixpkgs.pkgs;
+  stdenv = pkgs.stdenv;
+in
 stdenv.mkDerivation rec {
   name = "polyadvent";
   version = "0.1";
@@ -11,7 +13,7 @@ stdenv.mkDerivation rec {
 
   makeFlags = "PREFIX=$(out)";
 
-  buildInputs = [ SDL2 mesa ];
+  buildInputs = with pkgs; [ SDL2 mesa ];
 
   meta = with stdenv.lib; {
     description = "Procedural low poly fun";
