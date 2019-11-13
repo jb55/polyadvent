@@ -34,10 +34,6 @@ all: $(BIN) $(MODELS)
 clean:
 	rm -f src/main.o test/*.o tools/*.o $(OBJS) $(TESTS) $(TOOLS) $(MODELS) $(SHLIB) $(BIN) $(SRC)/*.d*
 
-include $(OBJS:.o=.d)
-include main.d
-include test/test_dae.d
-
 %.d: %.c
 	@rm -f $@; \
 	$(CC) -MM $(CFLAGS) $< > $@.$$$$; \
