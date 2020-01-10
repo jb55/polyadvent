@@ -30,7 +30,7 @@ static char *cached_file_contents(const char *filename) {
     return file_contents(filename, &len);
 }
 
-static char *strsep2(char **stringp, const char *delim) {
+static char *strsep(char **stringp, const char *delim) {
     if (*stringp == NULL) { return NULL; }
     char *token_start = *stringp;
     *stringp = strpbrk(token_start, delim);
@@ -45,7 +45,7 @@ static char **resolve_imports(char *contents, int *nlines, int level) {
     char *resolved_contents;
     char fname_buf[32] = {0};
 
-    while ((line = strsep2(&contents, "\n"))) {
+    while ((line = strsep(&contents, "\n"))) {
         nline++;
         int line_len = contents - line;
         int size = sizeof("#include");
