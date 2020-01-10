@@ -13,7 +13,16 @@ stdenv.mkDerivation rec {
 
   makeFlags = "PREFIX=$(out)";
 
-  buildInputs = with pkgs; [ SDL2 mesa ];
+  nativeBuildInputs = with pkgs; [ tinycc pkg-config ];
+
+  buildInputs = with pkgs; [ SDL2 mesa libglvnd ] ++ 
+                (with xorg; [ libX11 libxcb libXau libXdmcp libXext libXcursor 
+		              libXrender libXfixes libXinerama libXi libXrandr 
+			      libXScrnSaver libXxf86vm ]);
+
+  shellHook = ''
+	  export LD_LIBRARY_PATH=${pkgs.libglvnd}/lib;
+  '';
 
   meta = with stdenv.lib; {
     description = "Procedural low poly fun";
