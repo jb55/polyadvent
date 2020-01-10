@@ -99,7 +99,7 @@ init_gl(struct resources *resources, int width, int height) {
     /* 	assert(ok && "terrain tessellation eval shader"); */
     /* 	check_gl(); */
 
-	ok = make_shader(GL_FRAGMENT_SHADER, SHADER("test.f.glsl"), &fragment);
+	ok = make_shader(GL_FRAGMENT_SHADER, SHADER("main.f.glsl"), &fragment);
 	rtassert(ok, "default fragment shader");
 	check_gl();
 

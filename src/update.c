@@ -171,7 +171,7 @@ void resize_fbos(struct entity *player, struct fbo *shadow_buffer,
     }
 
     // TODO: compute better bounds based
-    const float factor = 10.5;
+    const float factor = 5.5;
 
     struct model *model   = get_model(&player->model_id); assert(model);
     struct geometry *geom = get_geometry(&model->geom_id); assert(geom);
@@ -386,7 +386,7 @@ static void player_update(struct game *game, struct entity *player)
     float pos[3];
     float pen;
     vec3_copy(node_world(node), pos);
-    debug("node_world(player) %f %f %f\n", pos[0], pos[1], pos[2]);
+    /* debug("node_world(player) %f %f %f\n", pos[0], pos[1], pos[2]); */
     struct tri *tri = collide_terrain(terrain, pos, move, &pen);
     /* node_translate(node, move); */
 
