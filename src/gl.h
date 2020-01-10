@@ -2,7 +2,7 @@
 #define POLYADVENT_GL_H
 
 /* #include <epoxy/gl.h> */
-#include <SDL2/SDL.h>
+#include <SDL.h>
 #include <GL/gl.h>
 #include <GL/glx.h>
 #include <GL/glext.h>

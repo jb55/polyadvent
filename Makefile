@@ -1,20 +1,24 @@
 NAME ?= polyadvent
 BIN ?= $(NAME)
 PREFIX ?= /usr/local
-DEFS= -DGLFW_INCLUDE_NONE
+# DEFS= -DGLFW_INCLUDE_NONE -DDEBUG
 # release build lol
 # DEFS= -DGLFW_INCLUDE_NONE -DNDEBUG
 
 # CFLAGS = $(DEFS) -ggdb -O0 -I src -Wall -Wextra -std=c99 \
 
-CFLAGS = $(DEFS) -Ofast -I src -Wall -Werror -Wextra -std=c99  \
-						-Wno-unused-function \
-						-Wno-unused-parameter \
-						-Wno-unused-variable \
-						-Wmissing-field-initializers \
-						-Wno-cast-align \
-						-Wno-padded
-LDFLAGS = -lSDL2 -lGL -lm
+CFLAGS = $(DEFS) -Ofast -DSDL_DISABLE_IMMINTRIN_H \
+	$(shell pkg-config --cflags sdl2 gl x11) \
+	-DSTBI_NO_SIMD \
+	-I src -Wall -Werror -Wextra -std=c99 \
+	-Wno-unused-function \
+	-Wno-unused-parameter \
+	-Wno-unused-variable \
+	-Wmissing-field-initializers \
+	-Wno-cast-align \
+	-Wno-padded
+
+LDFLAGS = $(shell pkg-config --libs-only-L gl xcb xi xau xdmcp xext xcursor xrender xrandr xfixes xinerama xscrnsaver xxf86vm) $(shell pkg-config --libs sdl2) -lGL -lm
 SRC=src
 
 SRCS=$(wildcard $(SRC)/*.c)
@@ -29,28 +33,22 @@ TESTS += test/test_scene
 
 TOOLS = tools/compile-model
 
-all: $(BIN) $(MODELS)
+all: tools $(BIN) $(MODELS)
 
 clean:
-	rm -f src/main.o test/*.o tools/*.o $(OBJS) $(TESTS) $(TOOLS) $(MODELS) $(SHLIB) $(BIN) $(SRC)/*.d*
+	rm -f src/main.o test/*.o tools/*.o polyadvent.o $(TESTS) $(TOOLS) $(MODELS) $(SHLIB) $(BIN) $(SRC)/*.d*
 
-%.d: %.c
-	@rm -f $@; \
-	$(CC) -MM $(CFLAGS) $< > $@.$$$$; \
-	sed 's,\(.*\)\.o[ :]*,src/\1.o $@ : ,g' < $@.$$$$ > $@; \
-	rm -f $@.$$$$
+polyadvent.o: $(SRCS)
+	@echo "cc $@"
+	@$(CC) $(CFLAGS) -r -o $@ $^
 
-%.o: %.c
-	@echo "cc $<"
-	@$(CC) -c -o $@ $(CPPFLAGS) $(CFLAGS) $<
-
-test/%: test/%.o $(OBJS)
+test/%: test/%.o polyadvent.o
 	@echo "link $@"
-	@$(CC) $(CFLAGS) $^ $(LDFLAGS) -o $@
+	@$(CC) $(CFLAGS) $(LDFLAGS) $^ -o $@
 
-tools/%: tools/%.o $(OBJS)
+tools/%: tools/%.c polyadvent.o
 	@echo "link $@"
-	@$(CC) $(CFLAGS) $^ $(LDFLAGS) -o $@
+	@$(CC) $(CFLAGS) $(LDFLAGS) $^ -o $@
 
 tools: $(TOOLS)
 
@@ -63,9 +61,9 @@ check: $(TESTS) $(MODELS)
 	./test/test_resource
 	./test/test_scene
 
-$(BIN): main.o $(OBJS)
+$(BIN): polyadvent.o main.o
 	@echo "link $@"
-	@$(CC) $(CFLAGS) $^ $(LDFLAGS) -o $@
+	@$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^
 
 install: $(BIN)
 	install -d $(PREFIX)/bin

@@ -3,7 +3,7 @@
 #ifndef POLYADVENT_INPUT_H
 #define POLYADVENT_INPUT_H
 
-#include <SDL2/SDL.h>
+#include <SDL.h>
 #include "common.h"
 
 /* enum key_state { */
