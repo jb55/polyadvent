@@ -8,7 +8,7 @@
 #include "util.h"
 #include <assert.h>
 
-#define MAX_ENTITIES 2048
+#define MAX_ENTITIES 10048
 
 enum entity_flags {
   ENT_IS_PLAYER     = 1 << 0,
