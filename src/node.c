@@ -69,7 +69,7 @@ struct node *node_init(struct node *node) {
 
 int node_set_label(struct node *node, const char *label)
 {
-    strncpy(node->label, label, sizeof(node->label));
+    strncpy(node->label, label, sizeof(node->label)-1);
     // return 0 if the string is too big and that we've truncated it
     int ok = node->label[sizeof(node->label)-1] == '\0';
     // strncpy won't write this for large strings =/
