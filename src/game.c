@@ -106,7 +106,7 @@ void game_init(struct game *game, int width, int height) {
     game->quit = 0;
     game->frame = 0;
 
-    const double size = 10000.0;
+    const double size = 5000.0;
     double scale = 0.03;
 
     terrain->settings = (struct perlin_settings){
@@ -127,9 +127,10 @@ void game_init(struct game *game, int width, int height) {
 
     init_terrain(terrain, size);
     int seed;
-    terrain->samples = load_samples(&seed, &terrain->n_samples);
+    /* terrain->samples = load_samples(&seed, &terrain->n_samples); */
+    terrain->n_samples = 0;
     create_terrain(terrain, size, game->seed);
-    /* update_terrain(terrain); */
+    /* update_terrain(terrain, terrain->cell_size); */
 
     /* get_entity(&terrain->entity_id)->flags |= ENT_INVISIBLE; */
 

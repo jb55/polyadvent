@@ -213,7 +213,7 @@ void create_terrain(struct terrain *terrain, float scale, int seed) {
     del_point2d_t *points = calloc(terrain->n_samples, sizeof(*points));
     float *verts = calloc(terrain->n_samples * 3, sizeof(*verts));
     terrain->cell_size = pdist;
-    terrain->n_cells = round(size / terrain->cell_size);
+    terrain->n_cells = round(size / terrain->cell_size) + 1;
     debug("n_cells %d\n", terrain->n_cells);
 
     struct terrain_cell *grid =
