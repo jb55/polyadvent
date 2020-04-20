@@ -60,7 +60,7 @@ void entity_test_scene(struct game *game)
     struct geometry *geom = get_geometry(&pmodel->geom_id); assert(geom);
     proc_sphere(geom);
 
-    for (int i = 0; i < 5; i++) {
+    for (int i = 0; i < 200; i++) {
         struct entity *ent = new_entity(NULL);
         struct node *node  = get_node(&ent->node_id);
 
