@@ -13,7 +13,7 @@ stdenv.mkDerivation rec {
 
   makeFlags = "PREFIX=$(out)";
 
-  nativeBuildInputs = with pkgs; [ tinycc pkg-config ];
+  nativeBuildInputs = with pkgs; [ tinycc pkg-config gdb ];
 
   buildInputs = with pkgs; [ SDL2 mesa libglvnd ] ++ 
                 (with xorg; [ libX11 libxcb libXau libXdmcp libXext libXcursor 
