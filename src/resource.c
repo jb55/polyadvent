@@ -168,8 +168,10 @@ void *new_resource(struct resource_manager *r, struct resource_id *id)
 
     struct resource_id *fresh_id;
 
-    if (r->resource_count + 1 > r->max_capacity)
+    if (r->resource_count + 1 > r->max_capacity) {
+        printf("new_resource: count %d > max cap %d\n", r->resource_count, r->max_capacity);
         return NULL;
+    }
 
     if (r->resource_count + 1 > r->current_capacity)
         resize(r);
