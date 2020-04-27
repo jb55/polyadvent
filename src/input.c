@@ -20,6 +20,7 @@ static void key_down(struct input *input, int scancode, u64 current_frame) {
 }
 
 static void key_up(struct input *input, int scancode, u64 current_frame) {
+    input->modifiers = SDL_GetModState();
     struct input_edge *edge = &input->key_edge_states[scancode];
 
     edge->up_frame = current_frame;
