@@ -19,12 +19,7 @@
 #define FLAG_KEY_DOWN (1<<0)
 #define FLAG_KEY_UP   (1<<1)
 
-enum key_edge_state {
-  EDGE_KEY_DOWN = 1 << 0,
-  EDGE_KEY_UP   = 1 << 1,
-};
-
-struct key_edge {
+struct input_edge {
     int is_down;
     u64 down_frame;
     u64 up_frame;
@@ -34,6 +29,7 @@ struct input {
   /* enum key_state keys[0x7F-0x1F]; */
     u8 const *keystates;
     SDL_Keymod modifiers;
+    SDL_GameController *controller;
     int mx, my, last_mx, last_my;
     int mdx, mdy;
     float wheel_x, wheel_y;
@@ -46,12 +42,14 @@ struct input {
     /* u64 up_key_frames[KEY_BUFFER_SIZE]; */
     /* u8 frame_down_keys[KEY_BUFFER_SIZE]; */
     /* u8 frame_up_keys[KEY_BUFFER_SIZE]; */
-    struct key_edge key_edge_states[SDL_NUM_SCANCODES];
+    struct input_edge key_edge_states[SDL_NUM_SCANCODES];
+    struct input_edge button_edge_states[SDL_CONTROLLER_BUTTON_MAX];
 };
 
 int input_is_dragging(struct input *input, int mouse_button);
 
-int is_key_down_on_frame(struct input *input, u8 scancode, u64 frame);
+bool is_key_down_on_frame(struct input *input, u8 scancode, u64 frame);
+bool is_button_down_on_frame(struct input *input, SDL_GameControllerButton button, u64 frame);
 
 void input_init(struct input *input);
 

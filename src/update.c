@@ -348,12 +348,12 @@ static void camera_keep_above_ground(struct terrain *terrain,
     }
 }
 
-static void entity_jump(struct entity *ent)
+static void entity_jump(struct entity *ent, float amount)
 {
     float dir[3];
     debug("jumping\n");
     vec3_normalize(ent->velocity, dir);
-    vec3_add(dir, V3(0,0,1.0), dir);
+    vec3_add(dir, V3(0, 0, amount), dir);
     vec3_add(ent->velocity, dir, ent->velocity);
 }
 
@@ -409,8 +409,9 @@ static void player_update(struct game *game, struct entity *player)
     }
 
     if (player->flags & ENT_ON_GROUND &&
-        was_key_pressed_this_frame(game, SDL_SCANCODE_SPACE)) {
-        entity_jump(player);
+        (was_key_pressed_this_frame(game, SDL_SCANCODE_SPACE) ||
+         was_button_pressed_this_frame(game, SDL_CONTROLLER_BUTTON_X))) {
+        entity_jump(player, 0.5);
     }
 
     /* debug("player velocity %f %f %f\n", */

@@ -25,8 +25,14 @@ mat4 *cam_init = (float[16]){
   -71.766136, -47.881512, -44.216671, 1.000000
 };
 
-int was_key_pressed_this_frame(struct game *game, int scancode) {
+bool was_key_pressed_this_frame(struct game *game, int scancode)
+{
     return is_key_down_on_frame(&game->input, scancode, game->frame);
+}
+
+bool was_button_pressed_this_frame(struct game *game, SDL_GameControllerButton button)
+{
+    return is_button_down_on_frame(&game->input, button, game->frame);
 }
 
 static void camera_update(struct node *node) {
@@ -58,7 +64,7 @@ static void init_user_settings(struct user_settings *settings) {
 
 static void init_sdl(SDL_Window **window, int width, int height)
 {
-    /* SDL_Init( SDL_INIT_VIDEO ); */
+    SDL_Init( SDL_INIT_JOYSTICK );
 
     /* SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES); */
 
@@ -73,18 +79,8 @@ void quit_game(struct game *game)
     game->quit = 1;
 }
 
-void game_init(struct game *game, int width, int height) {
-    init_sdl(&game->window, width, height);
-    init_gl(&game->test_resources, width, height);
-    init_entity_system();
-    init_geometry_manager();
-    init_model_manager();
-    init_node_manager();
-    init_user_settings(&game->user_settings);
-    check_gl();
-
-    game->wireframe = 0;
-
+// TODO: cleanup
+void init_misc(struct game *game, int width, int height) {
     struct resources *res = &game->test_resources;
     mat4 *mvp = res->test_mvp;
 
@@ -208,4 +204,43 @@ void game_init(struct game *game, int width, int height) {
 
     // TEXTURES
     // END TEXTURES
+}
+
+void init_controller(struct input *input) {
+    SDL_GameControllerAddMappingsFromFile("data/gamecontrollerdb.txt");
+
+    int joysticks = SDL_NumJoysticks();
+    SDL_GameController *controller = NULL;
+
+    printf("Found %d joysticks\n", joysticks);
+
+    for (int i = 0; i < joysticks; i++) {
+        if (SDL_IsGameController(i)) {
+            controller = SDL_GameControllerOpen(i);
+            if (controller) {
+                printf("Found a game controller\n");
+                input->controller = controller;
+                break;
+            }
+        } else {
+            printf("Could not open game controller %d: %s\n", i, SDL_GetError());
+        }
+    }
+}
+
+void game_init(struct game *game, int width, int height) {
+    init_sdl(&game->window, width, height);
+    init_gl(&game->test_resources, width, height);
+    init_entity_system();
+    init_geometry_manager();
+    init_model_manager();
+    init_node_manager();
+    init_user_settings(&game->user_settings);
+
+    check_gl();
+
+    game->wireframe = 0;
+
+    init_controller(&game->input);
+    init_misc(game, width, height);
 }

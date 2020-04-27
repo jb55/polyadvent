@@ -103,7 +103,8 @@ struct entity *get_terrain_entity(struct terrain *);
 void game_init(struct game *game, int width, int height);
 void quit_game(struct game *game);
 void should_update(struct game *game);
-int was_key_pressed_this_frame(struct game *game, int scancode);
+bool was_key_pressed_this_frame(struct game *game, int scancode);
+bool was_button_pressed_this_frame(struct game *game, SDL_GameControllerButton button);
 int is_free_camera(struct game *game);
 
 #endif /* PA_GAME_H */

@@ -7,7 +7,7 @@
 static void key_down(struct input *input, int scancode, u64 current_frame) {
     input->modifiers = SDL_GetModState();
 
-    struct key_edge *edge = &input->key_edge_states[scancode];
+    struct input_edge *edge = &input->key_edge_states[scancode];
 
     if (edge->is_down)
         return;
@@ -20,12 +20,35 @@ static void key_down(struct input *input, int scancode, u64 current_frame) {
 }
 
 static void key_up(struct input *input, int scancode, u64 current_frame) {
-    struct key_edge *edge = &input->key_edge_states[scancode];
+    struct input_edge *edge = &input->key_edge_states[scancode];
 
     edge->up_frame = current_frame;
     edge->is_down = 0;
 }
 
+static void button_up(struct input *input, SDL_JoyButtonEvent *event, u64 current_frame)
+{
+    if (event->button >= SDL_CONTROLLER_BUTTON_MAX) return;
+    /* printf("button up %d\n", event->button); */
+    struct input_edge *edge = &input->button_edge_states[event->button];
+
+    edge->up_frame = current_frame;
+    edge->is_down = 0;
+}
+
+static void button_down(struct input *input, SDL_JoyButtonEvent *event, u64 current_frame)
+{
+    if (event->button >= SDL_CONTROLLER_BUTTON_MAX) return;
+    /* printf("button down %d\n", event->button); */
+
+    struct input_edge *edge = &input->button_edge_states[event->button];
+
+    if (edge->is_down)
+        return;
+
+    edge->down_frame = current_frame;
+    edge->is_down = 1;
+}
 
 void process_events(struct input *input, u64 current_frame) {
   SDL_Event event;
@@ -46,6 +69,12 @@ void process_events(struct input *input, u64 current_frame) {
         break;
     case SDL_KEYUP:
         key_up(input, event.key.keysym.scancode, current_frame);
+        break;
+    case SDL_JOYBUTTONUP:
+        button_up(input, &event.jbutton, current_frame);
+        break;
+    case SDL_JOYBUTTONDOWN:
+        button_down(input, &event.jbutton, current_frame);
         break;
     case SDL_MOUSEBUTTONDOWN:
         if (event.button.button <= MOUSE_BUTTONS)
@@ -106,10 +135,16 @@ void input_init(struct input *input) {
   assert(input->keystates);
 }
 
-int is_key_down_on_frame(struct input *input, u8 scancode, u64 frame) {
-    struct key_edge *edge = &input->key_edge_states[scancode];
+bool is_key_down_on_frame(struct input *input, u8 scancode, u64 frame) {
+    struct input_edge *edge = &input->key_edge_states[scancode];
 
     // is_down is implied, but do it for good measure
+    return edge->down_frame == frame && edge->is_down;
+}
+
+bool is_button_down_on_frame(struct input *input, SDL_GameControllerButton button, u64 frame)
+{
+    struct input_edge *edge = &input->button_edge_states[button];
     return edge->down_frame == frame && edge->is_down;
 }
 
