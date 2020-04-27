@@ -391,7 +391,7 @@ static void player_update(struct game *game, struct entity *player)
     /* node_translate(node, move); */
 
     if (tri) {
-        if (vec3_eq(move, V3(0,0,0), 0.01)) {
+        if (vec3_eq(move, V3(0,0,0), 0.1)) {
             player->flags |= ENT_ON_GROUND;
         }
         else if (pen < 0) {
@@ -411,7 +411,7 @@ static void player_update(struct game *game, struct entity *player)
     if (player->flags & ENT_ON_GROUND &&
         (was_key_pressed_this_frame(game, SDL_SCANCODE_SPACE) ||
          was_button_pressed_this_frame(game, SDL_CONTROLLER_BUTTON_X))) {
-        entity_jump(player, 0.5);
+        entity_jump(player, 2.0);
     }
 
     /* debug("player velocity %f %f %f\n", */
