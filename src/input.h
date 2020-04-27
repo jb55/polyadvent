@@ -55,15 +55,13 @@ struct input {
 
 int input_is_dragging(struct input *input, int mouse_button);
 
+bool is_button_down(struct input *input, SDL_GameControllerButton button);
 bool is_key_down_on_frame(struct input *input, u8 scancode, u64 frame);
 bool is_button_down_on_frame(struct input *input, SDL_GameControllerButton button, u64 frame);
 
-void input_init(struct input *input);
-
+void init_input(struct input *input);
 void input_reset(struct input *input);
-
 void handle_key(struct input *input, SDL_KeyboardEvent);
-
 void process_events(struct input *input, u64 current_frame);
 
 #endif /* POLYADVENT_INPUT_H */

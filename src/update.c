@@ -44,12 +44,16 @@ static void movement(struct game *game, struct node *node, float speed_mult)
 
     amt *= speed_mult;
 
+    if ((game->input.modifiers & KMOD_SHIFT) ||
+        is_button_down(&game->input, SDL_CONTROLLER_BUTTON_LEFTSTICK))
+    {
+        amt *= 20;
+    }
+
     // joystick movement
     node_forward(node, V3(0,amt*y_axis, 0));
     node_forward(node, V3(amt*x_axis, 0, 0));
 
-    if (game->input.modifiers & KMOD_SHIFT)
-        amt *= 20;
 
     if (game->input.keystates[SDL_SCANCODE_A])
         node_forward(node, V3(-amt,0,0));

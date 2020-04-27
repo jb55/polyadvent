@@ -195,8 +195,6 @@ void init_misc(struct game *game, int width, int height) {
     node_rotate(freecam, V3(100, 0, 0));
     node_translate(freecam, V3(0,-40,20));
 
-    input_init(&game->input);
-
     // FBO STUFF
     init_fbo(&res->shadow_buffer);
     resize_fbos(player, &res->shadow_buffer, res->proj_ortho, width, height);
@@ -241,6 +239,7 @@ void game_init(struct game *game, int width, int height) {
 
     game->wireframe = 0;
 
+    init_input(&game->input);
     init_controller(&game->input);
     init_misc(game, width, height);
 }

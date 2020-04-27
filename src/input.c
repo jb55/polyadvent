@@ -54,12 +54,12 @@ static void axis_motion(struct input *input, SDL_JoyAxisEvent *event)
 {
     if (event->axis >= MAX_AXIS) return;
     input->axis[event->axis] = event->axis == 1 ? -event->value : event->value;
-    printf("axis %d %d", input->axis[0], input->axis[1]);
+    /* printf("axis %d %d", input->axis[0], input->axis[1]); */
     for (int i = 0; i < MAX_AXIS; i++) {
         if (input->axis[i] >= -4000 && input->axis[i] <= 4000 )
             input->axis[i] = 0;
     }
-    printf(" -> %d %d\n", input->axis[0], input->axis[1]);
+    /* printf(" -> %d %d\n", input->axis[0], input->axis[1]); */
 }
 
 void process_events(struct input *input, u64 current_frame) {
@@ -132,7 +132,7 @@ void process_events(struct input *input, u64 current_frame) {
 
 }
 
-void input_init(struct input *input) {
+void init_input(struct input *input) {
   /* memset(input->keys, 0, sizeof(input->keys[0]) * ARRAY_SIZE(input->keys)); */
   input->keystates = SDL_GetKeyboardState(NULL);
   assert(sizeof(input->key_edge_states) == SDL_NUM_SCANCODES * sizeof(input->key_edge_states[0]));
@@ -150,6 +150,7 @@ void input_init(struct input *input) {
   input->last_my = 0;
   input->resized_height = 0;
   input->resized_width = 0;
+  input->controller = 0;
   assert(input->keystates);
 }
 
@@ -178,4 +179,13 @@ void input_reset(struct input *input) {
 
 int input_is_dragging(struct input *input, int mouse_button) {
     return input->mbuttons[mouse_button-1];
+}
+
+bool is_button_down(struct input *input, SDL_GameControllerButton button)
+{
+    if (!input->controller) {
+        return false;
+    }
+
+    return SDL_GameControllerGetButton(input->controller, button) == 1;
 }
