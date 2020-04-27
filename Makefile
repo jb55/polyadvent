@@ -7,7 +7,7 @@ DEFS= -DGLFW_INCLUDE_NONE
 
 # CFLAGS = $(DEFS) -ggdb -O0 -I src -Wall -Wextra -std=c99 \
 
-CFLAGS = $(DEFS) -Ofast -I src -Wall -Werror -Wextra -std=c99  \
+CFLAGS = $(DEFS) -O1 -g -DDEBUG -I src -Wall -Werror -Wextra -std=c99  \
 						-Wno-unused-function \
 						-Wno-unused-parameter \
 						-Wno-unused-variable \
