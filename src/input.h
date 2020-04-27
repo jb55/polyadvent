@@ -19,6 +19,11 @@
 #define FLAG_KEY_DOWN (1<<0)
 #define FLAG_KEY_UP   (1<<1)
 
+#define MAX_AXIS 2
+#define MAX_AXIS_VALUE 32767
+#define MIN_AXIS_VALUE -32767
+#define MAX_CONTROLLERS
+
 struct input_edge {
     int is_down;
     u64 down_frame;
@@ -31,6 +36,8 @@ struct input {
     SDL_Keymod modifiers;
     SDL_GameController *controller;
     int mx, my, last_mx, last_my;
+    int axis[MAX_AXIS];
+    int axis_min_input;
     int mdx, mdy;
     float wheel_x, wheel_y;
     int mbuttons[MOUSE_BUTTONS];

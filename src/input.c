@@ -39,7 +39,7 @@ static void button_up(struct input *input, SDL_JoyButtonEvent *event, u64 curren
 static void button_down(struct input *input, SDL_JoyButtonEvent *event, u64 current_frame)
 {
     if (event->button >= SDL_CONTROLLER_BUTTON_MAX) return;
-    /* printf("button down %d\n", event->button); */
+    printf("button down %d\n", event->button);
 
     struct input_edge *edge = &input->button_edge_states[event->button];
 
@@ -48,6 +48,18 @@ static void button_down(struct input *input, SDL_JoyButtonEvent *event, u64 curr
 
     edge->down_frame = current_frame;
     edge->is_down = 1;
+}
+
+static void axis_motion(struct input *input, SDL_JoyAxisEvent *event)
+{
+    if (event->axis >= MAX_AXIS) return;
+    input->axis[event->axis] = event->axis == 1 ? -event->value : event->value;
+    printf("axis %d %d", input->axis[0], input->axis[1]);
+    for (int i = 0; i < MAX_AXIS; i++) {
+        if (input->axis[i] >= -4000 && input->axis[i] <= 4000 )
+            input->axis[i] = 0;
+    }
+    printf(" -> %d %d\n", input->axis[0], input->axis[1]);
 }
 
 void process_events(struct input *input, u64 current_frame) {
@@ -69,6 +81,9 @@ void process_events(struct input *input, u64 current_frame) {
         break;
     case SDL_KEYUP:
         key_up(input, event.key.keysym.scancode, current_frame);
+        break;
+    case SDL_JOYAXISMOTION:
+        axis_motion(input, &event.jaxis);
         break;
     case SDL_JOYBUTTONUP:
         button_up(input, &event.jbutton, current_frame);
@@ -122,6 +137,9 @@ void input_init(struct input *input) {
   input->keystates = SDL_GetKeyboardState(NULL);
   assert(sizeof(input->key_edge_states) == SDL_NUM_SCANCODES * sizeof(input->key_edge_states[0]));
   memset(input->key_edge_states, 0, sizeof(input->key_edge_states));
+  memset(input->button_edge_states, 0, sizeof(input->button_edge_states));
+  memset(input->axis, 0, sizeof(input->axis));
+  input->axis_min_input = 1024;
   input->mx = 0;
   input->my = 0;
   input->mdx = 0;

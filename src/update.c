@@ -39,7 +39,14 @@ static void movement(struct game *game, struct node *node, float speed_mult)
     float amt = 3.0 * game->dt;
     float turn = 1.0 * game->dt;
 
+    float x_axis = (float)game->input.axis[0] / (float)MAX_AXIS_VALUE;
+    float y_axis = (float)game->input.axis[1] / (float)MAX_AXIS_VALUE;
+
     amt *= speed_mult;
+
+    // joystick movement
+    node_forward(node, V3(0,amt*y_axis, 0));
+    node_forward(node, V3(amt*x_axis, 0, 0));
 
     if (game->input.modifiers & KMOD_SHIFT)
         amt *= 20;
