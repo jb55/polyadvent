@@ -32,7 +32,7 @@ TOOLS = tools/compile-model
 all: $(BIN) $(MODELS)
 
 clean:
-	rm -f src/main.o test/*.o tools/*.o $(OBJS) $(TESTS) $(TOOLS) $(MODELS) $(SHLIB) $(BIN) $(SRC)/*.d*
+	rm -f main.o polyadvent.o src/main.o test/*.o tools/*.o $(OBJS) $(TESTS) $(TOOLS) $(MODELS) $(SHLIB) $(BIN) $(SRC)/*.d*
 
 %.d: %.c
 	@rm -f $@; \
@@ -40,7 +40,7 @@ clean:
 	sed 's,\(.*\)\.o[ :]*,src/\1.o $@ : ,g' < $@.$$$$ > $@; \
 	rm -f $@.$$$$
 
-%.o: %.c
+%.o: %.c %.h
 	@echo "cc $<"
 	@$(CC) -c -o $@ $(CPPFLAGS) $(CFLAGS) $<
 
