@@ -74,8 +74,7 @@ static void test_compact()
 static void test_int_resource_manager()
 {
     printf("test_int_resource_manager\n");
-    struct resource_manager r
-;
+    struct resource_manager r;
     struct resource_id id, first_id;
     int *p;
     // 2 item case

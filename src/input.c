@@ -140,6 +140,7 @@ void init_input(struct input *input) {
   memset(input->key_edge_states, 0, sizeof(input->key_edge_states));
   memset(input->button_edge_states, 0, sizeof(input->button_edge_states));
   memset(input->axis, 0, sizeof(input->axis));
+  memset(input->mbuttons, 0, sizeof(input->mbuttons));
   input->axis_min_input = 1024;
   input->mx = 0;
   input->my = 0;

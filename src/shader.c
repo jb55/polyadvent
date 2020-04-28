@@ -145,6 +145,11 @@ int make_shader(GLenum type, const char *filename, struct shader *shader) {
 
 #define N_SHADERS 3
 
+void init_gpu_program(struct gpu_program *program) {
+    program->n_shaders = 0;
+    memset(program->shaders, 0, sizeof(program->shaders));
+}
+
 #ifdef DEBUG
 int reload_program(struct gpu_program *program) {
 	int ok;
@@ -153,6 +158,8 @@ int reload_program(struct gpu_program *program) {
     struct gpu_program new_program;
     struct shader new_shaders[n_shaders];
     struct shader *new_shaders_p[n_shaders];
+
+    init_gpu_program(&new_program);
 
     int changes[n_shaders];
 

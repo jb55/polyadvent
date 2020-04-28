@@ -90,6 +90,7 @@ void init_misc(struct game *game, int width, int height) {
 
     struct node *root = new_node(&res->root_id);
     struct node *sun_camera = new_node(&res->sun_camera_id);
+
     struct terrain *terrain = &game->terrain;
     struct entity *player;
 
@@ -226,7 +227,13 @@ void init_controller(struct input *input) {
     }
 }
 
+void init_resources(struct resources *res)
+{
+    memset(res, 0, sizeof(*res));
+}
+
 void game_init(struct game *game, int width, int height) {
+    init_resources(&game->test_resources);
     init_sdl(&game->window, width, height);
     init_gl(&game->test_resources, width, height);
     init_entity_system();

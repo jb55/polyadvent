@@ -32,6 +32,7 @@ struct gpu_program {
 int reload_program(struct gpu_program *program);
 int make_shader(GLenum type, const char *filename, struct shader *shader);
 
+void init_gpu_program(struct gpu_program *program);
 int make_program_from_shaders(struct shader **shaders,
                               int n_shaders,
                               struct gpu_program *program);
