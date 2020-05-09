@@ -195,6 +195,13 @@ static int collide_terrain_debug(struct terrain *terrain, struct terrain_cell *c
 }
 #endif /* DEBUG */
 
+static double distance_to_closest_edge(double size, double x, double y) {
+    double top    = y;
+    double left   = x;
+    double right  = size - x;
+    double bottom = size - y;
+    return min(top, min(left, min(right, bottom)));
+}
 
 void create_terrain(struct terrain *terrain, float scale, int seed) {
     u32 i;
@@ -244,6 +251,11 @@ void create_terrain(struct terrain *terrain, float scale, int seed) {
 
         int grid_x = verts[n] / terrain->cell_size;
         int grid_y = verts[n+1] / terrain->cell_size;
+
+        // clamp height at edge
+
+        double d = distance_to_closest_edge(size, x, y);
+        z *= d / (size/2.0);
 
         struct terrain_cell *cell =
             index_terrain_cell(terrain, grid_x, grid_y);
