@@ -42,7 +42,7 @@ vec3 shadow_strength(vec4 position, vec4 normal, vec4 v_shadow_coord) {
         && shadow_sample.y < 1.0;
 
     if (light_dir.z > 0.0 && in_shadow) {
-        float factor = 1.0-abs(light_angle);
+        float factor = 1.0-abs(light_angle)*0.2;
         // float factor = 1.0;
         visibility = vec3(1.0)*factor;
         // visibility = shadow_sample;

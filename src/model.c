@@ -20,7 +20,7 @@ static struct resource_manager dyn_modelman;
 
 struct model *init_model(struct model *model) {
     init_id(&model->geom_id);
-    model->shading = SHADING_VERT_COLOR;
+    model->shader = DEFAULT_PROGRAM;
     model->texture = 0;
     model->nposes = 0;
     for (u16 i = 0; i < ARRAY_SIZE(model->poses); i++) {
@@ -95,7 +95,7 @@ static struct model *load_static_model(enum static_model m)
     }
 
     // Load mesh
-    debug("loading %s model with geom_id ", static_model_defs[m].file);
+    debug("loading %s model with geom_id\n", static_model_defs[m].file);
 
     assert(m < NUM_STATIC_MODELS);
     snprintf(path, 128, "data/models/%s.mdl", static_model_defs[m].file);

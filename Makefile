@@ -1,7 +1,7 @@
 NAME ?= polyadvent
 BIN ?= $(NAME)
 PREFIX ?= /usr/local
-DEFS= -DGLFW_INCLUDE_NONE
+DEFS= -DGLFW_INCLUDE_NONE -DDEBUG
 # release build lol
 # DEFS= -DGLFW_INCLUDE_NONE -DNDEBUG
 

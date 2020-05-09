@@ -64,7 +64,7 @@ static const float bias_matrix[] = {
 
 void
 init_gl(struct resources *resources, int width, int height) {
-    struct shader vertex, terrain_vertex, terrain_geom, fragment, fragment_smooth;
+    struct shader vertex, terrain_vertex, chess_piece_vertex, terrain_geom, fragment, fragment_smooth;
     struct shader terrain_teval, terrain_tc;
     float tmp_matrix[16];
     int ok = 0;
@@ -80,24 +80,13 @@ init_gl(struct resources *resources, int width, int height) {
 	ok = make_shader(GL_VERTEX_SHADER, SHADER("vertex-color.glsl"), &vertex);
 	rtassert(ok, "vertex-color shader");
 
-    ok = make_shader(GL_VERTEX_SHADER, SHADER("terrain.v.glsl"),
-                     &terrain_vertex);
+    ok = make_shader(GL_VERTEX_SHADER, SHADER("terrain.v.glsl"), &terrain_vertex);
 	rtassert(ok, "terrain vertex shader");
 	check_gl();
 
-    /* ok = make_shader(GL_GEOMETRY_SHADER, SHADER("terrain.g.glsl"), */
-    /*                  &terrain_geom); */
-    /* 	assert(ok && "terrain geometry shader"); */
-
-    /* ok = make_shader(GL_TESS_CONTROL_SHADER, SHADER("terrain.tc.glsl"), */
-    /*                  &terrain_tc); */
-    /* 	assert(ok && "terrain tessellation control shader"); */
-    /* 	check_gl(); */
-
-    /* ok = make_shader(GL_TESS_EVALUATION_SHADER, SHADER("terrain.te.glsl"), */
-    /*                  &terrain_teval); */
-    /* 	assert(ok && "terrain tessellation eval shader"); */
-    /* 	check_gl(); */
+    ok = make_shader(GL_VERTEX_SHADER, SHADER("chess-piece.v.glsl"), &chess_piece_vertex);
+	rtassert(ok, "chess-piece vertex shader");
+	check_gl();
 
 	ok = make_shader(GL_FRAGMENT_SHADER, SHADER("main.f.glsl"), &fragment);
 	rtassert(ok, "default fragment shader");
@@ -109,17 +98,6 @@ init_gl(struct resources *resources, int width, int height) {
 			 1,
 			 5000,
 			 resources->proj_persp);
-
-	/* Shader program */
-    /* struct shader *terrain_shaders[] = */
-    /*     { &terrain_vertex, &fragment, &terrain_tc, &terrain_teval, */
-    /*       &terrain_geom }; */
-
-    /* struct shader *terrain_shaders[] = */
-    /*     { &terrain_vertex, &fragment, &terrain_tc, &terrain_teval }; */
-
-    /* struct shader *terrain_shaders[] = */
-    /*     { &terrain_vertex, &fragment, &terrain_geom }; */
 
     struct shader *terrain_shaders[] =
         { &terrain_vertex, &fragment };
@@ -135,9 +113,15 @@ init_gl(struct resources *resources, int width, int height) {
 	rtassert(ok, "vertex-color program");
     check_gl();
 
+	ok = make_program(&chess_piece_vertex, &fragment, &resources->programs[CHESS_PIECE_PROGRAM]);
+	rtassert(ok, "chess-piece program");
+    check_gl();
+
+    // Program variables
     GLuint programs[] =
         { resources->programs[TERRAIN_PROGRAM].handle
         , resources->programs[DEFAULT_PROGRAM].handle
+        , resources->programs[CHESS_PIECE_PROGRAM].handle
         };
 
     // uniforms shared between all shaders
@@ -149,6 +133,10 @@ init_gl(struct resources *resources, int width, int height) {
             glGetUniformLocation(handle, "camera_position");
         check_gl();
 
+        // TODO: more flexible uniforms
+        resources->uniforms.piece_color = glGetUniformLocation(handle, "piece_color");
+        check_gl();
+
         /* resources->uniforms.depth_vp = */
         /*     glGetUniformLocation(handle, "depth_vp"); */
         /* check_gl(); */
@@ -156,6 +144,10 @@ init_gl(struct resources *resources, int width, int height) {
         resources->uniforms.depth_mvp =
             glGetUniformLocation(handle, "depth_mvp");
         check_gl();
+        resources->uniforms.camera_position =
+            glGetUniformLocation(handle, "camera_position");
+        check_gl();
+
 
         resources->uniforms.light_intensity =
             glGetUniformLocation(handle, "light_intensity");
@@ -214,6 +206,7 @@ init_gl(struct resources *resources, int width, int height) {
 	resources->vertex_attrs[va_color] =
         (gpu_addr)glGetAttribLocation(resources->programs[DEFAULT_PROGRAM]
                                         .handle, "color");
+
     /* assert(resources->attributes.color != 0xFFFFFFFF); */
     check_gl();
 }
@@ -273,14 +266,6 @@ void render (struct game *game, struct render_config *config) {
 
     struct gpu_program *current_program = NULL;
 
-    struct gpu_program *terrain_program =
-        &game->test_resources.programs[TERRAIN_PROGRAM];
-
-    struct gpu_program *default_program =
-        &game->test_resources.programs[DEFAULT_PROGRAM];
-
-    /* mat4_multiply(view_proj, res->skybox.node.mat, mvp); */
-
     mat4_inverse((float*)camera, view);
     mat4_multiply(projection, view, view_proj);
 
@@ -303,6 +288,8 @@ void render (struct game *game, struct render_config *config) {
 
     for (u32 i = 0; i < num_entities; ++i) {
         struct entity *entity = &entities[i];
+        struct model *model = get_model(&entity->model_id);
+        assert(model);
 
         if (entity->flags & ENT_INVISIBLE)
             continue;
@@ -310,16 +297,22 @@ void render (struct game *game, struct render_config *config) {
         if (config->is_depth_pass && !(entity->flags & ENT_CASTS_SHADOWS))
             continue;
 
-        // TODO this is a bit wonky, refactor this
-        current_program = i == 0 ? terrain_program : default_program;
+        current_program = &game->test_resources.programs[model->shader];
+
         glUseProgram(current_program->handle);
         check_gl();
-
 
         glUniform3f(res->uniforms.camera_position,
                     camera[M_X],
                     camera[M_Y],
                     camera[M_Z]);
+        check_gl();
+
+        if (entity->flags & ENT_IS_WHITE)
+            glUniform3f(res->uniforms.piece_color, 0.9f, 0.9f, 0.9f);
+        else
+            glUniform3f(res->uniforms.piece_color, 0.2f, 0.2f, 0.2f);
+        check_gl();
 
         glUniform1i(res->uniforms.fog_on, res->fog_on);
         check_gl();
@@ -359,8 +352,6 @@ void render (struct game *game, struct render_config *config) {
         recalc_normals(res->uniforms.normal_matrix, model_view, normal_matrix);
         check_gl();
 
-        struct model *model = get_model(&entity->model_id);
-        assert(model);
         struct geometry *geo = get_geometry(&model->geom_id);
         /* debug("geo node %s\n", node->label); */
         assert(geo);

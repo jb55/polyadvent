@@ -89,13 +89,18 @@ static void movement(struct game *game, struct node *node, float speed_mult)
     /*   node_translate(node, V3(0, 0, -amt)); */
 
     if (was_key_pressed_this_frame(game, SDL_SCANCODE_P)) {
-        debug("%f %f %f ",
+        debug("player %f %f %f quat %f %f %f %f\n",
                 node->pos[0],
                 node->pos[1],
-                node->pos[2]);
-        node_recalc(node);
-        grid_pos_debug(node->label, &game->terrain, node_world(node));
-        /* mat4_print(node->mat); */
+                node->pos[2],
+                node->orientation[0],
+                node->orientation[1],
+                node->orientation[2],
+                node->orientation[3]
+              );
+        struct spherical *cam = &game->test_resources.orbit_camera.coords;
+        debug("camera settings radius %f inc %f azimuth %f\n",
+              cam->radius, cam->inclination, cam->azimuth);
     }
 }
 
@@ -182,7 +187,7 @@ void resize_fbos(struct entity *player, struct fbo *shadow_buffer,
     }
 
     // TODO: compute better bounds based
-    const float factor = 5.5;
+    const float factor = 40.5;
 
     struct model *model   = get_model(&player->model_id); assert(model);
     struct geometry *geom = get_geometry(&model->geom_id); assert(geom);
@@ -190,15 +195,15 @@ void resize_fbos(struct entity *player, struct fbo *shadow_buffer,
     float left   = geom->min[0] - factor;
     float right  = geom->max[0] + factor;
     float bottom = geom->min[1] - factor;
-    float top    = geom->max[1] + factor/2.0;
+    float top    = geom->max[1] + factor;
 
     /* float left   = -factor; */
     /* float right  = factor; */
     /* float bottom = factor; */
     /* float top    = -factor; */
 
-    const float near = -5.0;
-    const float far = 5.0;
+    const float near = -50.0;
+    const float far = 50.0;
 
     // default ortho screenspace projection
     mat4_ortho(left, right, bottom, top, near, far, m4_ortho);
@@ -299,8 +304,8 @@ void orbit_update_from_mouse(struct orbit *camera, struct input *input,
 
     node_recalc(target_node);
     vec3_copy(node_world(target_node), target);
-    assert(player_geom->max[2] != 0);
-    vec3_add(target, V3(0.0, 0.0, player_geom->max[2]), target);
+    /* assert(player_geom->max[2] != 0); */
+    vec3_add(target, V3(0.0, 0.0, -15.0), target);
     /* vec3_add(target, V3(0.0, 0.0, 10.0), target); */
 
     float mx = 0.0, my = 0.0;
@@ -381,7 +386,7 @@ static void player_update(struct game *game, struct entity *player)
     orbit_update_from_mouse(camera, &game->input, game->user_settings.mouse_sens,
                             player, game->dt);
 
-    camera_keep_above_ground(&game->terrain, cam_node);
+    /* camera_keep_above_ground(&game->terrain, cam_node); */
 
     // move player camera toward camera orientation
     if (input_is_dragging(&game->input, SDL_BUTTON_RIGHT)) {
@@ -398,7 +403,8 @@ static void player_update(struct game *game, struct entity *player)
     float pen;
     vec3_copy(node_world(node), pos);
     /* debug("node_world(player) %f %f %f\n", pos[0], pos[1], pos[2]); */
-    struct tri *tri = collide_terrain(terrain, pos, move, &pen);
+    /* struct tri *tri = collide_terrain(terrain, pos, move, &pen); */
+    struct tri *tri = NULL;
     /* node_translate(node, move); */
 
     if (tri) {
@@ -416,14 +422,14 @@ static void player_update(struct game *game, struct entity *player)
     }
     else {
         static int tric = 0;
-        debug("%d no tri\n", tric++);
+        /* debug("%d no tri\n", tric++); */
     }
 
-    if (player->flags & ENT_ON_GROUND &&
-        (was_key_pressed_this_frame(game, SDL_SCANCODE_SPACE) ||
-         was_button_pressed_this_frame(game, SDL_CONTROLLER_BUTTON_X))) {
-        entity_jump(player, 2.0);
-    }
+    /* if (player->flags & ENT_ON_GROUND && */
+    /*     (was_key_pressed_this_frame(game, SDL_SCANCODE_SPACE) || */
+    /*      was_button_pressed_this_frame(game, SDL_CONTROLLER_BUTTON_X))) { */
+    /*     entity_jump(player, 2.0); */
+    /* } */
 
     /* debug("player velocity %f %f %f\n", */
     /*       player->velocity[0], */
@@ -433,7 +439,7 @@ static void player_update(struct game *game, struct entity *player)
     /* if (player->flags & ENT_AT_REST) */
     /*     vec3_scale(player->velocity, 0.00001, player->velocity); */
 
-    node_translate(node, player->velocity);
+    /* node_translate(node, player->velocity); */
     node_recalc(node);
 }
 
@@ -443,7 +449,7 @@ void update (struct game *game) {
 	static int toggle_fog = 0;
 	static int needs_terrain_update = 0;
 	struct resources *res          = &game->test_resources;
-    struct terrain   *terrain      = &game->terrain;
+    /* struct terrain   *terrain      = &game->terrain; */
 	struct node      *root         = get_node(&game->test_resources.root_id);
     struct entity    *player       = get_player(res);
     struct node      *pnode        = get_node(&player->node_id);

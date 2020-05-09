@@ -42,7 +42,7 @@ static void create_quad(geometry_id *id)
         .normals = quad_normals,
         .tex_coords = quad_uvs,
         .num_indices = ARRAY_SIZE(quad_indices),
-        .num_verts = ARRAY_SIZE(quad_vertices),
+        .num_verts = ARRAY_SIZE(quad_vertices)/3,
         .num_uv_components = 2
     };
     init_id(id);

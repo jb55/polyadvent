@@ -213,6 +213,7 @@ int node_count(struct node *node)
     return c;
 }
 
+
 void node_attach(struct resource_id *node_id, struct resource_id *to_id)
 {
     struct node *node = get_node(node_id);

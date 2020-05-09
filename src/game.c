@@ -35,14 +35,6 @@ bool was_button_pressed_this_frame(struct game *game, SDL_GameControllerButton b
     return is_button_down_on_frame(&game->input, button, game->frame);
 }
 
-static void camera_update(struct node *node) {
-  mat4 *persp = (float*)node->custom_update_data;
-  mat4 *mat = (float*)node->mat;
-
-  mat4_inverse(mat, mat);
-  mat4_multiply(persp, mat, mat);
-}
-
 struct entity *get_player(struct resources *res) {
     struct entity *player = get_entity(&res->player_id);
     assert(player);
@@ -103,7 +95,7 @@ void init_misc(struct game *game, int width, int height) {
     game->quit = 0;
     game->frame = 0;
 
-    const double size = 5000.0;
+    const double size = 4000.0;
     double scale = 0.03;
 
     terrain->settings = (struct perlin_settings){
@@ -144,9 +136,9 @@ void init_misc(struct game *game, int width, int height) {
     light_dir[1] = 0.8;
     light_dir[2] = 0.8;
 
-    res->sun_color[0] = 1.0;
-    res->sun_color[1] = 0.9;
-    res->sun_color[2] = 0.8;
+    res->piece_color[0] = 1.0;
+    res->piece_color[1] = 1.0;
+    res->piece_color[2] = 1.0;
 
     res->sun_color[0] = 0.5;
     res->sun_color[1] = 0.6;

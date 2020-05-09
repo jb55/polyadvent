@@ -19,14 +19,6 @@
 
 #define MAX_PROGRAMS 12
 
-enum program_type {
-  DEFAULT_PROGRAM,
-  TERRAIN_PROGRAM,
-  UI_PROGRAM,
-  SKYBOX_PROGRAM,
-  NUM_PROGRAMS,
-};
-
 /*
  * Global data used by our render callback:
  * NOTE: just for testing right now
@@ -51,6 +43,7 @@ struct resources {
 		GLint mvp;
 		GLint normal_matrix;
 		GLint sky_intensity;
+		GLint piece_color;
 		GLint sun_color;
 		GLint time;
 		GLint view_proj;
@@ -72,6 +65,7 @@ struct resources {
 
     struct skybox skybox;
 	float sun_color[3];
+	float piece_color[3];
 	float test_mvp[MAT4_ELEMS];
 	float light_dir[3];
 	float light_intensity;

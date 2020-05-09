@@ -64,7 +64,7 @@ void init_terrain(struct terrain *terrain, float size) {
 
     assert(terrain->entity_id.index == 0);
 
-    model->shading = SHADING_TERRAIN;
+    model->shader = TERRAIN_PROGRAM;
     node_set_label(node, "terrain");
     ent->flags &= ~ENT_CASTS_SHADOWS;
 
@@ -255,7 +255,7 @@ void create_terrain(struct terrain *terrain, float scale, int seed) {
         // clamp height at edge
 
         double d = distance_to_closest_edge(size, x, y);
-        z *= d / (size/2.0);
+        z *= (d / (size/2.0)) * 2.0;
 
         struct terrain_cell *cell =
             index_terrain_cell(terrain, grid_x, grid_y);

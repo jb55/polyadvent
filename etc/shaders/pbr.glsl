@@ -40,7 +40,7 @@ vec3 fresnel_schlick(float cos_theta, vec3 F0)
 }
 
 vec3 pbr(vec3 albedo, vec3 V, vec3 normal) {
-    const float ao = 12.0;
+    const float ao = 15.0;
     const float metallic = 0.6;
     const float exposure = 0.05;
     const float roughness = 0.6;

@@ -13,7 +13,6 @@
 #include "quickhull.h"
 #include "render.h"
 #include "scene.h"
-#include "slab_geom.h"
 #include "slab.h"
 #include "terrain.h"
 #include "uniform.h"
@@ -30,9 +29,11 @@ int main(void)
 {
     int nsamples;
 
-    int seed = time(NULL);
+    /* int seed = time(NULL); */
+    /* int seed = 1588992474; */
+    int seed = 1589065328;
     /* int seed = 42; */
-    debug("seed %d\n", seed);
+    printf("seed %d\n", seed);
     srand(seed);
 
     struct game game;
@@ -43,7 +44,7 @@ int main(void)
     int height = 480;
     game_init(&game, width, height);
     /* reset_scene(&game); */
-    entity_test_scene(&game);
+    chess_scene(&game);
 
     check_gl();
     double last = hires_time_in_seconds();

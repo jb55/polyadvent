@@ -17,16 +17,20 @@
 
 typedef struct resource_id model_id;
 
-enum shading {
-    SHADING_TERRAIN,
-    SHADING_VERT_COLOR,
-    SHADING_UI,
+enum program_type {
+                   DEFAULT_PROGRAM,
+                   TERRAIN_PROGRAM,
+                   UI_PROGRAM,
+                   SKYBOX_PROGRAM,
+                   CHESS_PIECE_PROGRAM,
+                   NUM_PROGRAMS,
 };
+
 
 struct model {
     /* geometry_id geom_id; */
     geometry_id geom_id;
-    enum shading shading;
+    enum program_type shader;
     struct pose poses[MAX_POSES]; // TODO: separate animated_model buffer?
     int nposes;
     u32 texture;
