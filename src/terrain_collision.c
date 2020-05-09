@@ -176,6 +176,8 @@ struct tri *collide_terrain(struct terrain *terrain, float *pos, float *move, fl
     get_closest_verts(terrain, pos, queries, cells);
 
     for (int j = 0; j < ARRAY_SIZE(queries); j++) {
+        if (!queries[j].cell)
+            continue;
         int vind = queries[j].cell->verts_index[queries[j].cell_vert_index];
         struct vert_tris *vtris = &terrain->vtris[vind / 3];
 
