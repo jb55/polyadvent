@@ -27,29 +27,7 @@ struct resources {
 	struct vbo vertex_buffer, element_buffer, normal_buffer;
     struct fbo shadow_buffer;
 
-    struct gpu_program programs[NUM_PROGRAMS];
-
-	struct uniforms {
-		GLint ambient_str;
-		GLint camera_position;
-		GLint depth_mvp;
-		GLint depth_vp;
-		GLint diffuse_on;
-		GLint fog_on;
-		GLint light_dir;
-		GLint light_intensity;
-		GLint model;
-		GLint model_view;
-		GLint mvp;
-		GLint normal_matrix;
-		GLint sky_intensity;
-		GLint piece_color;
-		GLint sun_color;
-		GLint time;
-		GLint view_proj;
-	} uniforms;
-
-	gpu_addr vertex_attrs[MAX_VERTEX_ATTRS];
+    struct gpu_program programs[MAX_PROGRAMS];
 
 	node_id root_id;
 	entity_id player_id;

@@ -86,7 +86,7 @@ void create_skybox(struct skybox *skybox, struct gpu_program *program) {
     make_shader(GL_FRAGMENT_SHADER, SHADER("skybox.f.glsl"), &frag);
     check_gl();
 
-    ok = make_program_from_shaders(shaders, 2, skybox->program);
+    ok = make_program("skybox", &vertex, &frag, skybox->program);
     assert(ok);
     check_gl();
 

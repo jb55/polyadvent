@@ -62,8 +62,33 @@ static const float bias_matrix[] = {
   0.5, 0.5, 0.5, 1.0
 };
 
-void
-init_gl(struct resources *resources, int width, int height) {
+static void add_attribute(struct gpu_program *program,
+                          const char *name,
+                          enum vertex_attr attr)
+{
+    int id = program->vertex_attrs[attr] =
+        (gpu_addr)glGetAttribLocation(program->handle, name);
+    /* assert(id != -1); */
+    check_gl();
+}
+
+static void add_uniform(struct gpu_program *program,
+                        const char *name,
+                        enum uniform_id id)
+{
+    struct uniform *var = &program->uniforms[id];
+    var->name = name;
+    var->id = id;
+    var->location = glGetUniformLocation(program->handle, var->name);
+    if (var->location == -1) {
+        debug("warn: could not find uniform location: %s in program %s\n",
+              var->name, program->name);
+    }
+    /* assert(var->location != -1); */
+    check_gl();
+}
+
+void init_gl(struct resources *resources, int width, int height) {
     struct shader vertex, terrain_vertex, chess_piece_vertex, terrain_geom, fragment, fragment_smooth;
     struct shader terrain_teval, terrain_tc;
     float tmp_matrix[16];
@@ -77,7 +102,8 @@ init_gl(struct resources *resources, int width, int height) {
     check_gl();
 
 	// Shaders
-	ok = make_shader(GL_VERTEX_SHADER, SHADER("vertex-color.glsl"), &vertex);
+	ok = make_shader(GL_VERTEX_SHADER, SHADER("vertex-color.glsl"),
+                     &vertex);
 	rtassert(ok, "vertex-color shader");
 
     ok = make_shader(GL_VERTEX_SHADER, SHADER("terrain.v.glsl"), &terrain_vertex);
@@ -102,113 +128,56 @@ init_gl(struct resources *resources, int width, int height) {
     struct shader *terrain_shaders[] =
         { &terrain_vertex, &fragment };
 
-    ok = make_program_from_shaders(terrain_shaders, ARRAY_SIZE(terrain_shaders),
-                                   &resources->programs[TERRAIN_PROGRAM]);
+    struct gpu_program *programs = resources->programs;
+    struct gpu_program *program;
 
+    ok = make_program("terrain", &terrain_vertex, &fragment,
+                      &programs[TERRAIN_PROGRAM]);
     // TODO: replace rtassert with error reporting/handling
 	rtassert(ok, "terrain program");
     check_gl();
 
-	ok = make_program(&vertex, &fragment, &resources->programs[DEFAULT_PROGRAM]);
+	ok = make_program("vertex-color", &vertex, &fragment, &programs[DEFAULT_PROGRAM]);
 	rtassert(ok, "vertex-color program");
     check_gl();
 
-	ok = make_program(&chess_piece_vertex, &fragment, &resources->programs[CHESS_PIECE_PROGRAM]);
+    program = &programs[CHESS_PIECE_PROGRAM];
+	ok = make_program("chess-piece", &chess_piece_vertex, &fragment, program);
 	rtassert(ok, "chess-piece program");
-    check_gl();
+    add_uniform(program, "piece_color", UNIFORM_PIECE_COLOR);
 
-    // Program variables
-    GLuint programs[] =
-        { resources->programs[TERRAIN_PROGRAM].handle
-        , resources->programs[DEFAULT_PROGRAM].handle
-        , resources->programs[CHESS_PIECE_PROGRAM].handle
-        };
+    struct uniform *var;
+    for (int i = 0; i < NUM_PROGRAMS; ++i) {
+        struct gpu_program *program = &programs[i];
+        if (program == NULL) {
+            debug("program %d is NULL\n", i);
+            continue;
+        }
 
-    // uniforms shared between all shaders
-    for (size_t i = 0; i < ARRAY_SIZE(programs); ++i) {
-        GLuint handle = programs[i];
+        if (program->name == NULL) {
+            debug("program %d name is NULL, not initialized?\n", i);
+            continue;
+        }
 
         // Program variables
-        resources->uniforms.camera_position =
-            glGetUniformLocation(handle, "camera_position");
-        check_gl();
+        add_uniform(program, "camera_position", UNIFORM_CAMERA_POSITION);
+        add_uniform(program, "depth_mvp", UNIFORM_DEPTH_MVP);
+        add_uniform(program, "light_intensity", UNIFORM_LIGHT_INTENSITY);
+        add_uniform(program, "sky_intensity", UNIFORM_SKY_INTENSITY);
+        add_uniform(program, "time", UNIFORM_TIME);
+        add_uniform(program, "light_dir", UNIFORM_LIGHT_DIR);
+        add_uniform(program, "sun_color", UNIFORM_SUN_COLOR);
+        add_uniform(program, "fog_on", UNIFORM_FOG_ON);
+        add_uniform(program, "model", UNIFORM_MODEL);
+        add_uniform(program, "mvp", UNIFORM_MVP);
+        add_uniform(program, "normal_matrix", UNIFORM_NORMAL_MATRIX);
 
-        // TODO: more flexible uniforms
-        resources->uniforms.piece_color = glGetUniformLocation(handle, "piece_color");
-        check_gl();
-
-        /* resources->uniforms.depth_vp = */
-        /*     glGetUniformLocation(handle, "depth_vp"); */
-        /* check_gl(); */
-
-        resources->uniforms.depth_mvp =
-            glGetUniformLocation(handle, "depth_mvp");
-        check_gl();
-        resources->uniforms.camera_position =
-            glGetUniformLocation(handle, "camera_position");
-        check_gl();
-
-
-        resources->uniforms.light_intensity =
-            glGetUniformLocation(handle, "light_intensity");
-        check_gl();
-
-        resources->uniforms.sky_intensity =
-            glGetUniformLocation(handle, "sky_intensity");
-        check_gl();
-
-        resources->uniforms.time =
-            glGetUniformLocation(handle, "time");
-        check_gl();
-
-        resources->uniforms.light_dir =
-            glGetUniformLocation(handle, "light_dir");
-        check_gl();
-
-        resources->uniforms.sun_color =
-            glGetUniformLocation(handle, "sun_color");
-        check_gl();
-
-        resources->uniforms.fog_on =
-            glGetUniformLocation(handle, "fog_on");
-        check_gl();
-
-        /* resources->uniforms.diffuse_on = */
-        /*     glGetUniformLocation(handle, "diffuse_on"); */
-        /* check_gl(); */
-
-        resources->uniforms.model =
-            glGetUniformLocation(handle, "model");
-        check_gl();
-
-        resources->uniforms.mvp =
-            glGetUniformLocation(handle, "mvp");
-        check_gl();
-
-        /* resources->uniforms.model_view = */
-        /*     glGetUniformLocation(handle, "model_view"); */
-
-        resources->uniforms.normal_matrix =
-            glGetUniformLocation(handle, "normal_matrix");
-        check_gl();
-
-        resources->vertex_attrs[va_normal] =
-            (gpu_addr)glGetAttribLocation(handle, "normal");
-        check_gl();
-
-        resources->vertex_attrs[va_position] =
-            (gpu_addr)glGetAttribLocation(handle, "position");
-        check_gl();
-
+        // Attributes
+        add_attribute(program, "normal", va_normal);
+        add_attribute(program, "position", va_position);
+        add_attribute(program, "color", va_color);
     }
 
-    // TODO: auto-generate these somehow?
-	resources->vertex_attrs[va_color] =
-        (gpu_addr)glGetAttribLocation(resources->programs[DEFAULT_PROGRAM]
-                                        .handle, "color");
-
-    /* assert(resources->attributes.color != 0xFFFFFFFF); */
-    check_gl();
 }
 
 
@@ -225,6 +194,34 @@ static void gamma_correct(float *c, float *d) {
     d[0] = powf(c[0], gamma);
     d[1] = powf(c[1], gamma);
     d[2] = powf(c[2], gamma);
+}
+
+static inline void uniform_3f(struct gpu_program *program,
+                              enum uniform_id id, const float *v3)
+{
+    glUniform3f(program->uniforms[id].location, v3[0], v3[1], v3[2]);
+    check_gl();
+}
+
+static inline void uniform_1i(struct gpu_program *program,
+                             enum uniform_id id, int i)
+{
+    glUniform1i(program->uniforms[id].location, i);
+    check_gl();
+}
+
+static inline void uniform_m4f(struct gpu_program *program,
+                               enum uniform_id id, float *m)
+{
+    glUniformMatrix4fv(program->uniforms[id].location, 1, 0, m);
+    check_gl();
+}
+
+static inline void uniform_1f(struct gpu_program *program,
+                              enum uniform_id id, float f)
+{
+    glUniform1f(program->uniforms[id].location, f);
+    check_gl();
 }
 
 void render (struct game *game, struct render_config *config) {
@@ -264,7 +261,7 @@ void render (struct game *game, struct render_config *config) {
     struct entity *entities =
         get_all_entities(&num_entities, NULL);
 
-    struct gpu_program *current_program = NULL;
+    struct gpu_program *program = NULL;
 
     mat4_inverse((float*)camera, view);
     mat4_multiply(projection, view, view_proj);
@@ -290,6 +287,8 @@ void render (struct game *game, struct render_config *config) {
         struct entity *entity = &entities[i];
         struct model *model = get_model(&entity->model_id);
         assert(model);
+        struct node *node = get_node(&entity->node_id);
+        assert(node);
 
         if (entity->flags & ENT_INVISIBLE)
             continue;
@@ -297,65 +296,41 @@ void render (struct game *game, struct render_config *config) {
         if (config->is_depth_pass && !(entity->flags & ENT_CASTS_SHADOWS))
             continue;
 
-        current_program = &game->test_resources.programs[model->shader];
+        program = &game->test_resources.programs[model->shader];
 
-        glUseProgram(current_program->handle);
+        glUseProgram(program->handle);
         check_gl();
 
-        glUniform3f(res->uniforms.camera_position,
-                    camera[M_X],
-                    camera[M_Y],
-                    camera[M_Z]);
-        check_gl();
+        uniform_3f(program, UNIFORM_CAMERA_POSITION, &camera[M_X]);
 
-        if (entity->flags & ENT_IS_WHITE)
-            glUniform3f(res->uniforms.piece_color, 0.9f, 0.9f, 0.9f);
-        else
-            glUniform3f(res->uniforms.piece_color, 0.2f, 0.2f, 0.2f);
-        check_gl();
+        if (model->shader == CHESS_PIECE_PROGRAM) {
+            if (entity->flags & ENT_IS_WHITE)
+                uniform_3f(program, UNIFORM_PIECE_COLOR, V3(0.9f, 0.9f, 0.9f));
+            else
+                uniform_3f(program, UNIFORM_PIECE_COLOR, V3(0.2f, 0.2f, 0.2f));
+        }
 
-        glUniform1i(res->uniforms.fog_on, res->fog_on);
-        check_gl();
-
-        glUniform3f(res->uniforms.light_dir, light[0], light[1], light[2]);
-        check_gl();
-
-        glUniform1f(res->uniforms.light_intensity, res->light_intensity);
-        check_gl();
-
-        glUniform1f(res->uniforms.sky_intensity, sky_intensity);
-        check_gl();
-
-        glUniform3f(res->uniforms.sun_color,
-                    res->sun_color[0],
-                    res->sun_color[1],
-                    res->sun_color[2]);
-        check_gl();
-
-        struct node *node = get_node(&entity->node_id);
-        assert(node);
-        if (node == NULL)
-            return;
+        uniform_1i(program, UNIFORM_FOG_ON, res->fog_on);
+        uniform_3f(program, UNIFORM_LIGHT_DIR, light);
+        uniform_1f(program, UNIFORM_LIGHT_INTENSITY, res->light_intensity);
+        uniform_1f(program, UNIFORM_SKY_INTENSITY, sky_intensity);
+        uniform_3f(program, UNIFORM_SUN_COLOR, res->sun_color);
 
         mat4_multiply(view_proj, node->mat, mvp);
         mat4_copy(node->mat, model_view);
         mat4_multiply(config->depth_vp, model_view, depth_mvp);
-        glUniformMatrix4fv(res->uniforms.depth_mvp, 1, 0, depth_mvp);
-        check_gl();
+        uniform_m4f(program, UNIFORM_DEPTH_MVP, depth_mvp);
+        uniform_m4f(program, UNIFORM_MVP, mvp);
+        uniform_m4f(program, UNIFORM_MODEL, node->mat);
 
-        glUniformMatrix4fv(res->uniforms.mvp, 1, 0, mvp);
-        check_gl();
-
-        glUniformMatrix4fv(res->uniforms.model, 1, 0, node->mat);
-        check_gl();
-
-        recalc_normals(res->uniforms.normal_matrix, model_view, normal_matrix);
+        recalc_normals(program->uniforms[UNIFORM_NORMAL_MATRIX].location,
+                       model_view, normal_matrix);
         check_gl();
 
         struct geometry *geo = get_geometry(&model->geom_id);
         /* debug("geo node %s\n", node->label); */
         assert(geo);
-        render_geometry(geo, res->vertex_attrs, current_program);
+        render_geometry(geo, program->vertex_attrs, program);
         check_gl();
     }
 

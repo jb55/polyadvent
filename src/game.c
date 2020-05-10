@@ -111,20 +111,16 @@ void init_misc(struct game *game, int width, int height) {
     };
 
     create_ui(&game->ui, width, height, &res->programs[UI_PROGRAM]);
-
     check_gl();
 
     init_terrain(terrain, size);
-    int seed;
     /* terrain->samples = load_samples(&seed, &terrain->n_samples); */
     terrain->n_samples = 0;
     create_terrain(terrain, size, game->seed);
     /* update_terrain(terrain, terrain->cell_size); */
-
     /* get_entity(&terrain->entity_id)->flags |= ENT_INVISIBLE; */
 
-    create_skybox(&res->skybox, &res->programs[SKYBOX_PROGRAM]);
-    /* node_translate(&res->skybox.node, V3(-100.0, -100.0, 0.0)); */
+    create_skybox(&res->skybox, &res->programs[SKYBOX_PROGRAM]); /* node_translate(&res->skybox.node, V3(-100.0, -100.0, 0.0)); */
     /* node_scale(&res->skybox.node, size/4.0); */
 
     mat4_id(mvp);

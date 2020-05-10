@@ -106,7 +106,7 @@ void create_ui(struct ui *ui, int width, int height, struct gpu_program *shader)
     ok = make_shader(GL_FRAGMENT_SHADER, SHADER("ui.f.glsl"), &fragment);
     assert(ok && "ui fragment shader");
 
-    ok = make_program(&vertex, &fragment, ui->shader);
+    ok = make_program("ui", &vertex, &fragment, ui->shader);
     assert(ok && "ui program");
 
     GLuint program = ui->shader->handle;

@@ -199,7 +199,8 @@ int reload_program(struct gpu_program *program) {
         return 2;
     }
 
-	ok = make_program_from_shaders(new_shaders_p, n_shaders, &new_program);
+	ok = make_program_from_shaders(program->name, new_shaders_p,
+                                   n_shaders, &new_program);
 
     if (!ok) {
         for (int i = 0; i < n_shaders; i++) {
@@ -214,16 +215,17 @@ int reload_program(struct gpu_program *program) {
 #endif
 
 int
-make_program(struct shader *vertex,
+make_program(const char *name,
+             struct shader *vertex,
              struct shader *fragment,
 	         struct gpu_program *program)
 {
     struct shader *shaders[] = { vertex, fragment };
-    return make_program_from_shaders(shaders, 2, program);
+    return make_program_from_shaders(name, shaders, 2, program);
 }
 
-int
-make_program_from_shaders(struct shader **shaders, int n_shaders, struct gpu_program *program)
+int make_program_from_shaders(const char *name, struct shader **shaders,
+                              int n_shaders, struct gpu_program *program)
 {
 	GLint program_ok;
 
@@ -231,6 +233,7 @@ make_program_from_shaders(struct shader **shaders, int n_shaders, struct gpu_pro
 	program->handle = glCreateProgram();
     check_gl();
     program->n_shaders = n_shaders;
+    program->name = name;
 
     assert(n_shaders <= MAX_SHADERS);
     for (int i = 0; i < n_shaders; i++) {

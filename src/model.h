@@ -18,12 +18,12 @@
 typedef struct resource_id model_id;
 
 enum program_type {
-                   DEFAULT_PROGRAM,
-                   TERRAIN_PROGRAM,
-                   UI_PROGRAM,
-                   SKYBOX_PROGRAM,
-                   CHESS_PIECE_PROGRAM,
-                   NUM_PROGRAMS,
+    DEFAULT_PROGRAM,
+    TERRAIN_PROGRAM,
+    UI_PROGRAM,
+    SKYBOX_PROGRAM,
+    CHESS_PIECE_PROGRAM,
+    NUM_PROGRAMS,
 };
 
 
