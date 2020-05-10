@@ -9,7 +9,7 @@
 #define MAX_SHADER_INCLUDES 16
 #define MAX_INCLUDE_FNAME_LEN 64
 #define MAX_SHADERS 5
-#define MAX_UNIFORMS 16
+#define MAX_UNIFORMS 32
 
 struct shader {
 	GLenum type;
