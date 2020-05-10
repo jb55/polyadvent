@@ -11,9 +11,9 @@ struct resource_manager geom_manager;
 void
 destroy_buffer_geometry(geometry_id *geom_id) {
     struct geometry *geom = get_geometry(geom_id);
-    gpu_addr buffers[n_vertex_attrs];
+    gpu_addr buffers[MAX_VERTEX_ATTRS];
 
-    for (int i = 0; i < n_vertex_attrs; i++)
+    for (int i = 0; i < MAX_VERTEX_ATTRS; i++)
         buffers[i] = geom->vbos[i].handle;
     /* void glDeleteVertexArrays(GLsizei n, const GLuint *arrays); */
     /* glDisableVertexAttribArray(geom->buffer.vertex_buffer.handle); */
@@ -32,7 +32,7 @@ destroy_buffer_geometry(geometry_id *geom_id) {
 
 void bind_geometry(struct geometry *geom, gpu_addr *vertex_attrs) {
     struct vbo *vbo;
-    for (int i = 0; i < n_vertex_attrs; i++) {
+    for (int i = 0; i < MAX_VERTEX_ATTRS; i++) {
         vbo = &geom->vbos[i];
         if (vbo->handle && vertex_attrs[i] != 0xFFFFFFFF) {
             bind_vbo(vbo, vertex_attrs[i], vbo->component_type);
@@ -91,7 +91,7 @@ void init_make_geometry(struct make_geometry *mkgeom) {
 void init_geometry(struct geometry *geom) {
     geom->has_vbos = 0;
 
-    for (int i = 0; i < n_vertex_attrs; i++)
+    for (int i = 0; i < MAX_VERTEX_ATTRS; i++)
         init_vbo(&geom->vbos[i]);
 
     geom->num_uv_components = 2;
@@ -203,7 +203,7 @@ void destroy_geometry(geometry_id *geom_id)
     struct geometry *geom = get_geometry(geom_id); assert(geom);
     struct vbo *vbo;
 
-    for (int i = 0; i < n_vertex_attrs; i++) {
+    for (int i = 0; i < MAX_VERTEX_ATTRS; i++) {
         vbo = &geom->vbos[i];
         if (vbo->handle)
             glDeleteBuffers(1, &vbo->handle);

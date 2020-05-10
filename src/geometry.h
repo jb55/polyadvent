@@ -14,7 +14,7 @@
 typedef struct resource_id geometry_id;
 
 struct geometry {
-    struct vbo vbos[n_vertex_attrs];
+    struct vbo vbos[MAX_VERTEX_ATTRS];
     float min[3];
     float max[3];
 

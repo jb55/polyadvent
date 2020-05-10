@@ -6,8 +6,6 @@
 
 typedef GLuint gpu_addr;
 
-#define VERT_ATTRS 6
-
 enum vertex_attr {
     va_position,
     va_normal,
@@ -16,7 +14,7 @@ enum vertex_attr {
     va_tex_coord,
     va_joint_ids,
     va_joint_weights,
-    n_vertex_attrs
+    MAX_VERTEX_ATTRS
 };
 
 struct vbo {

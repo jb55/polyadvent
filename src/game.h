@@ -49,7 +49,7 @@ struct resources {
 		GLint view_proj;
 	} uniforms;
 
-	gpu_addr vertex_attrs[n_vertex_attrs];
+	gpu_addr vertex_attrs[MAX_VERTEX_ATTRS];
 
 	node_id root_id;
 	entity_id player_id;

@@ -10,7 +10,7 @@
 struct skybox {
     struct gpu_program *program;
     model_id model_id;
-    gpu_addr attrs[n_vertex_attrs];
+    gpu_addr attrs[MAX_VERTEX_ATTRS];
     struct node node;
     struct {
         int mvp;
