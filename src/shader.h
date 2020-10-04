@@ -21,6 +21,16 @@ struct shader {
 	time_t load_mtime;
 };
 
+enum program_type {
+    DEFAULT_PROGRAM,
+    TERRAIN_PROGRAM,
+    UI_PROGRAM,
+    SKYBOX_PROGRAM,
+    CHESS_PIECE_PROGRAM,
+    NUM_PROGRAMS,
+};
+
+
 enum uniform_id {
     UNIFORM_AMBIENT_STR,
     UNIFORM_CAMERA_POSITION,
@@ -38,7 +48,7 @@ enum uniform_id {
     UNIFORM_SUN_COLOR,
     UNIFORM_TIME,
     UNIFORM_VIEW_PROJ,
-    UNIFORM_PIECE_COLOR,
+    UNIFORM_IS_WHITE,
     MAX_UNIFORMS
 };
 
@@ -57,11 +67,17 @@ struct gpu_program {
     const char *name;
 };
 
+void add_uniform(struct gpu_program *program, const char *name, enum uniform_id id);
+void add_attribute(struct gpu_program *program, const char *name, enum vertex_attr attr);
+
 #define NO_GEOM_SHADER NULL
 
-int reload_program(struct gpu_program *program);
+int reload_program(struct gpu_program *program, struct gpu_program *programs);
 int make_shader(GLenum type, const char *filename, struct shader *shader);
 
+void find_uniforms(struct gpu_program *programs);
+void find_program_uniforms(struct gpu_program *program,
+                           struct gpu_program *programs);
 void init_gpu_program(struct gpu_program *program);
 int make_program_from_shaders(const char *name,
                               struct shader **shaders,

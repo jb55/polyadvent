@@ -64,6 +64,7 @@ void render_geometry(struct geometry *geom, gpu_addr *vertex_attrs,
                        GL_UNSIGNED_INT,    /* type */
                        (void*)0            /* element array buffer offset */
                        );
+        /* printf("render_geometry %s\n", program->name); */
         check_gl();
     }
     else {

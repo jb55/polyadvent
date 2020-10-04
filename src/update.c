@@ -157,7 +157,7 @@ static int try_reload_shaders(struct resources *res) {
 	int ret;
     for (int i = 0; i < NUM_PROGRAMS; ++i) {
         struct gpu_program *program = &res->programs[i];
-        ret = reload_program(program);
+        ret = reload_program(program, res->programs);
 
         if (ret == 2) {}
         else if (ret == 1)

@@ -14,6 +14,20 @@
 
 //     return clouds;
 // }
+
+vec3 hemispherical(vec3 color, vec3 normal) {
+  vec4 v4_normal = vec4(normal , 1);
+  vec4 trans_normal = normal_matrix * v4_normal;
+
+  vec3 l = light_dir;
+  vec3 n = normalize(trans_normal.xyz);
+
+  float costheta = dot(l,n);
+
+  float a = 0.5 + (0.5 * costheta);
+  return a * light_intensity * color + (1.0-a) * vec3(0.0, 0.0, 0.0) * color;
+}
+
 const float PI = 3.14159265;
 
 vec3 gamma_correct(vec3 color) {

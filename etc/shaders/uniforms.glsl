@@ -14,4 +14,3 @@ uniform vec3 sun_color;
 uniform vec3 camera_position;
 uniform vec3 light_dir;
 
-uniform vec3 piece_color;

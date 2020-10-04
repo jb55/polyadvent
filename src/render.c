@@ -62,32 +62,6 @@ static const float bias_matrix[] = {
   0.5, 0.5, 0.5, 1.0
 };
 
-static void add_attribute(struct gpu_program *program,
-                          const char *name,
-                          enum vertex_attr attr)
-{
-    int id = program->vertex_attrs[attr] =
-        (gpu_addr)glGetAttribLocation(program->handle, name);
-    /* assert(id != -1); */
-    check_gl();
-}
-
-static void add_uniform(struct gpu_program *program,
-                        const char *name,
-                        enum uniform_id id)
-{
-    struct uniform *var = &program->uniforms[id];
-    var->name = name;
-    var->id = id;
-    var->location = glGetUniformLocation(program->handle, var->name);
-    if (var->location == -1) {
-        debug("warn: could not find uniform location: %s in program %s\n",
-              var->name, program->name);
-    }
-    /* assert(var->location != -1); */
-    check_gl();
-}
-
 void init_gl(struct resources *resources, int width, int height) {
     struct shader vertex, terrain_vertex, chess_piece_vertex, terrain_geom, fragment, fragment_smooth;
     struct shader terrain_teval, terrain_tc;
@@ -125,9 +99,6 @@ void init_gl(struct resources *resources, int width, int height) {
 			 5000,
 			 resources->proj_persp);
 
-    struct shader *terrain_shaders[] =
-        { &terrain_vertex, &fragment };
-
     struct gpu_program *programs = resources->programs;
     struct gpu_program *program;
 
@@ -141,43 +112,12 @@ void init_gl(struct resources *resources, int width, int height) {
 	rtassert(ok, "vertex-color program");
     check_gl();
 
+
     program = &programs[CHESS_PIECE_PROGRAM];
 	ok = make_program("chess-piece", &chess_piece_vertex, &fragment, program);
 	rtassert(ok, "chess-piece program");
-    add_uniform(program, "piece_color", UNIFORM_PIECE_COLOR);
 
-    struct uniform *var;
-    for (int i = 0; i < NUM_PROGRAMS; ++i) {
-        struct gpu_program *program = &programs[i];
-        if (program == NULL) {
-            debug("program %d is NULL\n", i);
-            continue;
-        }
-
-        if (program->name == NULL) {
-            debug("program %d name is NULL, not initialized?\n", i);
-            continue;
-        }
-
-        // Program variables
-        add_uniform(program, "camera_position", UNIFORM_CAMERA_POSITION);
-        add_uniform(program, "depth_mvp", UNIFORM_DEPTH_MVP);
-        add_uniform(program, "light_intensity", UNIFORM_LIGHT_INTENSITY);
-        add_uniform(program, "sky_intensity", UNIFORM_SKY_INTENSITY);
-        add_uniform(program, "time", UNIFORM_TIME);
-        add_uniform(program, "light_dir", UNIFORM_LIGHT_DIR);
-        add_uniform(program, "sun_color", UNIFORM_SUN_COLOR);
-        add_uniform(program, "fog_on", UNIFORM_FOG_ON);
-        add_uniform(program, "model", UNIFORM_MODEL);
-        add_uniform(program, "mvp", UNIFORM_MVP);
-        add_uniform(program, "normal_matrix", UNIFORM_NORMAL_MATRIX);
-
-        // Attributes
-        add_attribute(program, "normal", va_normal);
-        add_attribute(program, "position", va_position);
-        add_attribute(program, "color", va_color);
-    }
-
+    find_uniforms(programs);
 }
 
 
@@ -304,10 +244,8 @@ void render (struct game *game, struct render_config *config) {
         uniform_3f(program, UNIFORM_CAMERA_POSITION, &camera[M_X]);
 
         if (model->shader == CHESS_PIECE_PROGRAM) {
-            if (entity->flags & ENT_IS_WHITE)
-                uniform_3f(program, UNIFORM_PIECE_COLOR, V3(0.9f, 0.9f, 0.9f));
-            else
-                uniform_3f(program, UNIFORM_PIECE_COLOR, V3(0.2f, 0.2f, 0.2f));
+            uniform_1i(program, UNIFORM_IS_WHITE,
+                       (entity->flags & ENT_IS_WHITE) == ENT_IS_WHITE);
         }
 
         uniform_1i(program, UNIFORM_FOG_ON, res->fog_on);

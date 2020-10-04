@@ -149,8 +149,80 @@ void init_gpu_program(struct gpu_program *program) {
     memset(program, 0, sizeof(*program));
 }
 
+void add_attribute(struct gpu_program *program, const char *name,
+                   enum vertex_attr attr)
+{
+    program->vertex_attrs[attr] =
+        (gpu_addr)glGetAttribLocation(program->handle, name);
+    check_gl();
+}
+
+void add_uniform(struct gpu_program *program,
+                 const char *name,
+                 enum uniform_id id)
+{
+    struct uniform *var = &program->uniforms[id];
+    var->name = name;
+    var->id = id;
+    var->location = glGetUniformLocation(program->handle, var->name);
+    if (var->location == -1) {
+        debug("warn: could not find uniform location: %s in program %s\n",
+              var->name, program->name);
+    }
+    /* assert(var->location != -1); */
+    check_gl();
+}
+
+void find_program_uniforms(struct gpu_program *program,
+                           struct gpu_program *programs)
+{
+    // Program variables
+    add_uniform(program, "camera_position", UNIFORM_CAMERA_POSITION);
+    add_uniform(program, "depth_mvp", UNIFORM_DEPTH_MVP);
+    add_uniform(program, "light_intensity", UNIFORM_LIGHT_INTENSITY);
+    add_uniform(program, "sky_intensity", UNIFORM_SKY_INTENSITY);
+    add_uniform(program, "time", UNIFORM_TIME);
+    add_uniform(program, "light_dir", UNIFORM_LIGHT_DIR);
+    add_uniform(program, "sun_color", UNIFORM_SUN_COLOR);
+    add_uniform(program, "fog_on", UNIFORM_FOG_ON);
+    add_uniform(program, "model", UNIFORM_MODEL);
+    add_uniform(program, "mvp", UNIFORM_MVP);
+    add_uniform(program, "normal_matrix", UNIFORM_NORMAL_MATRIX);
+
+    // Attributes
+    add_attribute(program, "normal", va_normal);
+    add_attribute(program, "position", va_position);
+    add_attribute(program, "color", va_color);
+
+    // chess stuff
+    if (program == &programs[CHESS_PIECE_PROGRAM]) {
+        add_uniform(program, "is_white",
+                    UNIFORM_IS_WHITE);
+    }
+}
+
+void find_uniforms(struct gpu_program *programs)
+{
+    for (int i = 0; i < NUM_PROGRAMS; ++i) {
+        struct gpu_program *program = &programs[i];
+        if (program == NULL) {
+            debug("program %d is NULL\n", i);
+            continue;
+        }
+
+        if (program->name == NULL) {
+            debug("program %d name is NULL, not initialized?\n", i);
+            continue;
+        }
+
+        find_program_uniforms(program, programs);
+    }
+
+}
+
 #ifdef DEBUG
-int reload_program(struct gpu_program *program) {
+int reload_program(struct gpu_program *program,
+                   struct gpu_program *programs) {
 	int ok;
 
     int n_shaders = program->n_shaders;
@@ -210,6 +282,8 @@ int reload_program(struct gpu_program *program) {
     }
 
     *program = new_program;
+
+    find_program_uniforms(program, programs);
     return 1;
 }
 #endif

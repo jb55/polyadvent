@@ -31,13 +31,14 @@ vec3 reflect_env(vec3 vert_pos) {
 //     return color;
 // }
 
+
 void main() {
   vec3 V = camera_position - vertex.position;
   vec4 v4_pos = vec4(vertex.position, 1.0);
   vec4 v4_normal = vec4(vertex.normal, 1.0);
 
   // vec3 color = standard_light(vertex.color, v4_pos, v4_normal);
-  // vec3 color = reflect_env(vertex.position);
+  // vec3 color = reflect_env(vertex.color);
   vec3 color = pbr(vertex.color, normalize(V), vertex.normal);
 
   if (fog_on) {
